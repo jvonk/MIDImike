@@ -19,8 +19,8 @@ before_install:
       arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --install-boards esp8266:esp8266;
       arduino --pref "boardsmanager.additional.urls=" --save-prefs;
     fi
-  - arduino --install-library "Adafruit ST7735 Library";
-  - arduino --install-library "Adafruit GFX Library";
+  - arduino --install-library "Adafruit ST7735 Library"
+  - arduino --install-library "Adafruit GFX Library"
   - findAndReplace() { sed -i'' -e"s|$1|$2|g" "$3"; }
   - buildExampleSketch() {
       EXAMPLE_SKETCH=$PWD/$1/$1.ino;
