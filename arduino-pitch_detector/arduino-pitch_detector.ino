@@ -11,7 +11,7 @@
  *
  * Platform: Arduino UNO R3 using Arduino IDE
  * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- * Tested with: Arduino IDE 1.6.12, board package arduino avr 1.6.13, Arduino/Genuino UNO R3
+ * Tested with: Arduino IDE 1.6.12, board package arduino avr 1.6.14, Arduino/Genuino UNO R3
  *
  * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
  * (c) Copyright 2015-2016, Johan Vonk

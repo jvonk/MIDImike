@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="microphone.cpp" />
+    <ClCompile Include="midifile.cpp" />
+    <ClCompile Include="segmentbuf.cpp" />
+    <ClCompile Include="midiserial.cpp" />
+    <ClCompile Include="pianoroll.cpp" />
+    <ClCompile Include="frequency.cpp" />
+    <ClCompile Include="debug.cpp" />
+    <ClCompile Include="segment.cpp" />
+    <ClCompile Include="staff.cpp" />
+    <ClCompile Include="staffsymbol.cpp" />
+    <ClCompile Include="sddir.cpp" />
+    <ClCompile Include="wave.cpp" />
+    <ClCompile Include="pitch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="adc_t.h" />
+    <ClInclude Include="microphone.h" />
+    <ClInclude Include="cbuf.h" />
+    <ClInclude Include="coordinate_t.h" />
+    <ClInclude Include="midifile.h" />
+    <ClInclude Include="midiserial.h" />
+    <ClInclude Include="midi_t.h" />
+    <ClInclude Include="segmentbuf.h" />
+    <ClInclude Include="pianoroll.h" />
+    <ClInclude Include="frequency.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="debug.h" />
+    <ClInclude Include="segment.h" />
+    <ClInclude Include="segment_t.h" />
+    <ClInclude Include="staff.h" />
+    <ClInclude Include="staffsymbol.h" />
+    <ClInclude Include="sample_t.h" />
+    <ClInclude Include="sddir.h" />
+    <ClInclude Include="wave.h" />
+    <ClInclude Include="pitch.h" />
+    <ClInclude Include="pitch_t.h" />
+    <ClInclude Include="mapping.h" />
+    <ClInclude Include="sandbox\endian.h" />
+    <ClInclude Include="__vm\.src.vsarduino.h" />
+    <ClInclude Include="__vm\.src (github).vsarduino.h" />
+    <ClInclude Include="__vm\.arduino-pitch_detector.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="arduino-pitch_detector.ino" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sddir.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frequency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pianoroll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="staff.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="staffsymbol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cbuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="segment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sample_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="segment_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="coordinate_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="segmentbuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="microphone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adc_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="midi_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="midifile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="midiserial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sddir.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frequency.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pianoroll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="staff.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="staffsymbol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="segment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="segmentbuf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="microphone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="midifile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="midiserial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

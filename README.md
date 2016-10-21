@@ -1,4 +1,4 @@
-# arduino-pitch_detector
+# arduino-pitch_detector  [![Build Status](https://travis-ci.org/cvonk/arduino-pitch_detector.svg)](https://travis-ci.org/cvonk/arduino-pitch_detector)
 ## Pitch Detection on Arduino using Autocorrelation
 
 While playing my clarinet, I realized that it would be fun to hear other instruments playing alongside me. Instruments like guitar, piano or even a choir. It would also be nice if the melodies could be transcribed on paper. All existing solutions to these problems require a bulky computer or a cell phone. I realized that creating this compact device would combine my interest for music with my passion for engineering and math.
