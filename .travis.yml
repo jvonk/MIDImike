@@ -19,8 +19,7 @@ before_install:
       arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --install-boards esp8266:esp8266;
       arduino --pref "boardsmanager.additional.urls=" --save-prefs;
     fi
-  - mkdir $HOME/.arduino15
-  - wget http://downloads.arduino.cc/libraries/library_index.json -O $HOME/.arduino15/library_index.json
+  - arduino --pref "boardsmanager.additional.urls=https://adafruit.github.io/arduino-board-index/package_adafruit_index.json" --save-prefs
   - arduino --install-library "Adafruit ST7735 Library"
   - arduino --install-library "Adafruit GFX Library"
   - findAndReplace() { sed -i'' -e"s|$1|$2|g" "$3"; }
