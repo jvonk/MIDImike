@@ -15,6 +15,8 @@ before_install:
   - tar xf arduino-$IDE_VERSION-linux64.tar.xz
   - mv arduino-$IDE_VERSION $HOME/arduino-ide
   - export PATH=$PATH:$HOME/arduino-ide
+  - mkdir $HOME/.arduino15
+  - wget http://downloads.arduino.cc/libraries/library_index.json -O $HOME/.arduino15/library_index.json
   - if [[ "$BOARD" =~ "esp8266:esp8266:" ]]; then
       arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --install-boards esp8266:esp8266;
       arduino --pref "boardsmanager.additional.urls=" --save-prefs;
@@ -22,10 +24,10 @@ before_install:
   - arduino --pref "boardsmanager.additional.urls=https://adafruit.github.io/arduino-board-index/package_adafruit_index.json" --save-prefs
   - arduino --install-library "Adafruit ST7735 Library"
   - arduino --install-library "Adafruit GFX Library"
+#  - git clone https://github.com/Links2004/arduinoWebSockets $HOME/Arduino/libraries/WebSockets
   - findAndReplace() { sed -i'' -e"s|$1|$2|g" "$3"; }
   - buildExampleSketch() {
       EXAMPLE_SKETCH=$PWD/$1/$1.ino;
-
       if [[ "$BOARD" =~ "esp8266:esp8266:" ]]; then
         findAndReplace WiFi101 ESP8266WiFi $EXAMPLE_SKETCH;
         findAndReplace WiFiSSLClient WiFiClientSecure $EXAMPLE_SKETCH;
@@ -33,7 +35,6 @@ before_install:
       fi
 
       cat $EXAMPLE_SKETCH;
-
       arduino --verbose-build --verify --board $BOARD $EXAMPLE_SKETCH;
     }
 install:
