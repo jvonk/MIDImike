@@ -12,4 +12,4 @@ The implementation is in C++ and uses an Arduino, breadboard, microphone and dis
 
 Continue reading at [http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252](http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252)
 
-(c) Copyright 2015-2016, Johan Vonk
+(c) Copyright 2015-2018, Johan Vonk
