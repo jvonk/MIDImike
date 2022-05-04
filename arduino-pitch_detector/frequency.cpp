@@ -1,18 +1,31 @@
 /**
  * @brief Frequency detector, using auto correlation to find frequency (f0) in signal
- * @file  frequency.cpp
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
+ * 
+ * © Copyright 2015-2016,2022 Johan Vonk
+ * 
+ * This file is part of Arduino_pitch-detector.
+ * 
+ * Arduino_pitch-detector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ * 
+ * Arduino_pitch-detector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with Arduino_pitch-detector. If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
 #include <Arduino.h>
 #include <stdint.h>
 #include <limits.h>
+
 #include "config.h"
 #include "debug.h"
 #include "microphone.h"
@@ -31,7 +44,7 @@ namespace {
 
 	 // Calculate auto correlation for "lag"
 
-	INLINE autoCorr_t const                 // (normalized) auto correlation result
+	INLINE autoCorr_t                       // (normalized) auto correlation result
 	_autoCorr( samples_t const    samples,  // pointer to signed 8-bit data samples
 		       samplesLag_t const lag )     // [in] lag
 	{
@@ -48,7 +61,7 @@ namespace {
 		return ac;
 	}
 
-	INLINE float const                 // returns interpolated peak adjustment compared to peak location
+	INLINE float                             // returns interpolated peak adjustment compared to peak location
 	_quadInterpAdj( autoCorr_t const left,   // sample value left of the peak
 	                autoCorr_t const mid,    // sample value at the peak
 					autoCorr_t const right ) // sample value right of the peak
@@ -65,7 +78,7 @@ namespace {
 #define INTERPOLATE (1)
 #define NORMALIZE (0)
 
-frequency_t const                                 // returns frequency found, 0 when not found [out]
+frequency_t                                       // returns frequency found, 0 when not found [out]
 Frequency::calculate( samples_t const  samples )  // pointer to signed 8-bit data samples [in]
 {
 	float period = 0;

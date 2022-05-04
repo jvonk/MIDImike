@@ -1,13 +1,25 @@
 /** 
  * @brief Asynchronous microphone driver
- * @file  microphone.cpp
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015, Coert Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
+ * 
+ * © Copyright 2015-2016,2022 Johan Vonk
+ * 
+ * This file is part of Arduino_pitch-detector.
+ * 
+ * Arduino_pitch-detector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ * 
+ * Arduino_pitch-detector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with Arduino_pitch-detector. If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
 #include <Arduino.h>
@@ -84,7 +96,7 @@ Microphone::begin( uint8_t const port )
 }
 
 
-samples_t const            // returns pointer to where new samples will be stored if successful
+void
 Microphone::update( void )
 {
     // init private date for ISR (so we don't have to test for ii==0 inside the ISR)
@@ -110,23 +122,22 @@ Microphone::update( void )
         ADCSRA_IRQ_ENABLE |
         ADCSRA_CONVERT_ENABLE |
         ADCSRA_CONVERT_START;
-
-    return 0;
 }
 
 
 // Get Samples
 
-samples_t const               // returns pointer to array of data samples, NULL on failure
+samples_t               // returns pointer to array of data samples, NULL on failure
 Microphone::getSamples( amplitude_t * const amplitudePtr )
 {
 
-        // wait until all samples are available
+    // wait until all samples are available
 
     while ( ADCSRA & ADCSRA_IRQ_ENABLE ) {
     }
 
 #if SHOW_SAMPLES
+# define SAMPLE_COUNT (5)
     _plotSamples ( fv.samples, SAMPLE_COUNT );
 #endif
     ::isr_t volatile * const isr = &_isr;
@@ -135,6 +146,7 @@ Microphone::getSamples( amplitude_t * const amplitudePtr )
     amplitude_t amplitude = (int16_t)isr->range.max - isr->range.min; // top-top [0..255]
 
     *amplitudePtr = amplitude/2; // range [0..127]
+
     return (amplitude / 2 > Config::AUDIBLE_THRESHOLD) && !clipping ? fv.samples : NULL;
 }
 
@@ -146,7 +158,7 @@ Microphone::getSamples( amplitude_t * const amplitudePtr )
 ISR ( ADC_vect )
 {
     ::isr_t volatile * const isr = &_isr;
-    char const s = ADCH + SCHAR_MIN;  // remove voltage bias by changing range from [0..255] to [-128..127]
+    sample_t const s = ADCH + SCHAR_MIN;  // remove voltage bias by changing range from [0..255] to [-128..127]
 
         // update min and max, so peak-to-peak value can be determined
     if ( isr->ii == 0 ) {

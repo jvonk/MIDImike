@@ -1,18 +1,31 @@
 /**
  * @brief Pitch Class, maps between frequency and note pitch
- * @file pitch.cpp
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
+ * 
+ * © Copyright 2015-2016,2022 Johan Vonk
+ * 
+ * This file is part of Arduino_pitch-detector.
+ * 
+ * Arduino_pitch-detector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ * 
+ * Arduino_pitch-detector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with Arduino_pitch-detector. If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
 #include <Arduino.h>
 #include <stdint.h>
 #include <string.h>
+
 #include "config.h"
 #include "pitch.h"
 
@@ -118,7 +131,7 @@ Pitch::Pitch( noteNr_t const number,    // note# with the octave
 }
 
 
-char const * const
+char const *
 Pitch::getShortName( void ) const
 {
 	int const idx = static_cast<int>(cv.noteNr);
@@ -175,7 +188,7 @@ Pitch::serialOut( char const * const  instrument,   // instrument name
 #endif
 
 
-frequency_t const
+frequency_t
 Pitch::getFrequency( void ) const
 {
 	uint8_t const notesCnt = sizeof(_notes) / sizeof(_notes[0]);
@@ -196,25 +209,25 @@ Pitch::getFrequency( void ) const
 }
 
 
-noteNr_t const
+noteNr_t
 Pitch::getNoteNr( void ) const
 {
 	return cv.noteNr;
 }
 
-octaveNr_t const
+octaveNr_t
 Pitch::getOctaveNr( void ) const
 {
 	return cv.octaveNr;
 }
 
-segmentPitch_t const
+segmentPitch_t
 Pitch::getPitch( void ) const
 {
 	return cv.octaveNr * 12 + static_cast<segmentPitch_t>(cv.noteNr);
 }
 
-segmentPitch_t const
+segmentPitch_t
 Pitch::freq2pitch( frequency_t const freq )  // returns the midi pitch for a given frequency
 {
 	return freq < Config::FREQ_MIN ? 0 : 69.0 + 12.0 * log( freq / 440.0 ) / log( 2 );

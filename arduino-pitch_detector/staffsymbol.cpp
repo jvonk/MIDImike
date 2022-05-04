@@ -1,22 +1,35 @@
 /**
  * @brief Show symbol on staff
- * @file staffsymbol.cpp
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
  *
  * Implementation:
  *   Enclosed bmp2c converts Microsoft Bitmap (.bmp) to C-style array
+ * 
+ * © Copyright 2015-2016,2022 Johan Vonk
+ * 
+ * This file is part of Arduino_pitch-detector.
+ * 
+ * Arduino_pitch-detector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ * 
+ * Arduino_pitch-detector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with Arduino_pitch-detector. If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
 #include <Arduino.h>
 #include <stdint.h>
 #include <Adafruit_GFX.h>    // core graphics
 #include <Adafruit_ST7735.h> // hardware-specific graphics
+
 #include "config.h"
 #include "pitch.h"
 #include "staffsymbol.h"

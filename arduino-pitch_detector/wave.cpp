@@ -1,15 +1,6 @@
 /**
  * @brief Read WAV audio files
- * @file wave.cpp
- * $Id: wave.cpp 336 2015-03-18 20:11:03Z cvonk $
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
- *
+ * 
  * Supports WAV files in 8-bit mono PCM.  Use SoX to transcode sound files to this format.
  *
  * Implementation details:
@@ -19,11 +10,32 @@
  *     http://frhed.sourceforge.net/en/
  *   Samples can be downloaded from the Univ of Iowa Electronic Music Studios
  *     http://theremin.music.uiowa.edu/index.html
+ * 
+ * © Copyright 2014, 2019, 2022, Coert Vonk
+ * 
+ * This file is part of Arduino_pitch-detector.
+ * 
+ * Arduino_pitch-detector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ * 
+ * Arduino_pitch-detector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with Arduino_pitch-detector. If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: Copyright 2014,2019,2022 Coert Vonk
  **/
 
 #include <Arduino.h>
 #include <stdint.h>
 #include <limits.h>
+
 #include "config.h"
 #include "sample_t.h"
 #include "wave.h"
@@ -93,7 +105,7 @@ namespace {
 	 * Local functions
 	 *****************/
 
-	uint_least8_t const
+	uint_least8_t
 	_readBytes( File &         f,       // in: file to read from
 	 	        uint16_t const len,     // in: number of bytes to read
 				int16_t const  offset,  // in: offset to add to each byte
@@ -120,7 +132,7 @@ namespace {
 	 * Read/parse wave header
 	 ************************/
 
-uint_least8_t const                                  // returns 0 if successful
+uint_least8_t                                        // returns 0 if successful
 Wave::readHeader( File &               f,            // file to read from [in]
 				  sampleCnt_t * const  pSampleCnt )  // total number of samples in file [out]
 {
@@ -178,14 +190,14 @@ Wave::readHeader( File &               f,            // file to read from [in]
 	 * Read samples
 	 **************/
 
-uint_least8_t const                                 // returns 0 if successful
+uint_least8_t                                       // returns 0 if successful
 Wave::readSamples( File &             f,            // file to read from [in]
 				   sampleCnt_t const  nrOfSamples,  // number of samples to [in]
 				   samples_t          samples )     // samples read [out]
 {
 		// remove bias by changing values from [0..255] to [-128..127]
 
-	if (_readBytes(f, nrOfSamples, SCHAR_MIN, samples) != 0) {
+	if (_readBytes(f, nrOfSamples, SCHAR_MIN, (char *)samples) != 0) {
 		return 1;
 	}
 	return 0;

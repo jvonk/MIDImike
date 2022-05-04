@@ -1,16 +1,5 @@
-/**
- * @brief Assert handler / memory tools / ..
- * @file debug.h
- *
- * Platform: Arduino UNO R3 using Arduino IDE
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015, Coert Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
- **/
-
 #pragma once
+
 #include <Arduino.h>
 #include <stdint.h>
 
@@ -23,7 +12,7 @@ namespace Debug {
         assertPrint( char const * const func,
                      int const lineno );
 
-    unsigned int const
+    unsigned int
         getMemFree( void );
 
     void

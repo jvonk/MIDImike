@@ -10,6 +10,9 @@ The implementation is in C++ and uses an Arduino UNO, breadboard, microphone and
 
 The implementation is in C++ and uses an Arduino, breadboard, microphone and display.  It changes the sound wave to an electrical signal; uses autocorrelation to find frequency played; display frequency as note on screen while sending to a MIDI synthesizer.
 
-Continue reading at [http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252](http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252)
+2018: Tested with: Arduino/Genuino UNO R3, Arduino AVR Boards 1.6.14, Arduino IDE 1.6.12
+2022: Tested with: Arduino/Genuino UNO R3, Arduino AVR Boards 1.8.5, Adafruit BusIO 1.11.5, Adafruit ST7735 and ST7789 Library 1.9.3, Adafruit GFX Library 1.11.0, Arduino IDE 1.8.19, VS Code
 
-(c) Copyright 2015-2018, Johan Vonk
+Continue reading at [https://coertvonk.com/category/sw/arduino/pitch-detector](https://coertvonk.com/category/sw/arduino/pitch-detector)
+
+(c) Copyright 2015-2018,2022, Johan Vonk
