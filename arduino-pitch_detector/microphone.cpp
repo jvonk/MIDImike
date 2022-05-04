@@ -32,7 +32,6 @@
 #include "microphone.h"
 #include "adc_t.h"
 
-
 namespace {
 
     struct filevariables_t {
@@ -55,7 +54,6 @@ namespace {
         {SCHAR_MAX, SCHAR_MIN}
     };
 
-
 #if SHOW_SAMPLES
     void
     _plotSamples( samples_t const    samples,       // pointer to 8-bit data samples [in]
@@ -73,7 +71,6 @@ namespace {
     }
 #endif
 }
-
 
 void
 Microphone::begin( uint8_t const port )
@@ -95,15 +92,12 @@ Microphone::begin( uint8_t const port )
     Microphone::update();
 }
 
-
 void
 Microphone::update( void )
 {
     // init private date for ISR (so we don't have to test for ii==0 inside the ISR)
     ::isr_t volatile * const isr = &_isr;
     isr->ii = 0;
-    isr->range.min = SCHAR_MAX;
-    isr->range.max = SCHAR_MIN;
 
     // start gathering new samples
     // (no need to disable interrupts, after all this interrupt is off, and we're turning it on here)
@@ -131,9 +125,8 @@ samples_t               // returns pointer to array of data samples, NULL on fai
 Microphone::getSamples( amplitude_t * const amplitudePtr )
 {
 
-    // wait until all samples are available
-
     while ( ADCSRA & ADCSRA_IRQ_ENABLE ) {
+        // spin wait until all samples are available
     }
 
 #if SHOW_SAMPLES
@@ -149,7 +142,6 @@ Microphone::getSamples( amplitude_t * const amplitudePtr )
 
     return (amplitude / 2 > Config::AUDIBLE_THRESHOLD) && !clipping ? fv.samples : NULL;
 }
-
 
     /***************************
      * Interrupt Service Routine
