@@ -219,9 +219,12 @@ void
 setup()
 {
     Serial.begin( Config::SERIAL_RATE );
+#if 0    
     while ( !Serial ) {
         ; // wait until the serial port connects
     }
+#endif    
+
     //Serial.println( "setup()" );
 #if SRC == SRC_FILE
     if (SdDir::begin(SPI_SD_CS) != 0) {
