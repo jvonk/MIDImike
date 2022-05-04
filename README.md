@@ -14,8 +14,7 @@ This project creates a small, affordable and accurate device that listens to a m
 
 A short video of an early prototype
 
-[![demo_video](media/arduino.Still002.jpg)](https://www.youtube.com/watch?W_s_MojYlSE)
-
+<iframe width="560" height="315" src="https://www.youtube.com/embed/W_s_MojYlSE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Hardware
 
