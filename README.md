@@ -14,7 +14,7 @@ This project creates a small, affordable and accurate device that listens to a m
 
 A short video of an early prototype
 
-[![demo_video](media/arduino.Still002.jpg)](https://www.youtube.com/watch?W_s_MojYlSE)
+[![demo_video](media/arduino.Still002.jpg)](https://www.youtube.com/embed/W_s_MojYlSE)
 
 
 ## Hardware
