@@ -1,11 +1,21 @@
-# arduino-pitch_detector  [![Build Status](https://travis-ci.org/johanvonk/Arduino_Pitch-Detector.svg?branch=master)](https://travis-ci.org/johanvonk/arduino-pitch_detector)
+# arduino-pitch_detector
+
+[![GitHub Discussions](https://img.shields.io/github/discussions/johanvonk/Arduino_Pitch-Detector)](https://github.com/johanvonk/Arduino_Pitch-Detector/discussions)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/johanvonk/Arduino_Pitch-Detector)
+![GitHub](https://img.shields.io/github/license/johanvonk/Arduino_Pitch-Detector)
+
 ## Pitch Detection on Arduino using Autocorrelation
 
 While playing my clarinet, I realized that it would be fun to hear other instruments playing alongside me. Instruments like guitar, piano or even a choir. It would also be nice if the melodies could be transcribed on paper. All existing solutions to these problems require a bulky computer or a cell phone. I realized that creating this compact device would combine my interest for music with my passion for engineering and math.
 
-![Image](media/icon.jpg)
+![Image](media/breadboard.jpg)
 
 This project creates a small, affordable and accurate device that listens to a musical instrument and recognizes the notes played. It displays the music as a a clef or piano roll. These notes can then be sent to a synthesizer using MIDI. This allows musician to hear other instruments playing alongside with them, and allows them store their compositions.
+
+A short video of an early prototype
+
+[![demo_video](media/arduino.Still002.jpg)](https://www.youtube.com/watch?W_s_MojYlSE)
+
 
 ## Hardware
 
