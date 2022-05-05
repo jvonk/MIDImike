@@ -1,20 +1,10 @@
-/**
- * @brief Configuration, tweak to suit your needs, save memory or enable debugging
- * @file  config.h
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
- **/
-
 #pragma once
 
 #include "sample_t.h"
 #include "segment_t.h"
 #include "midi_t.h"
+
+#pragma GCC diagnostic error "-Wall"
 
 namespace Config {
     unsigned long const SERIAL_RATE = 31250;           // [baud], must be 31250 for USB-midi, 115200 for HairlessMIDI

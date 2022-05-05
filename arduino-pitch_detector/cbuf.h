@@ -1,12 +1,12 @@
 /**
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
+ * Documentation: https://coertvonk.com/category/sw/arduino/pitch-detector
  *
  *   Since this code originated from code which is public domain, I
  *   hereby declare this code to be public domain as well.
  *
  *   Derived more functionality from macros to C++ template.
  *   2015, Johan and Coert Vonk
- *   see http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
+ *   see https://coertvonk.com/category/sw/arduino/pitch-detector
  *
  *   loosely based on http://www.keil.com/download/docs/200.asp
  **/
@@ -126,7 +126,7 @@ public:
     // returns a pointer to the next entry to push
     //   use in conjunction with pushAdvanceIdx() to fill out an entry before indicating that it's
     //   available.
-    EntryType * const pushNextPtr()
+    EntryType * pushNextPtr()
     {
         return &entry[pushIdx & (size - 1)];
     }
@@ -141,13 +141,13 @@ public:
      *****/
 
     // returns entry at the tail (least recent)
-    EntryType const pop()
+    EntryType pop()
     {
         return entry[popIdx++ & (size - 1)];
     }
 
     // returns ptr to entry at the tail (least recent)
-    EntryType * const popPtr( void)
+    EntryType * popPtr( void)
     {
         return &(entry[popIdx++ & (size - 1)]);
     }
@@ -164,50 +164,50 @@ public:
      ******/
 
     // returns ptr to the n'th entry from the tail (least recent)
-    EntryType * const getTailPtr( IndexType const n)
+    EntryType * getTailPtr( IndexType const n)
     {
         return &entry[(popIdx + n) & (size - 1)];
     }
 
     // returns ptr to the n'th entry from the head (most recent)
-    EntryType * const getHeadPtr( IndexType const n)
+    EntryType * getHeadPtr( IndexType const n)
     {
         return &entry[(pushIdx - n - 1) & (size - 1)];
     }
 
     // returns the number of entries which are currently contained in the circular buffer
-    IndexType len() const
+    IndexType len()
     {
         return pushIdx - popIdx;
     }
 
     // determines if the circular buffer is empty.
-    bool isEmpty() const
+    bool isEmpty()
     {
         return len() == 0;
     }
     
     // determines if the circular buffer is full
-    bool isFull() const
+    bool isFull()
     {
         return len() == size;
     }
 
     // determines if the circular buffer is currently overflowed or underflowed
-    bool error() const
+    bool error()
     {
         return len() > size;
     }
 
 #if 0
     // retrieves the n'th entry from the tail (least recent)
-    EntryType getFromTail( IndexType const n ) const
+    EntryType getFromTail( IndexType const n )
     {
         return entry[(popIdx + n) & (size - 1)];
     }
 
     // retrieves the n'th entry from the head (most recent)
-    EntryType getFromHead( IndexType const n ) const
+    EntryType getFromHead( IndexType const n )
     {
         return entry[(pushIdx - n - 1) & (size - 1)];
     }

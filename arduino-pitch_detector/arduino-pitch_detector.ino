@@ -1,6 +1,6 @@
+
 /**
  * @brief Pitch Detector for Monophonic Musical Instruments using Arduino
- * @file  arduino-pitch_detector.ino
  *
  *                            /----------------------------\
  *                            |          Arduino           |
@@ -10,20 +10,35 @@
  *                            \----------------------------/
  *
  * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- * Tested with: Arduino IDE 1.6.12, board package arduino avr 1.6.14, Arduino/Genuino UNO R3
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
+ * Documentation: http://coertvonk.com/category/sw/arduino/pitch-detector
+ * 
+ * © Copyright 2015-2016,2022 Johan Vonk
+ * 
+ * This file is part of Arduino_pitch-detector.
+ * 
+ * Arduino_pitch-detector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ * 
+ * Arduino_pitch-detector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with Arduino_pitch-detector. If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
 // The Arduino build environment requires all compilation units to be listed as #include's
+#include <Arduino.h>
 #include <stdint.h>
 #include <limits.h>
-#include <SPI.h>
-#include <SD.h>
+#include <SD.h>               // https://www.arduino.cc/en/reference/SD
+#include <SPI.h>              // https://www.arduino.cc/en/reference/SPI
 #include <Adafruit_ST7735.h>  // if error, read "Toolchain" at above mentioned URL
 #include <Adafruit_GFX.h>     // if error, read "Toolchain" at above mentioned URL
 
@@ -204,9 +219,12 @@ void
 setup()
 {
     Serial.begin( Config::SERIAL_RATE );
+#if 0    
     while ( !Serial ) {
         ; // wait until the serial port connects
     }
+#endif    
+
     //Serial.println( "setup()" );
 #if SRC == SRC_FILE
     if (SdDir::begin(SPI_SD_CS) != 0) {
@@ -265,7 +283,7 @@ loop()
     float freq = Frequency::calculate( samples );
 
     // no longer need the samples, so reuse it and start gathering samples for next time around
-    (void)Microphone::update();  // async
+    Microphone::update();  // async
 
     // ignore notes under audible threshold (2BD: already done in getSamples())
     if ( amplitude < Config::AUDIBLE_THRESHOLD ) {

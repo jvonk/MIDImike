@@ -2,7 +2,7 @@
  * @brief Analog input driver for joystick on Adafruit 1.8" TFT shield
  * @file  joystick.h
  * $Id$
- * see http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
+ * see https://coertvonk.com/category/sw/arduino/pitch-detector
  *
  * (c) Copyright 2015 by Coert Vonk
  * All rights reserved.  Use of copyright notice does not imply publication.
@@ -12,6 +12,7 @@
 
 #include <Arduino.h>
 #include <stdint.h>
+
 #include "config.h"
 
 enum class JoystickState {

@@ -1,15 +1,3 @@
-/**
- * @brief Pitch Class, maps between frequency and note pitch
- * @file pitch.h
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
- **/
-
 #pragma once
 
 #include <Arduino.h>
@@ -29,11 +17,11 @@ public:
 	Pitch( frequency_t const freq );
 
 	// get
-	char const * const    getShortName( void ) const;  // get note name (w/o octave#)
-	octaveNr_t const      getOctaveNr( void ) const;   // get octave number
-	noteNr_t const        getNoteNr( void ) const;     // get note number
-	segmentPitch_t const  getPitch( void ) const;      // get midi pitch
-	frequency_t const     getFrequency( void ) const;  // get frequency
+	char const *    getShortName( void ) const;  // get note name (w/o octave#)
+	octaveNr_t      getOctaveNr( void ) const;   // get octave number
+	noteNr_t        getNoteNr( void ) const;     // get note number
+	segmentPitch_t  getPitch( void ) const;      // get midi pitch
+	frequency_t     getFrequency( void ) const;  // get frequency
 
 #if DST == DST_SERIAL
 	static void
@@ -46,7 +34,7 @@ public:
 				   amplitude_t const   amplitude );  // amplitude measured
 #endif
 
-	static segmentPitch_t const
+	static segmentPitch_t
 		freq2pitch( frequency_t const freq ); // calculate midi pitch from frequency
 
 private:

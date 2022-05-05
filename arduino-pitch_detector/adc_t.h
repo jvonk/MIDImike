@@ -1,18 +1,6 @@
-/**
- * @brief Atmel AtMega328 Analog to Digital converter type definitions
- * @file  adc_t.h
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Coert Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
- **/
-
 #pragma once
-#include <Arduino.h>
 
+#include <Arduino.h>
 
 /**********************
 * Atmel ATMega328P ADC
@@ -21,7 +9,7 @@
 *   http://www.atmel.com/images/Atmel-8271-8-bit-AVR-Microcontroller-ATmega48A-48PA-88A-88PA-168A-168PA-328-328P_datasheet_Complete.pdf
 */
 
-// 24.9.1 ADMUX – ADC Multiplexer Selection Register
+// 24.9.1 ADMUX ~ ADC Multiplexer Selection Register
 
 enum ADMUX_REFS_t {
     ADMUX_REFERENCE_EXT = 0,
@@ -42,7 +30,7 @@ enum ADMUX_MUX_t {
 };
 uint8_t const ADMUX_INPUT_MASK = 0x0F;
 
-// 24.9.2 ADCSRA – ADC Control and Status Register A
+// 24.9.2 ADCSRA ~ ADC Control and Status Register A
 
 enum ADCSRA_ADEN_t {
     ADCSRA_CONVERT_DISABLE = 0,
@@ -75,13 +63,13 @@ enum ADCSRA_ADPS_t {
     ADCSRA_PRESCALER_DIV128 = 7
 };
 
-// 24.9.3 ADCL and ADCH – The ADC Data Register
+// 24.9.3 ADCL and ADCH ~ The ADC Data Register
 
 /* with ADMUX_RESULT_RIGHT_ALIGN .. ADCH[1:0] = b9..b8, ADCL[7:0] = b7..b0 */
 /* with ADMUX_RESULT_LEFT_ALIGN ... ADCH[7:0] = b9..b2, ADCL[7:6] = b1..b0 */
 
 
-// 24.9.4 ADCSRB – ADC Control and Status Register B
+// 24.9.4 ADCSRB ~ ADC Control and Status Register B
 
 enum ADCSRB_ACME_t {  // see 23.3.1
     ADCSRB_MULTIPLEXER_DISABLE = 0,
@@ -98,7 +86,7 @@ enum ADCSRB_ADTS_t {
     ADCSRB_TRIGGERSRC_TC1_CAPTURE = 7
 };
 
-// 24.9.5 DIDR0 – Digital Input Disable Register 0
+// 24.9.5 DIDR0 ~ Digital Input Disable Register 0
 
 enum DIDR0_ADCxD_t {
     DIDR0_DISABLE_DIGBUF_0 = bit( 0 ),

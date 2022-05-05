@@ -1,19 +1,32 @@
 /**
  * @brief Show music notes on tremble clef
- * @file  staff.cpp
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
  *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
+ * © Copyright 2015-2016,2022 Johan Vonk
+ * 
+ * This file is part of Arduino_pitch-detector.
+ * 
+ * Arduino_pitch-detector is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ * 
+ * Arduino_pitch-detector is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with Arduino_pitch-detector. If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
 #include <Arduino.h>
 #include <stdint.h>
 #include <Adafruit_GFX.h>    // core graphics
 #include <Adafruit_ST7735.h> // hardware-specific graphics
+
 #include "config.h"
 #include "pitch.h"
 #include "staffsymbol.h"
@@ -85,8 +98,8 @@ namespace {
         vStaffPos_t max;
     };
 
-    vStaffPos_t const _nr2vStaffPos( noteNr_t const number, octaveNr_t const octave );
-    vStaffPos_t const _freq2vStaffPos( frequency_t const freq );
+    vStaffPos_t _nr2vStaffPos( noteNr_t const number, octaveNr_t const octave );
+    vStaffPos_t _freq2vStaffPos( frequency_t const freq );
 
     struct _position_t {
         _positionHiLo_t show;
@@ -123,14 +136,14 @@ namespace {
     }
 
 
-    INLINE bool const
+    INLINE bool
     _isFlat(noteNr_t const noteNr)
     {
         return _notes[static_cast<int>(noteNr)].flat;
     }
 
 
-    INLINE vStaffPos_t const
+    INLINE vStaffPos_t
     _nr2vStaffPos(noteNr_t const number,
                   octaveNr_t const octave)
     {
@@ -138,7 +151,7 @@ namespace {
         return staffPositionsInOctave * octave + _notes[static_cast<int>(number)].posInOctave;
     }
 
-    INLINE vStaffPos_t const
+    INLINE vStaffPos_t
     _freq2vStaffPos( frequency_t const freq )
     {
         segmentPitch_t const pitch = Pitch::freq2pitch( freq );
@@ -149,7 +162,7 @@ namespace {
 
 
     // horizontal staff position to screen x coordinate
-    INLINE int16_t const
+    INLINE int16_t
     _hStaffPos2x( int const n )
     {
         // 2BD: one could move the notes closer to each other as they shift to the left
@@ -157,16 +170,14 @@ namespace {
     }
 
 
-    vStaffPos_t const
+    vStaffPos_t
     _getVStaffPos(Pitch & pitch )
     {
         return _nr2vStaffPos( pitch.getNoteNr(), pitch.getOctaveNr() );
     }
 
-
-
     // position on staff to screen y coordinate
-    int16_t const
+    int16_t
     _vStaffPos2y( vStaffPos_t const n )
     {
         vStaffPos_t const distAbove1stNoteOnStaff = n - _position.staff.min;  // could be negative!
@@ -258,8 +269,9 @@ namespace {
 
 void
 Staff::showNote( Pitch &           pitch,        // note measured
-                 amplitude_t const amplitude )  // amplitude measured
+                 amplitude_t const amplitude )   // amplitude measured
 {
+    (void)amplitude;
     static boolean        scroll = false;
     static uint_least8_t  curScreenPos = 0;
     static Pitch          notesOnScreen[MAX_NOTES_ON_SCREEN];

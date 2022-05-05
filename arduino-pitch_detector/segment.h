@@ -1,15 +1,3 @@
-/**
- * @brief Note level segmentation, based on Monty's method, 2000.
- * @file  segment.h 
- * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://www.coertvonk.com/technology/embedded/arduino-pitch-detector-13252
- *
- * GNU GENERAL PUBLIC LICENSE Version 3, check the file LICENSE for more information
- * (c) Copyright 2015-2016, Johan Vonk
- * All rights reserved.  Use of copyright notice does not imply publication.
- * All text above must be included in any redistribution
- **/
-
 #pragma once
 
 #include <Arduino.h>
@@ -43,7 +31,7 @@ public:
              segmentEnergy_t const  energy,       // energy/loudness measured [0..127]
              SegmentBuf * const     segmentBuf ); // segment buffer to write note to
 
-    absoluteTime_t const
+    absoluteTime_t
         getLastOffset( void );
 
 private:
@@ -65,7 +53,7 @@ private:
         segment_t *           note;     // current note, NULL if none
     } cv;  // class values
 
-    segmentRelTime_t const
+    segmentRelTime_t
         difftime_( absoluteTime_t const  t );
 
     void
