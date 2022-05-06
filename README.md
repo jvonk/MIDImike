@@ -14,6 +14,18 @@ A short video of an early prototype
 
 [![demo_video](media/arduino.Still002.jpg)](https://www.youtube.com/embed/W_s_MojYlSE)
 
+## Clone
+
+Clone the repository and its submodules to a local directory. The `--recursive` flag automatically initializes and updates the submodules in the repository.
+
+```bash
+git clone --recursive https://github.com/jvonk/Arduino_Pitch-Detector.git
+```
+
+or using `ssh`
+```bash
+git clone --recursive git@github.com:jvonk/Arduino_Pitch-Detector.git
+```
 
 ## Hardware
 
