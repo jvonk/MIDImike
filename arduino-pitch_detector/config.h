@@ -31,11 +31,11 @@ namespace Config {
 #define SRC_FILE (2)
 #define SRC (SRC_MICR)
 
-// output destination
+// output destination (must be DST_PIANOROLL for USB-MIDI output)
 #define DST_STAFF      (1)
 #define DST_PIANOROLL  (2)
 #define DST_SERIAL     (3)
-#define DST (DST_STAFF)
+#define DST (DST_PIANOROLL)
 
 // enable USB-midi output on the USB connector (requires DST=DST_PIANOROLL, and Config::SERIAL_RATE=31250)
 // after changing to USB-midi, connect MOSI2-to-GND and power cycle the Arduino
