@@ -1,0 +1,9 @@
+[submodule "hardware/components/Adafruit_1.8_Inch_TFT_Breakout_PCB"]
+	path = hardware/components/Adafruit_1.8_Inch_TFT_Breakout_PCB
+	url = git@github.com:adafruit/Adafruit_1.8_Inch_TFT_Breakout_PCB.git
+[submodule "hardware/components/Adafruit-1.8-TFT-Shield-PCB"]
+	path = hardware/components/Adafruit-1.8-TFT-Shield-PCB
+	url = git@github.com:adafruit/Adafruit-1.8-TFT-Shield-PCB.git
+[submodule "hardware/components/Adafruit-MAX4466-Electret-Mic-Amplifier-PCBs"]
+	path = hardware/components/Adafruit-MAX4466-Electret-Mic-Amplifier-PCBs
+	url = https://github.com/adafruit/Adafruit-MAX4466-Electret-Mic-Amplifier-PCBs
