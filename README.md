@@ -4,8 +4,6 @@
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/johanvonk/Arduino_Pitch-Detector)
 ![GitHub](https://img.shields.io/github/license/johanvonk/Arduino_Pitch-Detector)
 
-## Pitch Detection on Arduino using Autocorrelation
-
 While playing my clarinet, I realized that it would be fun to hear other instruments playing alongside me. Instruments like guitar, piano or even a choir. It would also be nice if the melodies could be transcribed on paper. All existing solutions to these problems require a bulky computer or a cell phone. I realized that creating this compact device would combine my interest for music with my passion for engineering and math.
 
 ![Image](media/breadboard.jpg)
@@ -19,7 +17,7 @@ A short video of an early prototype
 
 ## Hardware
 
-This project uses input from amplified microphone and outputs to a TFT display and USB-MIDI connection. To use the optional USB-MIDI output, you need to replace the firmware on the ATmega16U2 companion chip as described on the page [Sending MIDI Events](https://coertvonk.com/sw/arduino/pitch-detector/sending-midi-events-31581).
+This project uses input from amplified microphone and outputs to a TFT display and USB-MIDI connection. To use the optional USB-MIDI output, you need to replace the firmware on the ATmega16U2 companion chip.
 
 ### Schematic
 
