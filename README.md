@@ -1,4 +1,4 @@
-# arduino-pitch_detector
+# Arduino Pitch Detector
 
 [![GitHub Discussions](https://img.shields.io/github/discussions/johanvonk/Arduino_Pitch-Detector)](https://github.com/johanvonk/Arduino_Pitch-Detector/discussions)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/johanvonk/Arduino_Pitch-Detector)
@@ -23,7 +23,13 @@ This project uses input from amplified microphone and outputs to a TFT display a
 
 ### Schematic
 
-![Schematic](media/pitch-schematic-copy.svg)
+Power
+
+![Schematic](hardware/MIDImike-pwr.svg)
+
+Logic
+
+![Schematic](hardware/MIDImike.svg)
 
 To upload the sketch, the USB-MIDI switch needs to be open. The replay button was used during development to replay stored MIDI notes.
 
@@ -33,35 +39,93 @@ To upload the sketch, the USB-MIDI switch needs to be open. The replay button wa
 
 | Name | Description | Suggested mfr and part# | Paid |
 |------|-------------|-------------------------|-----:|
-| MICROPHONE | Electret microphone w/ auto gain control | Adafruit 1713 | [$7.95](https://www.adafruit.com/product/1713)
-| ARDUINO    | Arduino METRO 328, or Arduino Uno R3 |  Adafruit 2488 | [$17.50](https://www.adafruit.com/product/2488)
-| ST7735R | ST7735R 1.8" Color TFT display w/ MicroSD breakout | Adafruit 358 | [$19.95](https://www.adafruit.com/product/358)
+| PCB1 | Electret microphone w/ auto gain control| Adafruit 1713 | [$7.95](https://www.adafruit.com/product/1713)
+| PCB2 | Arduino Uno R3, or Arduino METRO 328 |  Adafruit 2488 | [$17.50](https://www.adafruit.com/product/2488)
+| PCB3 | ST7735R 1.8" Color TFT display w/ MicroSD breakout | Adafruit 358 | [$19.95](https://www.adafruit.com/product/358)
+| SW1  | Switch toggle, SPDT, 5A/120V | E-Switch 100SP1T1B4M2QE | [$2.65](https://www.digikey.com/en/products/detail/e-switch/100SP1T1B4M2QE/378824)
+| SW2  | Switch tactile, SPST-NO, 0.05A/24V | TE Connectivity 1825910-3 | [$0.15](https://www.digikey.com/en/products/detail/te-connectivity-alcoswitch-switches/1825910-3/2400476)
 
 ### Notes
 
-For the microphone, I use the Adafruit microphone breakout. because it has a 1.25 Volt DC bias and includes an automatic gain control. Other microphones will work for as long as they have a DC biased output, and the output signal is strong enough.
+For the microphone, I use the Adafruit microphone breakout, because it has a 1.25 Volt DC bias and includes an automatic gain control. The "max gain" is set to 40 dB by connecting the `GAIN` to `5V`. Other microphones will work for as long as they have a DC biased output, and the output signal is strong enough.
 
 The popular Arduino UNO R3 forms the heart of the system. Note that the REPLAY signal was only used during debugging. This board is now getting hard to find, but you can also use the Arduino METRO 328 or possibly other boards.
 
-If you’re going to reprogramming the Atmega16u2, you need access the companion chip header (ICSP1) as marked in the illustration below.
+If you’re going to reprogramming the `Atmega16u2`, you need access the companion chip header (ICSP1) as marked in the illustration below.
 
 ![Image](media/pitch-arduino-pins-copy.svg)
 
 ## Software
 
-The implementation is in C++ and uses an Arduino, breadboard, microphone and display.  It changes the sound wave to an electrical signal; uses autocorrelation to find frequency played; display frequency as note on screen while sending to a MIDI synthesizer.
+The implementation changes the sound wave to an electrical signal; uses autocorrelation to find frequency played; display frequency as note on screen while sending to a MIDI synthesizer.[^1]
+
+[^1]: Reprogramming the ATmega16U2 is described in [Sending MIDI Events](https://coertvonk.com/sw/arduino/pitch-detector/sending-midi-events-31581).
 
 ### Requirements
 
 | Component | Version tested |
 |-----------|----------------|
-| Arduino AVR Boards | 1.8.5 (and 1.6.14)
 | Arduino IDE | 1.8.19 (and 1.6.12)
+| Arduino AVR Boards | 1.8.5 (and 1.6.14)
+| Arduino SD library | 1.2.4
 | Adafruit BusIO library | 1.11.5
 | Adafruit ST7735 and ST7789 library | 1.9.3
 | Adafruit GFX Library | 1.11.0
 
+### Build
+
+- Install the libraries.
+- If switch `SW1` is closed, open it and power-cycle the device. 
+- Using the Arduino IDE or Visual Code
+    - Specify the board, COM port and baud rate.
+    - Build and upload the sketch .
+
+By default the USB port is used for USB-MIDI, so monitoring the serial port will not show anything useful.
+
+The device is now ready to show the pitch of notes played!
+
+If you want to connect it using USB-MIDI, continue reading.
+
+## USB-MIDI
+
+>Instructions are for Windows, but should equally apply to Linix and MacOS.
+
+The USB on the Arduino talks USB-SERIAL with the host computer. That is how the Serial.print() statements end up on the serial monitor. A small companion chip (ATmega16U2) on the Arduino acts a UART/USB-serial bridge.
+
+We reprogram this companion chip so the Arduino UNO R3 so that, when `SW1` is closed and you power-cycle the device it appears as a MIDI peripheral (HID), and otherwise as a the usual USB-SERIAL port. 
+
+This is important that the Arduino can still behave as USB-SERIAL, because this is the usual method of uploading new sketches.
+
+### Match the USB IDs
+
+I patched dualMocoLUFA, so that it matches what is reported by Windows Device Manager's property details.
+
+```
+USB\VID_2341&PID_0043&REV_0001
+```
+
+If your device shows different details, read [dualMocoLUFA/PATCHES.md](dualMocoLUFA/PATCHES.md) first.
+
+### Install
+
+To install the modified dualMocoLUFA firmware on the ATmega16U2m.
+
+- Install the [Atmel FLexible In-system Programmer](https://www.microchip.com/en-us/development-tool/flip) (FLIP).
+
+- Put the Arduino Uno R3 in DFU mode by briefly connecting the `RESET2*` to `GND` on the atmega16u2 ICSP1 header. These are the leftmost pins, near the USB connector, as shown above.
+
+- In Windows Device Manager, it should show up as “Atmel USB Devices > ATmega16U2“. If you encounter “unknown device“, install the driver from `U:\Program Files (x86)\Atmel\Flip 3.4.7\usb\atmel_usb_dfu.inf`.
+
+- Start Atmel FLIP
+    - Device » Select » `ATmega16U2`
+    - Settings » Communication » `USB`
+    - File » Load HEX File » `dualMocoLUFA/LUFA-100807-patched/Projects/dualMoco.hex`
+    - 
+    
+### Connect
+
+If you have a real synthesizer to connect to .. great. Otherwise consider software sequencers to record and play back MIDI events, such as the [free MidiEditor](https://www.midieditor.org/), [Anvil Studio](https://www.anvilstudio.com/), [MuseScore](https://musescore.org/en), [MidiSheetmusic](http://midisheetmusic.com/) or [ScoreCloud](https://scorecloud.com/).
 
 ## Design document
 
-Information on the design and implementation can be found at [here](https://coertvonk.com/category/sw/arduino/pitch-detector).
+More information on the design and implementation can be found at [here](https://coertvonk.com/category/sw/arduino/pitch-detector).
