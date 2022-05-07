@@ -43,7 +43,7 @@ namespace {
     uint16_t const TICKS_PER_BEAT = 1000 / BEATS_PER_MIN;
 
     // write bytes to file
-    bool const                         // returns true on success, false otherwise
+    bool                               // returns true on success, false otherwise
     _write( File & f,                  // file to append to
             void const * const  data,  // pointer to data
             size_t const dataLen )     // data length
@@ -69,7 +69,7 @@ namespace {
     // Write MIDI file header
     //   for example 4D 54 68 64 08 00 00 00 00 00 00 00 01 00 60 00
     //   where type="MHdr" len=8(0x00000008) format=0(0x00) tracks=1(0x0001) ticksPerQnote=(0x0060)
-    bool const                // returns true on success, false otherwise
+    bool                      // returns true on success, false otherwise
     _writeHeader( File & f )  // file to append to
     {
         midiHeader_t const header = {
@@ -82,7 +82,7 @@ namespace {
 
     // Write MIDI track begin
     //   for example 4D 54 72 6B 03 00 00 00, where type="MTrk", len=3(0x00000003)
-    bool const                              // returns true on success, false otherwise
+    bool                                    // returns true on success, false otherwise
     _writeTrackBegin( File &    f,          // file to append to
                       uint32_t  tracklen )  // #bytes to follow
     {
@@ -96,16 +96,20 @@ namespace {
     // Write MIDI track tempo event
     //   for example FF 51 03 07 A1 20, where sysEx=meta(0xFF), tempo(0x51), len=3(0x03), tempo=0x20A107
 
-    bool const                                // returns true on success, false otherwise
+    bool                                      // returns true on success, false otherwise
     _writeTrackTempo( File &         f,       // file to append to
                       uint32_t const tempo )  // tempo [usec/quaternote]
     {
-        // 0xFF 0x51 0x03 >>16 >>8 >>0
-        uint8_t const d1 = (tempo >> 16) & 0xFF;
-        uint8_t const d2 = (tempo >> 8) & 0xFF;
-        uint8_t const d3 = (tempo >> 0) & 0xFF;
-
-        midiMeta_t const event = {midiSysExTag_t::meta, midiMetaType_t::setTempo, META_TEMPOCHANGE_LEN, {d1, d2, d3}};
+        midiMeta_t const event = {
+            .sysEx = midiSysExTag_t::meta,
+            .type = midiMetaType_t::setTempo,
+            .len = META_TEMPOCHANGE_LEN,
+            .value = {
+                (uint8_t)((tempo >> 16) & 0xFF),
+                (uint8_t)((tempo >> 8) & 0xFF),
+                (uint8_t)((tempo >> 0) & 0xFF)
+            }
+        };
 
         return _write( f, &event, 3 + META_TEMPOCHANGE_LEN );
     }
@@ -116,7 +120,7 @@ namespace {
     //   Each byte only uses the lower 7-bits, with the MSB set if there is another length byte following.
     //   The bytes are in big endian order.
 
-    bool const                  // returns true on success, false otherwise
+    bool                        // returns true on success, false otherwise
     _writeVarLen( File &   f,   // file to append to
                   uint32_t d )  // value to write
     {
@@ -141,7 +145,7 @@ namespace {
     }
 
 
-    INLINE uint32_t const
+    INLINE uint32_t
     _msec2ticks( uint32_t const ms )
     {
         return (uint64_t)ms * BEATS_PER_MIN * TICKS_PER_BEAT / 60000;
@@ -152,7 +156,7 @@ namespace {
     //   for example 00 19 3E 38, where delay=0(0x00), event=noteOn(0x19), pitch=0x3E, velocity=0x38, or
     //               81 01 18 3E 38, where delay=...(0x8101), event=noteOff(0x18), pitch=0x3E velocity=0x3B
 
-    bool const                                         // returns true on success, false otherwise
+    bool                                               // returns true on success, false otherwise
     _writeTrackNote( File &                  f,        // file to append to
                      midiTime_t const        delay,    // delay compared to prior event (0 if none) [msec]
                      midiEvent_t const       eventNr,  // note event
@@ -174,11 +178,15 @@ namespace {
     // Write MIDI track end
     //   for example FF 2F 00, where sysEx=meta(0xFF), endoftrack(0x2F) len=0(0x00)
 
-    bool const                  // returns true on success, false otherwise
+    bool                   // returns true on success, false otherwise
     _writeTrackEnd( File & f )
     {
-        midiMeta_t const end = {midiSysExTag_t::meta, midiMetaType_t::trackEnd, META_TRACKEND_LEN};  // 0xFF, 0x2F, 0x00
-
+        midiMeta_t const end = {
+            .sysEx = midiSysExTag_t::meta,
+            .type = midiMetaType_t::trackEnd,
+            .len = META_TRACKEND_LEN,
+            .value = {0x00, 0x00, 0x00}
+        };
         return _write( f, &end, 3 + META_TRACKEND_LEN );
     }
 

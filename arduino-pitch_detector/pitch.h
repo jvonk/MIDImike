@@ -41,5 +41,5 @@ private:
 	struct NoteCv_t {
 	  octaveNr_t octaveNr;
 	  noteNr_t   noteNr;   // note# within octave
-	} cv;  // class variables
+	} cv = {};  // class variables
 };

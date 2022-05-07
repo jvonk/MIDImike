@@ -88,7 +88,7 @@ namespace {
 	}
 
 
-	INLINE xCoordinate_t const           // returns x-coordinate on display [0 .. screen width - 1]
+	INLINE xCoordinate_t                 // returns x-coordinate on display [0 .. screen width - 1]
 	_time2x( absoluteTime_t const  t,    // note time
 			 absoluteTime_t const  t0 )  // time on left of screen
 	{
@@ -98,7 +98,7 @@ namespace {
 	}
 
 
-	INLINE yCoordinate_t const              // returns y-coordinate on display
+	INLINE yCoordinate_t                    // returns y-coordinate on display
 	_pitch2y( segmentPitch_t const pitch )  // midi pitch
 	{
 		yCoordinate_t const diff = (pitch - PITCH_MIN) * _distance.pitch2pitch;

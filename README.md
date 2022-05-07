@@ -134,7 +134,19 @@ To install the modified dualMocoLUFA firmware on the ATmega16U2m.
     
 ### Connect
 
-If you have a real synthesizer to connect to .. great. Otherwise consider software sequencers to record and play back MIDI events, such as the [free MidiEditor](https://www.midieditor.org/), [Anvil Studio](https://www.anvilstudio.com/), [MuseScore](https://musescore.org/en), [MidiSheetmusic](http://midisheetmusic.com/) or [ScoreCloud](https://scorecloud.com/).
+At this point you should be able to connect the Arduino to a computer and see MIDI events using e.g. MidiView
+
+![MidiView snapshot](media/midiview-snapshot.png)
+
+If you have a real synthesizer to connect to, you can try that. Otherwise, I suggest installing a software synthesizer such as
+- [CoolSoft MIDIMapper and VirtualMIDISynth](https://coolsoft.altervista.org/en/virtualmidisynth) with sound fonts [FluidR3 GM](https://github.com/urish/cinto/blob/master/media/FluidR3%20GM.sf2) and/or [Timbres of Heaven](http://midkar.com/soundfonts/index.html).
+
+There are many [Software MIDI editors and sequencers](https://en.wikipedia.org/wiki/Comparison_of_MIDI_editors_and_sequencers) to choose from. A few that I tried are:
+- [MidiEditor](https://www.midieditor.org/), free. Can record. (Press the "Connect Midi In/Out" button.)
+- [MuseScore](https://musescore.org/en), free.
+- [Anvil Studio](https://www.anvilstudio.com/), freemium. Can record.
+- [ScoreCloud](https://scorecloud.com/), freemium; requires sign-in.
+- [Presonus Notation](https://www.presonus.com/products/notion), commercial
 
 ## Design document
 
