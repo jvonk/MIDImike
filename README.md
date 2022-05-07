@@ -149,6 +149,12 @@ There are many [Software MIDI editors and sequencers](https://en.wikipedia.org/w
 - [ScoreCloud](https://scorecloud.com/), freemium; requires sign-in.
 - [Presonus Notation](https://www.presonus.com/products/notion), commercial
 
+### Demo
+
+A video recording the MIDI with SoundCloud.
+
+[![demo_video](media/demo2-still-copy.png)](https://www.youtube.com/embed/6aWWbbG0Aqk)
+
 ## Design document
 
 More information on the design and implementation can be found at [here](https://coertvonk.com/category/sw/arduino/pitch-detector).
