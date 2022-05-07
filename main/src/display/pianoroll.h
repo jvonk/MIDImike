@@ -5,18 +5,6 @@
 
 #include "../../segment_t.h"
 
-namespace PianoRoll {
-
-    void begin(
-        uint_least8_t tftCS,    // SPI TFT Chip Select
-        uint_least8_t dc,       // SPI Data/Command
-        uint_least8_t reset );  // SPI Reset
-
-    void
-        clear( void );
-
-    void show(
-        absoluteTime_t const  lastOffset,    // needed to calculate absolute times
-        SegmentBuf * const    segmentBuf );  // midi buffer containing notes
-
-};
+void pianoroll_init(uint_least8_t tftCS_pin, uint_least8_t dc_pin, uint_least8_t reset_pin);
+void pianoroll_clear(void);
+void pianoroll_draw(absoluteTime_t const lastOffset, SegmentBuf * const segmentBuf);

@@ -7,16 +7,5 @@
 
 class Note;
 
-namespace Staff {
-
-	  void
-		  begin( uint_least8_t tftCS,    // SPI TFT Chip Select
-		         uint_least8_t dc,       // SPI Data/Command
-		         uint_least8_t reset );  // SPI Reset
-
-	  // end() function not needed, 'cause loop() never stops
-
-	  void
-		  showNote( Pitch &           pitch,       // pitch measured
-		            amplitude_t const amplitude ); // amplitude measured
-};
+void staff_init(uint_least8_t tftCS_pin, uint_least8_t dc_pin, uint_least8_t reset_pin);
+void staff_draw_note(Pitch & pitch, amplitude_t const amplitude);

@@ -36,32 +36,58 @@
 
 #if DST == DST_STAFF
 
-namespace {
+#define COLOR_NOTES (ST7735_BLACK)
+#define COLOR_STAFF (0x8410)  // gray encoded as rrrrrggggggbbbbb
+#define COLOR_BG (ST7735_WHITE)
+#define MAX_NOTES_ON_SCREEN (6)
+#define LINES_ON_STAFF (5)
+#define GKEY_WIDTH (36)
 
-    struct _colors_t {
-        uint16_t const notes;
-        uint16_t const staff;
-        uint16_t const background;
-    } _colors = {
-        ST7735_BLACK,
-        0x8410, // gray encoded as rrrrrggggggbbbbb
-        ST7735_WHITE
-    };
+typedef uint_least8_t hStaffPos_t;
+typedef int16_t vStaffPos_t;  // 2BD not 100% sure if this should be signed
 
-    uint_least8_t const MAX_NOTES_ON_SCREEN = 6;
+typedef struct note_t {
+    uint_least8_t  posInOctave;  // staff position within octave
+    bool           flat;
+} note_t;
 
-    Adafruit_ST7735 * _tft;
+typedef struct display_t {
+    int16_t height;
+    int16_t width;
+} display_t;
 
-    uint_least8_t const LINES_ON_STAFF = 5;
-    uint_least8_t const GKEY_WIDTH = 36;
+typedef struct distance_t {
+    int16_t bottom2loStaff;
+    int16_t top2hiStaff;
+    int16_t staffLine2line;
+    int16_t note2note;
+    int16_t noteRadius;
+} distance_t;
 
-    struct note_t {
-        uint_least8_t  posInOctave;  // staff position within octave
-        bool           flat;
-    };
+typedef struct positionHiLo_t {
+    vStaffPos_t min;
+    vStaffPos_t max;
+} positionHiLo_t;
 
-    // note: calculating the values would probably take up more memory
-    note_t const _notes[static_cast<int>(noteNr_t::COUNT)] = {
+typedef struct position_t {
+    positionHiLo_t show;
+    positionHiLo_t staff;
+} position_t;
+
+vStaffPos_t _nr2vStaffPos(noteNr_t const number, octaveNr_t const octave);
+vStaffPos_t _freq2vStaffPos(frequency_t const freq);
+
+typedef struct staff_t {
+    Adafruit_ST7735 * tft;
+    note_t const notes[static_cast<int>(noteNr_t::COUNT)];
+    display_t display;
+    distance_t distance;
+    position_t position;
+} staff_t;
+
+static staff_t _my = {
+    .tft = NULL,    
+    .notes = {  // calculating the values would probably take up more memory
         { 0, false },
         { 1, true  },
         { 1, false },
@@ -74,202 +100,151 @@ namespace {
         { 5, false },
         { 6, true  },
         { 6, false }
-    };
+    },
+    .display = {},
+    .distance = {},
+    .position = {}
+};
 
-    typedef uint_least8_t hStaffPos_t;
+// resize screen
+void
+_resize(int const width, 
+        int const height)
+{
+    _my.display.height = height;
+    _my.display.width = width;
 
-    struct _display_t {
-        int16_t height;
-        int16_t width;
-    } _display;
+    // staff in middle 1/3 of screen
+    _my.distance.bottom2loStaff = _my.display.height / 3;  
+    _my.distance.top2hiStaff = _my.display.height / 3;
+    _my.distance.staffLine2line = (_my.display.height -
+        _my.distance.bottom2loStaff -
+        _my.distance.top2hiStaff) / (LINES_ON_STAFF - 1);
 
-    struct _distance_t {
-        int16_t bottom2loStaff;
-        int16_t top2hiStaff;
-        int16_t staffLine2line;
-        int16_t note2note;
-        int16_t noteRadius;
-    } _distance;
+    _my.distance.note2note = (_my.display.width - GKEY_WIDTH) / MAX_NOTES_ON_SCREEN;
+    _my.distance.noteRadius = _my.distance.staffLine2line / 2 - 1;
+}
 
-    typedef int16_t vStaffPos_t;  // 2BD not 100% sure if this should be signed
+INLINE bool
+_isFlat(noteNr_t const noteNr)
+{
+    return _my.notes[static_cast<int>(noteNr)].flat;
+}
 
-    struct _positionHiLo_t {
-        vStaffPos_t min;
-        vStaffPos_t max;
-    };
+INLINE vStaffPos_t
+_nr2vStaffPos(noteNr_t const number,
+                octaveNr_t const octave)
+{
+    uint16_t const staffPositionsInOctave = 7;
+    return staffPositionsInOctave * octave + _my.notes[static_cast<int>(number)].posInOctave;
+}
 
-    vStaffPos_t _nr2vStaffPos( noteNr_t const number, octaveNr_t const octave );
-    vStaffPos_t _freq2vStaffPos( frequency_t const freq );
+INLINE vStaffPos_t
+_freq2vStaffPos(frequency_t const freq)
+{
+    segmentPitch_t const pitch = Pitch::freq2pitch(freq);
 
-    struct _position_t {
-        _positionHiLo_t show;
-        _positionHiLo_t staff;
-    } const _position = {
-        {_freq2vStaffPos(CONFIG_MIDIMIKE_FREQ_MIN ), _freq2vStaffPos( CONFIG_MIDIMIKE_FREQ_MAX )},
-        { _nr2vStaffPos( noteNr_t::E, 4 ), _nr2vStaffPos( noteNr_t::F, 5 ) }   // 30, 38
-    };
+    return  _nr2vStaffPos(static_cast<noteNr_t>(pitch % 12),
+        static_cast<octaveNr_t>(pitch / 12));
+}
 
+// horizontal staff position to screen x coordinate
+INLINE int16_t
+_hStaffPos2x(int const n)
+{
+    // 2BD: one could move the notes closer to each other as they shift to the left
+    return GKEY_WIDTH + (n * _my.distance.note2note + _my.distance.note2note / 2);
+}
 
+vStaffPos_t
+_getVStaffPos(Pitch & pitch)
+{
+    return _nr2vStaffPos(pitch.getNoteNr(), pitch.getOctaveNr());
+}
 
-    /*****************
-     * Local functions
-     *****************/
+// position on staff to screen y coordinate
+int16_t
+_vStaffPos2y(vStaffPos_t const n)
+{
+    vStaffPos_t const distAbove1stNoteOnStaff = n - _my.position.staff.min;  // could be negative!
 
-
-    // resize screen
-    void
-    _resize( int const  width, 
-             int const  height )
-    {
-        _display.height = height;
-        _display.width = width;
-
-        // staff in middle 1/3 of screen
-        _distance.bottom2loStaff = _display.height / 3;  
-        _distance.top2hiStaff = _display.height / 3;
-        _distance.staffLine2line = (_display.height -
-            _distance.bottom2loStaff -
-            _distance.top2hiStaff) / (LINES_ON_STAFF - 1);
-
-        _distance.note2note = (_display.width - GKEY_WIDTH) / MAX_NOTES_ON_SCREEN;
-        _distance.noteRadius = _distance.staffLine2line / 2 - 1;
-    }
-
-
-    INLINE bool
-    _isFlat(noteNr_t const noteNr)
-    {
-        return _notes[static_cast<int>(noteNr)].flat;
-    }
-
-
-    INLINE vStaffPos_t
-    _nr2vStaffPos(noteNr_t const number,
-                  octaveNr_t const octave)
-    {
-        uint16_t const staffPositionsInOctave = 7;
-        return staffPositionsInOctave * octave + _notes[static_cast<int>(number)].posInOctave;
-    }
-
-    INLINE vStaffPos_t
-    _freq2vStaffPos( frequency_t const freq )
-    {
-        segmentPitch_t const pitch = Pitch::freq2pitch( freq );
-
-        return  _nr2vStaffPos( static_cast<noteNr_t>(pitch % 12),
-            static_cast<octaveNr_t>(pitch / 12) );
-    }
-
-
-    // horizontal staff position to screen x coordinate
-    INLINE int16_t
-    _hStaffPos2x( int const n )
-    {
-        // 2BD: one could move the notes closer to each other as they shift to the left
-        return GKEY_WIDTH + (n * _distance.note2note + _distance.note2note / 2);
-    }
-
-
-    vStaffPos_t
-    _getVStaffPos(Pitch & pitch )
-    {
-        return _nr2vStaffPos( pitch.getNoteNr(), pitch.getOctaveNr() );
-    }
-
-    // position on staff to screen y coordinate
-    int16_t
-    _vStaffPos2y( vStaffPos_t const n )
-    {
-        vStaffPos_t const distAbove1stNoteOnStaff = n - _position.staff.min;  // could be negative!
-
-        return ( _display.height - _distance.bottom2loStaff ) -
-            distAbove1stNoteOnStaff * _distance.staffLine2line / 2;
-    }
-
-
-    void
-    _displayStaff( void )
-    {
-        for ( int ii = 0; ii < LINES_ON_STAFF; ii++ ) {
-            _tft->drawFastHLine( 0, _vStaffPos2y( _position.staff.min + ii * 2 ),
-                _display.width, _colors.staff );
-        }
-    }
-
-
-    void
-    _drawHelperLine( uint16_t const    x,
-                     vStaffPos_t const positionOnStaff,
-                     uint16_t const    barColor )
-    {
-        uint16_t len = _distance.note2note * 4 / 5;
-
-        _tft->drawFastHLine(x - len/2, 
-            _vStaffPos2y(positionOnStaff),
-            len, barColor);
-    }
-
-
-    void
-    _drawNote( uint_least8_t const hpos,
-               Pitch & pitch,
-               bool const erase )
-    {
-        vStaffPos_t const n = _getVStaffPos(pitch);
-        if ( n == 0 ) {
-            return;
-        }
-        int16_t const x = _hStaffPos2x( hpos );
-        int16_t const y = _vStaffPos2y( n );
-
-        uint16_t const noteColor = erase ? _colors.background : _colors.notes;
-        uint16_t const barColor = erase ? _colors.background : _colors.staff;
-
-
-        vStaffPos_t positionOnStaff = _getVStaffPos(pitch);
-
-        if ( positionOnStaff < _position.show.min ) {
-            StaffSymbol::draw( x, 0, (staffSymbolName_t)staffSymbolName_t::toLow, noteColor );
-            return;
-        }
-
-        if ( positionOnStaff > _position.show.max ) {
-            StaffSymbol::draw( x, 0, (staffSymbolName_t)staffSymbolName_t::toHigh, noteColor );
-            return;
-        }
-
-        // draw helper line(s) if needed
-        if ( positionOnStaff < _position.staff.min ) {
-            for ( hStaffPos_t jj = positionOnStaff; jj < _position.staff.min; jj++ ) {
-                if ( jj % 2 == 0 ) {
-                    _drawHelperLine( x, jj, barColor );
-                }
-            }
-        }
-        if ( positionOnStaff > _position.staff.max ) {
-            for ( hStaffPos_t jj = positionOnStaff; jj > _position.staff.max; jj-- ) {
-                if (jj % 2 == 0) {
-                    _drawHelperLine( x, jj, barColor );
-                }
-            }
-        }
-
-        // draw flat symbol
-        if ( _isFlat( pitch.getNoteNr() ) ) {
-            StaffSymbol::draw( x, y, (staffSymbolName_t)staffSymbolName_t::flat, noteColor );
-        }
-
-        // draw the note itself
-        StaffSymbol::draw( x, y, (staffSymbolName_t)staffSymbolName_t::note, noteColor );
-        //_tft->fillCircle( x, y, _distance.noteRadius, noteColor );
-    }
-
-} // name space
-
+    return (_my.display.height - _my.distance.bottom2loStaff) -
+        distAbove1stNoteOnStaff * _my.distance.staffLine2line / 2;
+}
 
 void
-Staff::showNote( Pitch &           pitch,        // note measured
-                 amplitude_t const amplitude )   // amplitude measured
+_displayStaff(void)
+{
+    for (int ii = 0; ii < LINES_ON_STAFF; ii++) {
+        _my.tft->drawFastHLine(0, _vStaffPos2y(_my.position.staff.min + ii * 2),
+            _my.display.width, COLOR_STAFF);
+    }
+}
+
+void
+_drawHelperLine(uint16_t const x, vStaffPos_t const positionOnStaff, uint16_t const barColor)
+{
+    uint16_t len = _my.distance.note2note * 4 / 5;
+
+    _my.tft->drawFastHLine(x - len/2, 
+        _vStaffPos2y(positionOnStaff),
+        len, barColor);
+}
+
+void
+_drawNote(uint_least8_t const hpos, Pitch & pitch, bool const erase)
+{
+    vStaffPos_t const n = _getVStaffPos(pitch);
+    if (n == 0) {
+        return;
+    }
+    int16_t const x = _hStaffPos2x(hpos);
+    int16_t const y = _vStaffPos2y(n);
+
+    uint16_t const noteColor = erase ? COLOR_BG : COLOR_NOTES;
+    uint16_t const barColor = erase ? COLOR_BG : COLOR_STAFF;
+
+    vStaffPos_t positionOnStaff = _getVStaffPos(pitch);
+
+    if (positionOnStaff < _my.position.show.min) {
+        staffsymbol_draw(x, 0, STAFFSYMBOL_NAME_TO_LOW, noteColor);
+        return;
+    }
+
+    if (positionOnStaff > _my.position.show.max) {
+        staffsymbol_draw(x, 0, STAFFSYMBOL_NAME_TO_HIGH, noteColor);
+        return;
+    }
+
+    // draw helper line(s) if needed
+    if (positionOnStaff < _my.position.staff.min) {
+        for (hStaffPos_t jj = positionOnStaff; jj < _my.position.staff.min; jj++) {
+            if (jj % 2 == 0) {
+                _drawHelperLine(x, jj, barColor);
+            }
+        }
+    }
+    if (positionOnStaff > _my.position.staff.max) {
+        for (hStaffPos_t jj = positionOnStaff; jj > _my.position.staff.max; jj--) {
+            if (jj % 2 == 0) {
+                _drawHelperLine(x, jj, barColor);
+            }
+        }
+    }
+
+    // draw flat symbol
+    if (_isFlat(pitch.getNoteNr())) {
+        staffsymbol_draw(x, y, STAFFSYMBOL_NAME_FLAT, noteColor);
+    }
+
+    // draw the note itself
+    staffsymbol_draw(x, y, STAFFSYMBOL_NAME_NOTE, noteColor);
+    //_my.tft->fillCircle(x, y, _my.distance.noteRadius, noteColor);
+}
+
+void
+staff_draw_note(Pitch &           pitch,       // note measured
+                amplitude_t const amplitude)   // amplitude measured
 {
     (void)amplitude;
     static boolean        scroll = false;
@@ -278,26 +253,26 @@ Staff::showNote( Pitch &           pitch,        // note measured
 
         // if screen is full, shift to left
 
-    if ( scroll ) {
-        for ( uint_least8_t ii = 0; ii < MAX_NOTES_ON_SCREEN; ii++ ) {
+    if (scroll) {
+        for (uint_least8_t ii = 0; ii < MAX_NOTES_ON_SCREEN; ii++) {
 
                 // erase old note from screen position
-            _drawNote( ii, notesOnScreen[ii], true );
+            _drawNote(ii, notesOnScreen[ii], true);
 
                 // draw new note in same screen position 
-            if ( ii < MAX_NOTES_ON_SCREEN - 1 ) {
+            if (ii < MAX_NOTES_ON_SCREEN - 1) {
                 notesOnScreen[ii] = notesOnScreen[ii + 1];
-                _drawNote( ii, notesOnScreen[ii], false );
+                _drawNote(ii, notesOnScreen[ii], false);
             }
         }
         _displayStaff();  // draw staff to cover up empty spots
     }
     notesOnScreen[curScreenPos] = pitch;  // remember for later
 
-    _drawNote( curScreenPos, pitch, false );
+    _drawNote(curScreenPos, pitch, false);
 
-    if ( !scroll ) {
-        if ( curScreenPos == MAX_NOTES_ON_SCREEN - 1 ) {
+    if (!scroll) {
+        if (curScreenPos == MAX_NOTES_ON_SCREEN - 1) {
             scroll = true;
         } else {
             curScreenPos++;
@@ -305,27 +280,31 @@ Staff::showNote( Pitch &           pitch,        // note measured
     }
 }
 
-
 void
-Staff::begin( uint_least8_t tftCS,   // SPI TFT Chip Select
-              uint_least8_t dc,      // SPI Data/Command
-              uint_least8_t reset )  // SPI Reset
+staff_init(uint_least8_t tftCS_pin,   // GPIO# for SPI TFT Chip Select
+            uint_least8_t dc_pin,     // GPIO# for SPI Data/Command
+            uint_least8_t reset_pin)  // GPIO# for SPI Reset
 {
-    pinMode( tftCS, OUTPUT );
-    _tft = new Adafruit_ST7735( tftCS, dc, reset );
-    _tft->initR( INITR_BLACKTAB );  // initialize ST7735S chip, black tab
-    _tft->fillScreen( _colors.background );
-    _tft->setRotation( 3 );         // (0,0) corresponds to top-right
-    _resize( _tft->width(), _tft->height() );
+    pinMode(tftCS_pin, OUTPUT);
+    _my.tft = new Adafruit_ST7735(tftCS_pin, dc_pin, reset_pin);
+    _my.tft->initR(INITR_BLACKTAB);  // initialize ST7735S chip, black tab
+    _my.tft->fillScreen(COLOR_BG);
+    _my.tft->setRotation(3);         // (0,0) corresponds to top-right
+    _resize(_my.tft->width(), _my.tft->height());
     _displayStaff();
 
-    StaffSymbol::begin( _tft,
-                      _display.width, _display.height,
-                      _distance.noteRadius, _distance.bottom2loStaff, _distance.top2hiStaff,
-                      _vStaffPos2y( _nr2vStaffPos( noteNr_t::G, 4 ) ));
+    _my.position = {
+        { _freq2vStaffPos(CONFIG_MIDIMIKE_FREQ_MIN), _freq2vStaffPos(CONFIG_MIDIMIKE_FREQ_MAX)},
+        { _nr2vStaffPos(noteNr_t::E, 4), _nr2vStaffPos(noteNr_t::F, 5) }   // 30, 38
+    };
+
+    staffsymbol_init(_my.tft,
+                      _my.display.width, _my.display.height,
+                      _my.distance.noteRadius, _my.distance.bottom2loStaff, _my.distance.top2hiStaff,
+                      _vStaffPos2y(_nr2vStaffPos(noteNr_t::G, 4)));
 
 #if GKEY != GKEY_NONE
-    StaffSymbol::draw( _hStaffPos2x( 0 ), 0, (staffSymbolName_t)staffSymbolName_t::gKey, _colors.staff );
+    staffsymbol_draw(_hStaffPos2x(0), 0, (staffSymbolName_t)STAFFSYMBOL_NAME_GKEY, COLOR_STAFF);
 #endif
 }
 
