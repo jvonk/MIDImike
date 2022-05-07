@@ -105,9 +105,9 @@ namespace {
             .type = midiMetaType_t::setTempo,
             .len = META_TEMPOCHANGE_LEN,
             .value = {
-                (tempo >> 16) & 0xFF,
-                (tempo >> 8) & 0xFF,
-                (tempo >> 0) & 0xFF
+                (uint8_t)((tempo >> 16) & 0xFF),
+                (uint8_t)((tempo >> 8) & 0xFF),
+                (uint8_t)((tempo >> 0) & 0xFF)
             }
         };
 
