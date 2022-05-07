@@ -1,18 +1,16 @@
 #pragma once
 
-#if 0
-
 #include <Arduino.h>
 #include <stdint.h>
 
 // other option is to use __BASE_FILE__
-#define ASSERT(x) do { if (!(x)) { Debug::assertPrint(__func__, __LINE__); /*blink LED*/} } while (0)
+#define ASSERT(x) do { if (!(x)) { debug_assertPrint(__func__, __LINE__); /*blink LED*/} } while (0)
+
+void debug_assertPrint( char const * const func, int const lineno );
+
+#if 0
 
 namespace Debug {
-
-    void
-        assertPrint( char const * const func,
-                     int const lineno );
 
     unsigned int
         getMemFree( void );

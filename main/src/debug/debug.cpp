@@ -22,20 +22,15 @@
  * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
-#if 0
-
 #include <Arduino.h>
 #include <stdint.h>
-#include "../../config.h"
-#include "debug.h"
-
 
 	/********
 	 * Assert
 	 ********/
 
 void
-Debug::assertPrint( char const * const file, int const lineno)
+debug_assertPrint( char const * const file, int const lineno)
 {
 	do {
 		Serial.print( "ASSERT at " );
@@ -46,6 +41,11 @@ Debug::assertPrint( char const * const file, int const lineno)
 	} while ( true );  // should be true for production
 	//abort();  // ABORT PROGRAM
 }
+
+#if 0
+
+#include "../../config.h"
+
 
 #if 0
 	// __file is the name passed to the compiler.  Visual Micro passes the full path name,

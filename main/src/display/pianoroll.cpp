@@ -28,7 +28,6 @@
 #include <Adafruit_ST7735.h> // hardware-specific graphics
 
 #include "../../config.h"
-#include "../../debug.h"
 #include "../../sample_t.h"
 #include "../../coordinate_t.h"
 #include "../pitch/pitch.h"

@@ -27,12 +27,11 @@
 #include <SD.h>
 
 #include "../../config.h"
-#include "../../debug.h"
 #include "../../sample_t.h"
-#include "../../src/pitch/pitch.h"
-#include "../../src/segment/segmentbuf.h"
-#include "../../src/midi/midiserial.h"
-#include "../../src/midi/midifile.h"
+#include "../pitch/pitch.h"
+#include "../segment/segmentbuf.h"
+#include "../midi/midiserial.h"
+#include "../midi/midifile.h"
 
 #if DST == DST_PIANOROLL
 

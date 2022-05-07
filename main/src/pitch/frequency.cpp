@@ -27,7 +27,6 @@
 #include <limits.h>
 
 #include "../../config.h"
-#include "../../debug.h"
 #include "../microphone/microphone.h"
 #include "frequency.h"
 

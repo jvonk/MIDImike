@@ -27,8 +27,8 @@
 #include <limits.h>
 
 #include "../../config.h"
-#include "../../debug.h"
 #include "../../sample_t.h"
+#include "../debug/debug.h"
 #include "microphone.h"
 #include "adc_t.h"
 

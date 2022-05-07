@@ -43,7 +43,6 @@
 #include <Adafruit_GFX.h>     // if error, read "Toolchain" at above mentioned URL
 
 #include "config.h"
-#include "debug.h"
 #include "sample_t.h"
 #include "src/pitch/pitch.h"
 #include "src/sdcard/sddir.h"

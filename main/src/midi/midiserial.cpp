@@ -30,7 +30,6 @@
 #include <SD.h>
 
 #include "../../config.h"
-#include "../../debug.h"
 #include "../../sample_t.h"
 #include "../../midi_t.h"
 #include "../../segment_t.h"
