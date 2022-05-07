@@ -145,6 +145,7 @@ There are many [Software MIDI editors and sequencers](https://en.wikipedia.org/w
 - [MidiEditor](https://www.midieditor.org/), free. Can record. (Press the "Connect Midi In/Out" button.)
 - [MuseScore](https://musescore.org/en), free.
 - [Anvil Studio](https://www.anvilstudio.com/), freemium. Can record.
+- [Cakewalk](http://www.cakewalk.com/)
 - [ScoreCloud](https://scorecloud.com/), freemium; requires sign-in.
 - [Presonus Notation](https://www.presonus.com/products/notion), commercial
 
