@@ -77,13 +77,13 @@ static char const _ids[IDTYPE_COUNT][4] = {
 };
 
 /**
- * @brief read a specified number of bytes from file
+ * @brief Read a specified number of bytes from file.
  * 
- * @param f              in: file to read from
- * @param len            in: number of bytes to read
- * @param offset         in: offset to add to each byte
- * @param data           out: data read
- * @return uint_least8_t returns # of bytes read
+ * @param f              File to read from [in]
+ * @param len            Number of bytes to read [in]
+ * @param offset         Offset to add to each byte [in]
+ * @param data           Data read [out]
+ * @return uint_least8_t Returns number of of bytes read
  */
 static uint_least8_t
 _read_bytes(File &f, uint16_t const len, int16_t const offset, char * const data)
@@ -103,7 +103,7 @@ _read_bytes(File &f, uint16_t const len, int16_t const offset, char * const data
 }
 
 /**
- * @brief read WAV header
+ * @brief Read WAV header.
  * 
  * @param f              file to read from [in]
  * @param sample_cnt_p   total number of samples in file [out]
@@ -113,7 +113,6 @@ uint_least8_t
 wave_read_hdr(File &f, sample_cnt_t * const sample_cnt_p)
 {
 	// main chunk
-
 	wave_chunk_t chunk;
 	if (_read_bytes(f, sizeof(chunk), 0, (char *) &chunk) != 0 ||
 		memcmp(&chunk.hdr.id, _ids[ IDTYPE_TIFF ], sizeof(chunk.hdr.id)) != 0 ||
@@ -123,7 +122,6 @@ wave_read_hdr(File &f, sample_cnt_t * const sample_cnt_p)
 	}
 	
 	// sub chunk "fmt "
-
 	wave_hdr_t hdr;
 	wave_fmtvalue_t fmtValue;
 	if (_read_bytes(f, sizeof(hdr), 0, (char *)&hdr) ||
@@ -135,7 +133,6 @@ wave_read_hdr(File &f, sample_cnt_t * const sample_cnt_p)
 		_read_bytes(f, hdr.len - sizeof(fmtValue), 0, NULL) != 0) {
 		return 3;
 	}
-
 	if (fmtValue.audio_format != 1 ||     // PCM
 		fmtValue.num_of_channels != 1 ||  // mono
 		fmtValue.bits_per_sample != 8 ||  // 8 bits/sample
@@ -144,7 +141,6 @@ wave_read_hdr(File &f, sample_cnt_t * const sample_cnt_p)
 	}
 	
 	// sub chunk "data"
-
 	if (_read_bytes(f, sizeof(hdr), 0, (char *) &hdr) != 0 ||
 		memcmp(&hdr.id, _ids[IDTYPE_DATA], sizeof(hdr.id)) != 0) {
 

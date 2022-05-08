@@ -36,9 +36,15 @@
 
 sddir_callback_t _callback = NULL;
 
+/**
+ * @brief Recursively walk directory, calling registered `_callback` for files
+ * 
+ * @param dir            Directory to start at
+ * @param lvl            Current level
+ * @return uint_least8_t Returns 0 if successful
+ */
 static uint_least8_t
-_walkDirectory(File &dir,                // directory to start
-			   uint_least8_t const lvl)  // current level
+_walkDirectory(File &dir, uint_least8_t const lvl)
 {
 	File f;
 	uint_least8_t err = 0;
@@ -62,11 +68,15 @@ _walkDirectory(File &dir,                // directory to start
 	return err;
 }
 
-// for each file in Directory
-
-uint_least8_t                                    // returns 0 if successful
-sddir_for_each_file(char const * const dirName,  // directory (and its sub directories) to search
-				    sddir_callback_t cb)         // function to call for each file found
+/**
+ * @brief For each file in directory
+ * 
+ * @param dirName        Directory (and its sub directories) to search
+ * @param cb             Function to call for each file found
+ * @return uint_least8_t Returns 0 if successful
+ */
+uint_least8_t
+sddir_for_each_file(char const * const dirName, sddir_callback_t cb)
 {
 	_callback = cb;
 
@@ -77,6 +87,12 @@ sddir_for_each_file(char const * const dirName,  // directory (and its sub direc
 	return err;
 }
 
+/**
+ * @brief Initialize
+ * 
+ * @param cs_pin         GPIO pin used for SD Chip Select
+ * @return uint_least8_t Returns 0 if successful
+ */
 uint_least8_t
 sddir_init(uint_least8_t const cs_pin)
 {
