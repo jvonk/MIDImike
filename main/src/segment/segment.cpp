@@ -38,21 +38,21 @@ namespace {
 }
 
 void
-Segment::energyInit_( segmentEnergyTrend_t * const trend )
+Segment::energyInit_(segmentEnergyTrend_t * const trend)
 {
-	MidiSerial::programChange(CONFIG_MIDIMIKE_MIDI_INSTRUMENT);
+	midiserial_send_program_change(CONFIG_MIDIMIKE_MIDI_INSTRUMENT);
 	trend->previous = 0;
 	trend->state = segmentEnergyState_t::findNegSlope;
 }
 
 
 void
-Segment::energyUpdate_( segmentEnergyTrend_t  * const trend,
-						segmentEnergy_t const        energy )
+Segment::energyUpdate_(segmentEnergyTrend_t  * const trend,
+						segmentEnergy_t const        energy)
 {
-	switch ( trend->state ) {
+	switch (trend->state) {
 		case segmentEnergyState_t::findNegSlope:
-			if ( energy < trend->previous ) {  // downward slope started
+			if (energy < trend->previous) {  // downward slope started
 				trend->min = energy;
 				trend->state = segmentEnergyState_t::findPosSlope;
 			} else {
@@ -60,8 +60,8 @@ Segment::energyUpdate_( segmentEnergyTrend_t  * const trend,
 			}
 			break;
 		case segmentEnergyState_t::findPosSlope:
-			if ( energy > trend->previous ) {  // energy increasing again
-				if ( energy > ((100 + SEGMENT_ENERGY_INCR_THRESHOLD) * trend->min) / 100 ) {
+			if (energy > trend->previous) {  // energy increasing again
+				if (energy > ((100 + SEGMENT_ENERGY_INCR_THRESHOLD) * trend->min) / 100) {
 					trend->state = segmentEnergyState_t::foundPosSlope;  // trend on the rise again
 				}
 			} else {
@@ -75,16 +75,16 @@ Segment::energyUpdate_( segmentEnergyTrend_t  * const trend,
 }
 
 
-Segment::Segment( void )
+Segment::Segment(void)
 {
 	cv.candidate.pitch = 0;
 	cv.prevEndTime = millis();
-	this->energyInit_( &cv.energyTrend );
+	this->energyInit_(&cv.energyTrend);
 	cv.note = NULL;
 }
 
 segmentRelTime_t
-Segment::difftime_( absoluteTime_t const t )
+Segment::difftime_(absoluteTime_t const t)
 {
 	absoluteTime_t const t0 = cv.lastEventTime;
 	cv.lastEventTime = t;
@@ -100,76 +100,76 @@ Segment::difftime_( absoluteTime_t const t )
 //   - when the note offset is detected, the 'offset' for the note is updated in the midi buffer.
 
 void
-Segment::put( absoluteTime_t const   now,          // absolute current time (at the end of chunk) [msec]
+Segment::put(absoluteTime_t const   now,          // absolute current time (at the end of chunk) [msec]
 			  segmentPitch_t const   pitch,        // midi pitch measured
 			  segmentEnergy_t const  energy,       // energy/loudness measured [0..127]
-			  SegmentBuf * const     segmentBuf )  // segment buffer to write note to
+			  SegmentBuf * const     segmentBuf)  // segment buffer to write note to
 {
 	absoluteTime_t t = 0;  // init to please compiler
 	bool startNewNote = false;
 	bool stopCurrentNote = false;
 
-	if ( cv.note ) {
+	if (cv.note) {
 		cv.note->duration = now - cv.lastEventTime;  // update needed for piano roll display
 		cv.lastOffset = now;
 	}
 
 	// note start/stop
-	if ( pitch ) {
+	if (pitch) {
 
-		if ( pitch == cv.candidate.pitch ) {
+		if (pitch == cv.candidate.pitch) {
 
 			bool const meetsMinDuration = now - cv.candidate.startTime > CONFIG_MIDIMIKE_MIN_SEGMENT_DURATION;
 			bool const noteFollowingRest = !cv.note;
 			bool const pitchChanged = cv.candidate.pitch != cv.note->pitch;
 			bool const energyIncreasing = cv.energyTrend.state == segmentEnergyState_t::foundPosSlope;
 
-			if ( meetsMinDuration && (noteFollowingRest || pitchChanged || energyIncreasing) ) {
+			if (meetsMinDuration && (noteFollowingRest || pitchChanged || energyIncreasing)) {
 				t = cv.candidate.startTime;
-				if ( cv.note ) {               
+				if (cv.note) {               
 					stopCurrentNote = true;  // EXISTING NOTE TERMINATED BY THE START OF A NEW NOTE
 				}
 				startNewNote = true;  // NEW NOTE STARTS AFTER REST
 			}
-			energyUpdate_( &cv.candidate.energyTrend, energy );
+			energyUpdate_(&cv.candidate.energyTrend, energy);
 
 		} else {  // this becomes the new candidate
 			cv.candidate.startTime = cv.prevEndTime;
 			cv.candidate.pitch = pitch;
-			energyInit_( &cv.candidate.energyTrend );
+			energyInit_(&cv.candidate.energyTrend);
 		}
 
 	} else {
 
-		if ( cv.note ) {  // EXISTING NOTE TERMINATED BY REST
+		if (cv.note) {  // EXISTING NOTE TERMINATED BY REST
 			cv.candidate.pitch = 0;
 			t = cv.prevEndTime;
 			stopCurrentNote = true;
 		}
 	}
 
-	if ( stopCurrentNote ) {
-		MidiSerial::noteOff(cv.note->pitch, 0);
-		//MidiSerial::programChange(random(1, 52));
-		cv.note = segmentBuf->noteEnd( difftime_( t ), cv.energyTrend.max, cv.note );
+	if (stopCurrentNote) {
+		midiserial_send_note_off(cv.note->pitch, 0);
+		//midiserial_send_program_change(random(1, 52));
+		cv.note = segmentBuf->noteEnd(difftime_(t), cv.energyTrend.max, cv.note);
 		cv.lastOffset = t;
 
 	}
 
-	if ( startNewNote ) {
-		MidiSerial::noteOn(pitch, energy);
-		if ( segmentBuf->len() == 0 ) {  // first segment should have relative time=0
+	if (startNewNote) {
+		midiserial_send_note_on(pitch, energy);
+		if (segmentBuf->len() == 0) {  // first segment should have relative time=0
 			cv.lastEventTime = t;
 		}
-		cv.note = segmentBuf->noteStart( difftime_( t ), now - t, pitch, energy );
+		cv.note = segmentBuf->noteStart(difftime_(t), now - t, pitch, energy);
 		cv.lastOffset = now;
 		cv.energyTrend = cv.candidate.energyTrend;
 
 	}
 
 	// update energy level trend (2BD should stop when a new candidate presents itself)
-	if ( cv.note ) {
-		energyUpdate_( &cv.energyTrend, energy );
+	if (cv.note) {
+		energyUpdate_(&cv.energyTrend, energy);
 	}  else {
 		cv.energyTrend.previous = pitch ? energy : 0;
 	}
@@ -178,7 +178,7 @@ Segment::put( absoluteTime_t const   now,          // absolute current time (at 
 
 
 absoluteTime_t
-Segment::getLastOffset( void )
+Segment::getLastOffset(void)
 {
 	return this->cv.lastOffset;
 }

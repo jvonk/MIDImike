@@ -13,12 +13,12 @@
 
 enum ADMUX_REFS_t {
     ADMUX_REFERENCE_EXT = 0,
-    ADMUX_REFERENCE_VCC = bit( 6 ),  // 5V on Arduino Uno
-    ADMUX_REFERENCE_1V1 = bit( 6 ) | bit( 7 )
+    ADMUX_REFERENCE_VCC = bit(6),  // 5V on Arduino Uno
+    ADMUX_REFERENCE_1V1 = bit(6) | bit(7)
 };
 enum ADMUX_ADLAR_t {
     ADMUX_RIGHT_ALIGN = 0,
-    ADMUX_LEFT_ALIGN = bit( 5 )
+    ADMUX_LEFT_ALIGN = bit(5)
 };
 enum ADMUX_MUX_t {
     ADMUX_INPUT_A0 = 0,
@@ -34,23 +34,23 @@ uint8_t const ADMUX_INPUT_MASK = 0x0F;
 
 enum ADCSRA_ADEN_t {
     ADCSRA_CONVERT_DISABLE = 0,
-    ADCSRA_CONVERT_ENABLE = bit( 7 ),
+    ADCSRA_CONVERT_ENABLE = bit(7),
 };
 enum ADCSRA_ADSC_t {
     ADCSRA_CONVERT_FINISHED = 0,
-    ADCSRA_CONVERT_START = bit( 6 ),
+    ADCSRA_CONVERT_START = bit(6),
 };
 enum ADCSRA_ADATE_t {
     ADCSRA_AUTO_TRIGGER_DISABLE = 0,
-    ADCSRA_AUTO_TRIGGER_ENABLE = bit( 5 )
+    ADCSRA_AUTO_TRIGGER_ENABLE = bit(5)
 };
 enum ADCSRA_ADIF_t {
     ADCSRA_IRQ_NOTYET = 0,
-    ADCSRA_IRQ_ACTIVE = bit( 4 )
+    ADCSRA_IRQ_ACTIVE = bit(4)
 };
 enum ADCSRA_ADIE_t {
     ADCSRA_IRQ_DISABLE = 0,
-    ADCSRA_IRQ_ENABLE = bit( 3 )
+    ADCSRA_IRQ_ENABLE = bit(3)
 };
 enum ADCSRA_ADPS_t {
     ADCSRA_PRESCALER_DIV1 = 0,
@@ -64,16 +64,14 @@ enum ADCSRA_ADPS_t {
 };
 
 // 24.9.3 ADCL and ADCH ~ The ADC Data Register
-
-/* with ADMUX_RESULT_RIGHT_ALIGN .. ADCH[1:0] = b9..b8, ADCL[7:0] = b7..b0 */
-/* with ADMUX_RESULT_LEFT_ALIGN ... ADCH[7:0] = b9..b2, ADCL[7:6] = b1..b0 */
-
+// with ADMUX_RESULT_RIGHT_ALIGN .. ADCH[1:0] = b9..b8, ADCL[7:0] = b7..b0
+// with ADMUX_RESULT_LEFT_ALIGN ... ADCH[7:0] = b9..b2, ADCL[7:6] = b1..b0
 
 // 24.9.4 ADCSRB ~ ADC Control and Status Register B
 
 enum ADCSRB_ACME_t {  // see 23.3.1
     ADCSRB_MULTIPLEXER_DISABLE = 0,
-    ADCSRB_MULTIPLEXER_ENABLE = bit( 6 )
+    ADCSRB_MULTIPLEXER_ENABLE = bit(6)
 };
 enum ADCSRB_ADTS_t {
     ADCSRB_TRIGGERSRC_FREERUNNING = 0,
@@ -89,10 +87,10 @@ enum ADCSRB_ADTS_t {
 // 24.9.5 DIDR0 ~ Digital Input Disable Register 0
 
 enum DIDR0_ADCxD_t {
-    DIDR0_DISABLE_DIGBUF_0 = bit( 0 ),
-    DIDR0_DISABLE_DIGBUF_1 = bit( 1 ),
-    DIDR0_DISABLE_DIGBUF_2 = bit( 2 ),
-    DIDR0_DISABLE_DIGBUF_3 = bit( 3 ),
-    DIDR0_DISABLE_DIGBUF_4 = bit( 4 ),
-    DIDR0_DISABLE_DIGBUF_5 = bit( 5 )
+    DIDR0_DISABLE_DIGBUF_0 = bit(0),
+    DIDR0_DISABLE_DIGBUF_1 = bit(1),
+    DIDR0_DISABLE_DIGBUF_2 = bit(2),
+    DIDR0_DISABLE_DIGBUF_3 = bit(3),
+    DIDR0_DISABLE_DIGBUF_4 = bit(4),
+    DIDR0_DISABLE_DIGBUF_5 = bit(5)
 };

@@ -243,7 +243,7 @@ setup()
     pianoroll_init(SPI_TFT_CS, SPI_DC, SPI_RST);
 
 #if 0
-    if (MidiFile::begin(SPI_SD_CS) != 0) {
+    if (midifile_init(SPI_SD_CS) != 0) {
         Serial.println("No SD Card");  // uSD card inserted/formatted  ??
     }
 #endif
@@ -253,7 +253,7 @@ setup()
 #endif
 
 #if SRC == SRC_MICR
-    Microphone::begin(MICROPHONE_IN);
+    microphone_begin(MICROPHONE_IN);
 #endif
     // loop() never stops, so there is no need for corresponding end() methods
 }
@@ -276,13 +276,13 @@ loop()
     // get samples from microphone, samples will be dynamically allocated on first invocation
 
     amplitude_t amplitude;
-    samples_t samples = Microphone::getSamples(&amplitude);
+    samples_t samples = microphone_get_samples(&amplitude);
 
     // find frequency from samples
     float freq = Frequency::calculate(samples);
 
     // no longer need the samples, so reuse it and start gathering samples for next time around
-    Microphone::update();  // async
+    microphone_start();  // async
 
     // ignore notes under audible threshold (2BD: already done in getSamples())
     if (amplitude < CONFIG_MIDIMIKE_AUDIBLE_THRESHOLD) {
@@ -306,13 +306,13 @@ loop()
     // or maybe just start playing the buffer over MIDI ..
 
     if (USB_MIDI && digitalRead(BUTTON_IN) == 0) {
-        MidiSerial::send(mv.segmentBuf);
+        midiserial_send_notes(mv.segmentBuf);
         pianoroll_clear();
     }
 
 #if 0
-    if (MidiFile::write(mv.segmentBuf, "arduino.mid") != 0) {
-        Serial.println("MidiFile::write is mad");
+    if (midifile_write(mv.segmentBuf, "arduino.mid") != 0) {
+        Serial.println("midifile_write is mad");
     }
 #endif
 

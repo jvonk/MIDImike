@@ -107,7 +107,7 @@ static staff_t _my = {
 };
 
 // resize screen
-void
+static void
 _resize(int const width, 
         int const height)
 {
@@ -125,13 +125,13 @@ _resize(int const width,
     _my.distance.noteRadius = _my.distance.staffLine2line / 2 - 1;
 }
 
-INLINE bool
+static INLINE bool
 _isFlat(noteNr_t const noteNr)
 {
     return _my.notes[static_cast<int>(noteNr)].flat;
 }
 
-INLINE vStaffPos_t
+static INLINE vStaffPos_t
 _nr2vStaffPos(noteNr_t const number,
                 octaveNr_t const octave)
 {
@@ -139,7 +139,7 @@ _nr2vStaffPos(noteNr_t const number,
     return staffPositionsInOctave * octave + _my.notes[static_cast<int>(number)].posInOctave;
 }
 
-INLINE vStaffPos_t
+static INLINE vStaffPos_t
 _freq2vStaffPos(frequency_t const freq)
 {
     segmentPitch_t const pitch = Pitch::freq2pitch(freq);
@@ -149,21 +149,21 @@ _freq2vStaffPos(frequency_t const freq)
 }
 
 // horizontal staff position to screen x coordinate
-INLINE int16_t
+static INLINE int16_t
 _hStaffPos2x(int const n)
 {
     // 2BD: one could move the notes closer to each other as they shift to the left
     return GKEY_WIDTH + (n * _my.distance.note2note + _my.distance.note2note / 2);
 }
 
-vStaffPos_t
+static vStaffPos_t
 _getVStaffPos(Pitch & pitch)
 {
     return _nr2vStaffPos(pitch.getNoteNr(), pitch.getOctaveNr());
 }
 
 // position on staff to screen y coordinate
-int16_t
+static int16_t
 _vStaffPos2y(vStaffPos_t const n)
 {
     vStaffPos_t const distAbove1stNoteOnStaff = n - _my.position.staff.min;  // could be negative!
@@ -172,7 +172,7 @@ _vStaffPos2y(vStaffPos_t const n)
         distAbove1stNoteOnStaff * _my.distance.staffLine2line / 2;
 }
 
-void
+static void
 _displayStaff(void)
 {
     for (int ii = 0; ii < LINES_ON_STAFF; ii++) {
@@ -181,7 +181,7 @@ _displayStaff(void)
     }
 }
 
-void
+static void
 _drawHelperLine(uint16_t const x, vStaffPos_t const positionOnStaff, uint16_t const barColor)
 {
     uint16_t len = _my.distance.note2note * 4 / 5;
@@ -191,7 +191,7 @@ _drawHelperLine(uint16_t const x, vStaffPos_t const positionOnStaff, uint16_t co
         len, barColor);
 }
 
-void
+static void
 _drawNote(uint_least8_t const hpos, Pitch & pitch, bool const erase)
 {
     vStaffPos_t const n = _getVStaffPos(pitch);

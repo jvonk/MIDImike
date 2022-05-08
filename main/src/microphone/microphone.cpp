@@ -32,75 +32,47 @@
 #include "microphone.h"
 #include "adc_t.h"
 
-namespace {
+typedef struct amplitudeRange_t {
+    sample_t min;
+    sample_t max;
+} amplitudeRange_t;
 
-    struct filevariables_t {
-        uint8_t     analogPort;
-        uint8_t     prescaler;
-        sample_t *  samples;  // updated by ISR
-    } static fv;  // file scope variables
+typedef struct my_t {
+    sampleCnt_t cnt;
+    amplitudeRange_t range;
+    sample_t * samples;
+    uint8_t analogPort;
+    uint8_t prescaler;
+} my_t;
 
-    struct amplitudeRange_t {
-        sample_t min;
-        sample_t max;
-    };
-    struct isr_t {
-        sampleCnt_t ii;
-        amplitudeRange_t range;
-    };
-
-    isr_t volatile _isr = {  // data updated while interrupt enabled
-        0,
-        {SCHAR_MAX, SCHAR_MIN}
-    };
-
-#if SHOW_SAMPLES
-    void
-    _plotSamples( samples_t const    samples,       // pointer to 8-bit data samples [in]
-                  sampleCnt_t const  nrOfSamples )  // number of data samples [in]
-    {
-        for ( uint32_t ii = 0; ii < nrOfSamples; ii++ ) {
-            int16_t d = (int16_t)samples[ii] - SCHAR_MIN;
-            while ( d > 0 ) {
-                Serial.print ( " " );
-                d = d - 4;
-            }
-            Serial.println( "*" );
-            //Serial.println ( samples[ii], DEC );
-        }
-    }
-#endif
-}
+my_t volatile _my = {};  // data updates in ISR
 
 void
-Microphone::begin( uint8_t const port )
+microphone_begin(uint8_t const port)
 {
-    fv.analogPort = port;
+    _my.analogPort = port;
 
-    // allocate memory
-    //   no free, 'cause loop() never stops
-    fv.samples = new sample_t[CONFIG_MIDIMIKE_WINDOW_SIZE];
-    ASSERT(( fv.samples ));
+    // allocate memory (no freed, 'cause `loop` never stops)
+    _my.samples = new sample_t[CONFIG_MIDIMIKE_WINDOW_SIZE];
+    ASSERT((_my.samples));
 
-    // determine fv.prescaler setting for ADCSRA
-    fv.prescaler = 0;
-    for ( uint32_t d = 16e6 / 13; CONFIG_MIDIMIKE_SAMPLE_RATE < d; d /= 2 ) {
-        fv.prescaler++;
+    // determine prescaler setting for ADCSRA
+    _my.prescaler = 0;
+    for (uint32_t d = 16e6 / 13; CONFIG_MIDIMIKE_SAMPLE_RATE < d; d /= 2) {
+        _my.prescaler++;
     }
-
-    // start gathering samples
-    Microphone::update();
+    
+    microphone_start();  // start gathering samples
 }
 
 void
-Microphone::update( void )
+microphone_start(void)
 {
     // init private date for ISR (so we don't have to test for ii==0 inside the ISR)
-    ::isr_t volatile * const isr = &_isr;
-    isr->ii = 0;
+    my_t volatile * const my = &_my;
+    my->cnt = 0;
 
-    // start gathering new samples
-    // (no need to disable interrupts, after all this interrupt is off, and we're turning it on here)
+    // start gathering new samples (no need to disable interrupts, after all this interrupt is off, and we're turning it on here)
 
     ADCSRB =
         ADCSRB_MULTIPLEXER_ENABLE;
@@ -108,10 +80,10 @@ Microphone::update( void )
     ADMUX =
         ADMUX_REFERENCE_EXT |
         ADMUX_LEFT_ALIGN |
-        (ADMUX_INPUT_MASK & fv.analogPort);
+        (ADMUX_INPUT_MASK & my->analogPort);
 
     ADCSRA =
-        fv.prescaler |
+        my->prescaler |
         ADCSRA_AUTO_TRIGGER_ENABLE |
         ADCSRA_IRQ_ENABLE |
         ADCSRA_CONVERT_ENABLE |
@@ -119,57 +91,46 @@ Microphone::update( void )
 }
 
 
-// Get Samples
-
-samples_t               // returns pointer to array of data samples, NULL on failure
-Microphone::getSamples( amplitude_t * const amplitudePtr )
+samples_t  // returns pointer to array of data samples, NULL on failure
+microphone_get_samples(amplitude_t * const amplitudePtr)
 {
-
-    while ( ADCSRA & ADCSRA_IRQ_ENABLE ) {
+    while (ADCSRA & ADCSRA_IRQ_ENABLE) {
         // spin wait until all samples are available
     }
 
-#if SHOW_SAMPLES
-# define SAMPLE_COUNT (5)
-    _plotSamples ( fv.samples, SAMPLE_COUNT );
-#endif
-    ::isr_t volatile * const isr = &_isr;
+    my_t volatile * const my = &_my;
 
-    bool clipping = (isr->range.max == SCHAR_MIN) || (isr->range.max == SCHAR_MAX);
-    amplitude_t amplitude = (int16_t)isr->range.max - isr->range.min; // top-top [0..255]
+    bool clipping = (my->range.max == SCHAR_MIN) || (my->range.max == SCHAR_MAX);
+    amplitude_t amplitude = (int16_t)my->range.max - my->range.min; // top-top [0..255]
 
     *amplitudePtr = amplitude/2; // range [0..127]
 
-    return (amplitude / 2 > CONFIG_MIDIMIKE_AUDIBLE_THRESHOLD) && !clipping ? fv.samples : NULL;
+    return (amplitude / 2 > CONFIG_MIDIMIKE_AUDIBLE_THRESHOLD) && !clipping ? my->samples : NULL;
 }
 
-    /***************************
-     * Interrupt Service Routine
-     ***************************/
-
-ISR ( ADC_vect )
+// interrupt service routine
+ISR (ADC_vect)
 {
-    ::isr_t volatile * const isr = &_isr;
+    ::my_t volatile * const my = &_my;
     sample_t const s = ADCH + SCHAR_MIN;  // remove voltage bias by changing range from [0..255] to [-128..127]
 
         // update min and max, so peak-to-peak value can be determined
-    if ( isr->ii == 0 ) {
-        isr->range.min = SCHAR_MAX;
-        isr->range.max = SCHAR_MIN;
+    if (my->cnt == 0) {
+        my->range.min = SCHAR_MAX;
+        my->range.max = SCHAR_MIN;
     }
-    if ( s < isr->range.min ) {
-        isr->range.min = s;
+    if (s < my->range.min) {
+        my->range.min = s;
     }
-    if ( s > isr->range.max ) {
-        isr->range.max = s;
+    if (s > my->range.max) {
+        my->range.max = s;
     }
 
-    if ( isr->ii < CONFIG_MIDIMIKE_WINDOW_SIZE ) {
-        fv.samples[isr->ii++] = s;
-    } else {
-            // we're done
-        ADCSRA =
-            fv.prescaler |
+    if (my->cnt < CONFIG_MIDIMIKE_WINDOW_SIZE) {
+        my->samples[my->cnt++] = s;
+    } else {            
+        ADCSRA =  // we're done
+            my->prescaler |
             ADCSRA_AUTO_TRIGGER_DISABLE |
             ADCSRA_IRQ_DISABLE |
             ADCSRA_CONVERT_ENABLE;

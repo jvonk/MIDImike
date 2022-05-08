@@ -47,9 +47,6 @@
 # define GKEY (GKEY_LORES)
 #endif
 
-// debug option: simple ASCII plot of samples waveform on serial monitor
-#define SHOW_SAMPLES (0)
-
 // help reduce the number of #if statements in other files
 #if SHOW_MEMORY_USAGE
 #  define SHOW_MEMORY_USAGE_ONLY(a) do { a; } while (0)
