@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum noteNr_t {
+typedef enum notenr_t {
     NOTENR_C = 0,
     NOTENR_Db,
     NOTENR_D,
@@ -14,7 +14,11 @@ typedef enum noteNr_t {
     NOTENR_Bb,
     NOTENR_B,
     NOTENR_COUNT
-} noteNr_t;
+} notenr_t;
 
-typedef uint_least8_t  octaveNr_t;
+typedef uint_least8_t  octavenr_t;
 
+typedef struct pitch_t {
+    octavenr_t octavenr;
+    notenr_t notenr;
+} pitch_t;

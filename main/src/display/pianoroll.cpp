@@ -47,8 +47,8 @@
 #define CHAR_WIDTH (6)
 #define CHAR_HEIGHT (8)
 #define X_FIRSTNOTE (2 * CHAR_WIDTH)
-#define PITCH_MIN (Pitch::freq2pitch(CONFIG_MIDIMIKE_FREQ_MIN))
-#define PITCH_MAX (Pitch::freq2pitch(CONFIG_MIDIMIKE_FREQ_MAX))
+#define PITCH_MIN (pitch_freq2segment(CONFIG_MIDIMIKE_FREQ_MIN))
+#define PITCH_MAX (pitch_freq2segment(CONFIG_MIDIMIKE_FREQ_MAX))
 
 typedef struct display_t {
 	xCoordinate_t width;
@@ -116,7 +116,7 @@ _displayRoll(xCoordinate_t const xLeft,
 
 	for (segmentPitch_t ii = PITCH_MIN; ii <= PITCH_MAX; ii++) {
 
-		noteNr_t nr = static_cast<noteNr_t>(ii % 12);
+		notenr_t nr = static_cast<notenr_t>(ii % 12);
 
 		bool isC = (nr == NOTENR_C);
 		bool isG = (nr == NOTENR_G);
@@ -129,7 +129,7 @@ _displayRoll(xCoordinate_t const xLeft,
 		if (x == 0) {
 			if (isC || isG) {  // write a few note names on far left
 
-				octaveNr_t octave = ii / 12;
+				octavenr_t octave = ii / 12;
 				yCoordinate_t const cY = y - CHAR_HEIGHT / 2 + 1;
 
 				_pianoroll.tft->drawChar(0, cY, isC ? 'C' : 'G', color, color, 1);

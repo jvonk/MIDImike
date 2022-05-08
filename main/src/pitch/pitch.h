@@ -6,33 +6,18 @@
 #include "../../segment_t.h"
 #include "../../pitch_t.h"
 
-class Pitch {
+pitch_t pitch_get(char const * const fullname);
+pitch_t pitch_get(notenr_t const number, octavenr_t const octave);
+pitch_t pitch_get(frequency_t const freq);
 
-public:
-
-	// constructors
-	Pitch(void);
-	Pitch(char const * const fullname);
-	Pitch(noteNr_t const number, octaveNr_t const octave);
-	Pitch(frequency_t const freq);
-
-	// get
-	char const *   getShortName(void) const;
-	octaveNr_t     getOctaveNr(void) const;
-	noteNr_t       getNoteNr(void) const;
-	segmentPitch_t getPitch(void) const;
-	frequency_t    getFrequency(void) const;
+char const * pitch_shortname(pitch_t const * const pitch);
+octavenr_t pitch_octavenr(pitch_t const * const pitch);
+notenr_t pitch_notenr(pitch_t const * const pitch);
+segmentPitch_t pitch_segment(pitch_t const * const pitch);
+frequency_t pitch_frequency(pitch_t const * const pitch);
+segmentPitch_t pitch_freq2segment(frequency_t const freq);
 
 #if DST == DST_SERIAL
-	static void serialOutHeader(void);
-	void serialOut(char const * const instrument, Pitch & inPitch, frequency_t freq, amplitude_t const amplitude);
+void pitch_write_serial_hdr(void);
+void pitch_write_serial(pitch_t const * const pitch, char const * const instrument, frequency_t freq, amplitude_t const amplitude);
 #endif
-
-	static segmentPitch_t freq2pitch(frequency_t const freq);
-
-private:
-	struct NoteCv_t {
-	  octaveNr_t octaveNr;
-	  noteNr_t   noteNr;   // note# within octave
-	} cv = {};  // class variables
-};

@@ -10,4 +10,4 @@ class Note;
 #endif
 
 void staff_init(uint_least8_t tftCS_pin, uint_least8_t dc_pin, uint_least8_t reset_pin);
-void staff_draw_note(Pitch & pitch, amplitude_t const amplitude);
+void staff_draw_note(pitch_t const * const pitch, amplitude_t const amplitude);

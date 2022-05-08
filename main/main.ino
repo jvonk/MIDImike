@@ -177,25 +177,25 @@ namespace {
             float freq = frequency_calculate(samples);
 
             // find note from frequency
-            Pitch pitch(freq);  // instantiate using the `freq`
+            pitch_t pitch = pitch_get(freq);  // instantiate using the `freq`
 
 # if DST == DST_STAFF
 
             // show note on TFT display
-            staff_draw_note(pitch, amplitude);
+            staff_draw_note(&pitch, amplitude);
 
 # elif DST == DST_PIANOROLL
 
             // need it twice, otherwise it doesn't meet the minimum note duration
-			mv.segment->put(millis(), pitch.getPitch(), amplitude, mv.segmentBuf);
-			mv.segment->put(millis(), pitch.getPitch(), amplitude, mv.segmentBuf);
+			mv.segment->put(millis(), pitch_segment(pitch), amplitude, mv.segmentBuf);
+			mv.segment->put(millis(), pitch_segment(pitch), amplitude, mv.segmentBuf);
 			pianoroll_draw(mv.segment->getLastOffset(), mv.segmentBuf);
 
 # elif DST == DST_SERIAL
 
             // show note on Serial monitor
-            Pitch pitchIn(noteName);  // instantiate using the `noteName`
-            pitch.serialOut(instrument, pitchIn, freq, amplitude);
+            pitch_t const pitch_in = pitch_get(noteName);
+            pitch_write_serial(&pitch, instrument, pitchIn, freq, amplitude);
 # endif
         }
         //SHOW_MEMORY_USAGE_ONLY((Debug::showMemUsage()));
@@ -286,16 +286,16 @@ loop()
     }
 
     // find corresponding note
-    Pitch pitch(freq);  // instantiate using the `freq`
+    pitch_t const pitch = pitch_get(freq);  // instantiate using the `freq`
 
 # if DST == DST_STAFF
 
     // show note on TFT display
-    staff_draw_note(pitch, amplitude);
+    staff_draw_note(&pitch, amplitude);
 
 # elif DST == DST_PIANOROLL
 
-    mv.segment->put(millis(), pitch.getPitch(), amplitude, mv.segmentBuf);
+    mv.segment->put(millis(), pitch_segment(&pitch), amplitude, mv.segmentBuf);
     pianoroll_draw(mv.segment->getLastOffset(), mv.segmentBuf);
 
     // 2BD should clear the buffer if 64 seconds of silence,
@@ -314,8 +314,12 @@ loop()
 
 # elif DST == DST_SERIAL
 
-    Pitch pitchIn(NOTENR_C, 0);  // instantiate another using the `noteNr`
-    pitch.serialOut("microphone", pitchIn, freq, amplitude);
+#if 1
+    pitch_write_serial(&pitch, "microphone", freq, amplitude);
+#else
+    pitch_t const pitchIn = pitch_get(NOTENR_C, 0);
+    pitch_write_serial(&pitchIn, "microphone", freq, amplitude);
+#endif
 
 # endif
 
@@ -324,7 +328,7 @@ loop()
 
 #if SRC == SRC_FILE
 # if DST == DST_SERIAL
-    Pitch::serialOutHeader();
+    pitch_write_serial_hdr();
 # endif
     // for each file at sample rate, call _calcNoteFromFile()
     char dir[13] = "/notes/\012345";

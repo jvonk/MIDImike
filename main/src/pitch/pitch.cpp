@@ -53,17 +53,14 @@ static note_t const _notes[NOTENR_COUNT] = {
 
 // constructors
 
-Pitch::Pitch(void)
+pitch_t 
+pitch_get(char const * const fullname)  // note name w/ octave# e.g. "Gb4"
 {
-	cv.noteNr = NOTENR_C;
-	cv.octaveNr = 0;
-}
+	pitch_t pitch;
 
-Pitch::Pitch(char const * const fullname)  // construct based on note name w/ octave# e.g. "Gb4"
-{
 	// get octave# from the last char
 	uint_fast8_t len = strlen(fullname);
-	cv.octaveNr = fullname[len - 1] - '0';
+	pitch.octavenr = fullname[len - 1] - '0';
 
 	// chars before octave# are the note name itself
 	bool found = false;
@@ -74,70 +71,121 @@ Pitch::Pitch(char const * const fullname)  // construct based on note name w/ oc
 		if ((nn->name[0] == fullname[0]) &&
 			((nn->name[1] == '\0' && len < 3) ||
 			(nn->name[1] == fullname[1]))) {
-			cv.noteNr = static_cast<noteNr_t>(ii);
+			pitch.notenr = static_cast<notenr_t>(ii);
 			found = true;
 		}
 	}
 
 	if (!found) {
-		cv.noteNr = NOTENR_C;
-		cv.octaveNr = 0;
+		pitch.octavenr = 0;
+		pitch.notenr = NOTENR_C;
 	}
+	return pitch;
 }
 
-Pitch::Pitch(frequency_t const freq)  // construct based on frequency
+pitch_t 
+pitch_get(frequency_t const freq)
 {
+	pitch_t pitch;
 	frequency_t f = freq;
 
 	if (f) { //2BD:  f > FREQ_MIN && f < FREQ_MAX) {
 
 			// scale down frequency to octave 0, noting the # of octaves shifted
-		cv.octaveNr = 0;
-		uint_least8_t const notesCnt = sizeof(_notes) / sizeof(_notes[0]);
+		pitch.octavenr = 0;
 
-		while (f >= _notes[notesCnt - 1].freq_max) {
-			cv.octaveNr++;
+		while (f >= _notes[NOTENR_COUNT - 1].freq_max) {
+			pitch.octavenr++;
 			f /= 2;
 		}
-		for (uint_least8_t ii = 0; ii < notesCnt; ii++) {
+		for (uint_least8_t ii = 0; ii < NOTENR_COUNT; ii++) {
 			if (f < _notes[ii].freq_max) {
-				cv.noteNr = static_cast<noteNr_t>(ii);
+				pitch.notenr = static_cast<notenr_t>(ii);
 				break;
 			}
 		}
 
 	} else {
-		cv.noteNr = NOTENR_C;
-		cv.octaveNr = 0;
+		pitch.notenr = NOTENR_C;
+		pitch.octavenr = 0;
 	}
+	return pitch;
 }
 
-Pitch::Pitch(noteNr_t const number,    // note# with the octave
-			 octaveNr_t const octave) // octave#
+pitch_t 
+pitch_get(notenr_t const number,    // note# with the octave
+		  octavenr_t const octave)  // octave#
 {
+	pitch_t pitch;
+
 	if (number < NOTENR_COUNT) {
-		cv.noteNr = number;
-		cv.octaveNr = octave;
+		pitch.notenr = number;
+		pitch.octavenr = octave;
 	} else {
-		cv.noteNr = NOTENR_C;
-		cv.octaveNr = 0;
+		pitch.notenr = NOTENR_C;
+		pitch.octavenr = 0;
 	}
+	return pitch;
 }
 
 // public methods
 
 char const *
-Pitch::getShortName(void) const
+pitch_shortname(pitch_t const * const pitch)
 {
-	int const idx = static_cast<int>(cv.noteNr);
+	int const idx = pitch->notenr;
 
 	return _notes[idx].name;
+}
+
+frequency_t
+pitch_frequency(pitch_t const * const pitch)
+{
+	uint8_t const notesCnt = sizeof(_notes) / sizeof(_notes[0]);
+	uint_least8_t const idx = static_cast<uint_least8_t>(pitch->notenr);
+
+	if (idx >= notesCnt ||
+		(pitch->notenr == NOTENR_C && pitch->octavenr == 0)) {
+		return 0;
+	}
+	float freq = _notes[idx].freq;
+
+	uint_least8_t octave = pitch->octavenr;
+	while (octave) {
+		freq *= 2;
+		octave--;
+	}
+	return freq;
+}
+
+notenr_t
+pitch_notenr(pitch_t const * const pitch)
+{
+	return pitch->notenr;
+}
+
+octavenr_t
+pitch_octavenr(pitch_t const * const pitch)
+{
+	return pitch->octavenr;
+}
+
+segmentPitch_t
+pitch_segment(pitch_t const * const pitch)
+{
+	return pitch->octavenr * 12 + static_cast<segmentPitch_t>(pitch->notenr);
+}
+
+segmentPitch_t
+pitch_freq2segment(frequency_t const freq)  // returns the midi pitch for a given frequency
+{
+	return freq < CONFIG_MIDIMIKE_FREQ_MIN ? 0 : 69.0 + 12.0 * log(freq / 440.0) / log(2);
 }
 
 #if DST == DST_SERIAL
 
 void
-Pitch::serialOutHeader(void)
+pitch_write_serial_hdr(void)
 {
 	Serial.println("");
 	Serial.print("instrument samplefreq buffsize noteoctave freq => ");
@@ -146,85 +194,37 @@ Pitch::serialOutHeader(void)
 	Serial.println(CONFIG_MIDIMIKE_WINDOW_SIZE);
 }
 
-
 void
-Pitch::serialOut(char const * const  instrument,   // instrument name
-				  Pitch &             inPitch,     // note from file
-				  frequency_t         freq,        // frequency measured
-				  amplitude_t const   amplitude)   // amplitude measured
+pitch_write_serial(pitch_t const * const pitch,       // note from file
+				   char const * const    instrument,  // instrument name
+				   frequency_t           freq,        // frequency measured
+				   amplitude_t const     amplitude)   // amplitude measured
 {
 	(void) amplitude;
 	Serial.print(instrument); Serial.print(" ");
 	Serial.print(CONFIG_MIDIMIKE_SAMPLE_RATE); Serial.print(" ");
 	Serial.print(CONFIG_MIDIMIKE_WINDOW_SIZE); Serial.print(" ");
 
-	if (inPitch.getFrequency()) {  // do not show for microphone input
-		Serial.print(inPitch.getShortName());
-		Serial.print(inPitch.getOctaveNr());
-		if (strlen(inPitch.getShortName()) < 2) {
+	if (pitch_frequency(pitch)) {  // do not show for microphone input
+		Serial.print(pitch_shortname(pitch));
+		Serial.print(pitch_octavenr(pitch));
+		if (strlen(pitch_shortname(pitch)) < 2) {
 			Serial.print(" ");
 		}
 		Serial.print(" ");
-		Serial.print(inPitch.getFrequency());
+		Serial.print(pitch_frequency(pitch));
 	}
 
-	if (this->getPitch() > 0) {
+	if (pitch_segment(pitch) > 0) {
 		Serial.print(" => ");
 		Serial.print(freq);
 		Serial.print(" ");
-		Serial.print(this->getShortName());
-		Serial.print(this->getOctaveNr());
-		if (strlen(this->getShortName()) < 2) {
+		Serial.print(pitch_shortname(pitch));
+		Serial.print(pitch_octavenr(pitch));
+		if (strlen(pitch_shortname(pitch)) < 2) {
 			Serial.print(" ");
 		}
 	}
 	Serial.println();
 }
-
 #endif
-
-
-frequency_t
-Pitch::getFrequency(void) const
-{
-	uint8_t const notesCnt = sizeof(_notes) / sizeof(_notes[0]);
-	uint_least8_t const idx = static_cast<uint_least8_t>(cv.noteNr);
-
-	if (idx >= notesCnt ||
-		(cv.noteNr == NOTENR_C && cv.octaveNr == 0)) {
-		return 0;
-	}
-	float freq = _notes[idx].freq;
-
-	uint_least8_t octave = cv.octaveNr;
-	while (octave) {
-		freq *= 2;
-		octave--;
-	}
-	return freq;
-}
-
-
-noteNr_t
-Pitch::getNoteNr(void) const
-{
-	return cv.noteNr;
-}
-
-octaveNr_t
-Pitch::getOctaveNr(void) const
-{
-	return cv.octaveNr;
-}
-
-segmentPitch_t
-Pitch::getPitch(void) const
-{
-	return cv.octaveNr * 12 + static_cast<segmentPitch_t>(cv.noteNr);
-}
-
-segmentPitch_t
-Pitch::freq2pitch(frequency_t const freq)  // returns the midi pitch for a given frequency
-{
-	return freq < CONFIG_MIDIMIKE_FREQ_MIN ? 0 : 69.0 + 12.0 * log(freq / 440.0) / log(2);
-}
