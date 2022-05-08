@@ -142,8 +142,8 @@ static bool                                       // returns true on success, fa
 _writeTrackNote(File &                  f,        // file to append to
                 midiTime_t const        delay,    // delay compared to prior event (0 if none) [msec]
                 midiEvent_t const       eventNr,  // note event
-                segmentPitch_t const    pitch,    // note pitch
-                segmentEnergy_t const velocity)   // note velocity
+                segment_pitch_t const    pitch,    // note pitch
+                segment_energy_t const velocity)   // note velocity
 {
     _writeVarLen(f, _msec2ticks(delay));
 
@@ -209,7 +209,7 @@ midifile_write(SegmentBuf * const segmentBuf,  // buffer with segmented notes
     }
 
     uint_least8_t ii = 0;
-    while (segment_t const * note = segmentBuf->tailPtr(ii++)) {
+    while (segment_t const * note = segmentBuf->tail_ptr(ii++)) {
         if (_writeTrackNote(f, note->onset, midiEvent_t::noteOn, note->pitch, note->energy) == false ||
              _writeTrackNote(f, note->duration, midiEvent_t::noteOff, note->pitch, note->energy) == false) {
             return -4;

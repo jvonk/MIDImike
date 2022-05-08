@@ -34,6 +34,7 @@
 #include "../../midi_t.h"
 #include "../../segment_t.h"
 #include "../pitch/pitch.h"
+#include "../segment/segment.h"
 #include "../segment/segmentbuf.h"
 #include "midiserial.h"
 
@@ -47,8 +48,8 @@ _send_2byte_event(midiEvent_t const       event,
 
 static void
 _send_3byte_event(midiEvent_t const     event,
-				  segmentPitch_t const  pitch,
-				  segmentEnergy_t const velocity)
+				  segment_pitch_t const  pitch,
+				  segment_energy_t const velocity)
 {
 	Serial.write((static_cast<uint8_t>(event) << 4) | (CONFIG_MIDIMIKE_MIDI_CHANNEL & 0x0F));
 	Serial.write(pitch & 0x7F);
@@ -56,15 +57,15 @@ _send_3byte_event(midiEvent_t const     event,
 }
 
 void
-midiserial_send_note_on(segmentPitch_t const pitch,
-              segmentEnergy_t const energy)
+midiserial_send_note_on(segment_pitch_t const pitch,
+              segment_energy_t const energy)
 {
 	_send_3byte_event(midiEvent_t::noteOn, pitch, energy);
 }
 
 void
-midiserial_send_note_off(segmentPitch_t const pitch,
-               segmentEnergy_t const energy)
+midiserial_send_note_off(segment_pitch_t const pitch,
+               segment_energy_t const energy)
 {
 	_send_3byte_event(midiEvent_t::noteOff, pitch, energy);
 }
@@ -80,7 +81,7 @@ midiserial_send_notes(SegmentBuf * const  segmentBuf)  // buffer with segmented 
 {
 	midiserial_send_program_change(CONFIG_MIDIMIKE_MIDI_INSTRUMENT);
 
-	while (segment_t const * note = segmentBuf->popPtr()) {
+	while (segment_t const * note = segmentBuf->pop_ptr()) {
 
 		delay(note->onset);
 		midiserial_send_note_on(note->pitch, note->energy);

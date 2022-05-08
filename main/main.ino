@@ -10,7 +10,7 @@
  *                            \----------------------------/
  *
  * Platform: Arduino UNO R3 using Arduino IDE
- * Documentation: http://coertvonk.com/category/sw/arduino/pitch-detector
+ * Documentation: https://coertvonk.com/category/sw/arduino/pitch-detector
  * 
  * © Copyright 2015-2016,2022 Johan Vonk
  * 
@@ -58,15 +58,11 @@
 
 namespace {
 
-    /*****************
-     * I/O assignments
-     *****************/
-
     // Arduino Digital I/O that connect to the 1.8" TFT / SD Card
     //
     //  Arduino 5V -----------------wire to--- VCC *and* LITE on TFT/SD breakout
     //  Arduino GND ----------------wire to--- GND on TFT/SD breakout
-    enum digialIoPins {       //
+    enum digialIoPins {
         SPI_RST = 9,          // ---wire-to--- RESET on TFT/SD breakout    (Reset)
         SPI_DC = 8,           // ---wire-to--- D/C on TFT/SD breakout      (SPI Data/Command)
         SPI_SD_CS = 4,        // ---wire-to--- CARD_CS on TFT/SD breakout  (SPI SD Card Chip Select)
@@ -87,7 +83,6 @@ namespace {
         JOYSTICK_IN = 3       // ---wire-to--- on TFT/SD/joystick shield (NOT NEEDED, unused)
     };                        // ----n.c.----- AR on Microphone Amp breakout
 
-
 #if DST == DST_PIANOROLL
     struct mainvariables_t {
         Segment *     segment;
@@ -95,7 +90,6 @@ namespace {
     };  // file scope variables
     static mainvariables_t mv;
 #endif
-
 
     /************************
      * Read samples from file
@@ -177,25 +171,25 @@ namespace {
             float freq = frequency_calculate(samples);
 
             // find note from frequency
-            pitch_t pitch = pitch_get(freq);  // instantiate using the `freq`
+            Pitch pitch(freq);  // instantiate using the `freq`
 
 # if DST == DST_STAFF
 
             // show note on TFT display
-            staff_draw_note(&pitch, amplitude);
+            staff_draw_note(pitch);
 
 # elif DST == DST_PIANOROLL
 
             // need it twice, otherwise it doesn't meet the minimum note duration
-			mv.segment->put(millis(), pitch_segment(pitch), amplitude, mv.segmentBuf);
-			mv.segment->put(millis(), pitch_segment(pitch), amplitude, mv.segmentBuf);
-			pianoroll_draw(mv.segment->getLastOffset(), mv.segmentBuf);
+			mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
+			mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
+			pianoroll_draw(mv.segment->get_last_offset(), mv.segmentBuf);
 
 # elif DST == DST_SERIAL
 
             // show note on Serial monitor
-            pitch_t const pitch_in = pitch_get(noteName);
-            pitch_write_serial(&pitch, instrument, pitchIn, freq, amplitude);
+            Pitch pitch_in(noteName);
+            pitch.write_serial(instrument, pitch_in, freq);
 # endif
         }
         //SHOW_MEMORY_USAGE_ONLY((Debug::showMemUsage()));
@@ -286,17 +280,17 @@ loop()
     }
 
     // find corresponding note
-    pitch_t const pitch = pitch_get(freq);  // instantiate using the `freq`
+    Pitch pitch(freq);  // instantiate using the `freq`
 
 # if DST == DST_STAFF
 
     // show note on TFT display
-    staff_draw_note(&pitch, amplitude);
+    staff_draw_note(pitch);
 
 # elif DST == DST_PIANOROLL
 
-    mv.segment->put(millis(), pitch_segment(&pitch), amplitude, mv.segmentBuf);
-    pianoroll_draw(mv.segment->getLastOffset(), mv.segmentBuf);
+    mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
+    pianoroll_draw(mv.segment->get_last_offset(), mv.segmentBuf);
 
     // 2BD should clear the buffer if 64 seconds of silence,
     // or maybe just start playing the buffer over MIDI ..
@@ -314,12 +308,8 @@ loop()
 
 # elif DST == DST_SERIAL
 
-#if 1
-    pitch_write_serial(&pitch, "microphone", freq, amplitude);
-#else
-    pitch_t const pitchIn = pitch_get(NOTENR_C, 0);
-    pitch_write_serial(&pitchIn, "microphone", freq, amplitude);
-#endif
+    Pitch pitch_in(NOTENR_C, 0);
+    pitch.write_serial("microphone", pitch_in, freq);
 
 # endif
 
@@ -328,7 +318,7 @@ loop()
 
 #if SRC == SRC_FILE
 # if DST == DST_SERIAL
-    pitch_write_serial_hdr();
+    Pitch::write_serial_hdr();
 # endif
     // for each file at sample rate, call _calcNoteFromFile()
     char dir[13] = "/notes/\012345";

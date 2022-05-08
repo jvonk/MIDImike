@@ -139,10 +139,10 @@ _nr2vStaffPos(notenr_t const number,
 static INLINE vStaffPos_t
 _freq2vStaffPos(frequency_t const freq)
 {
-    segmentPitch_t const pitch = pitch_freq2segment(freq);
+    segment_pitch_t const segment = Pitch::freq2segment(freq);
 
-    return  _nr2vStaffPos(static_cast<notenr_t>(pitch % 12),
-        static_cast<octavenr_t>(pitch / 12));
+    return  _nr2vStaffPos(static_cast<notenr_t>(segment % 12),
+        static_cast<octavenr_t>(segment / 12));
 }
 
 // horizontal staff position to screen x coordinate
@@ -154,9 +154,9 @@ _hStaffPos2x(int const n)
 }
 
 static vStaffPos_t
-_getVStaffPos(pitch_t const * const pitch)
+_getVStaffPos(Pitch & pitch)
 {
-    return _nr2vStaffPos(pitch_notenr(pitch), pitch_octavenr(pitch));
+    return _nr2vStaffPos(pitch.get_notenr(), pitch.get_octavenr());
 }
 
 // position on staff to screen y coordinate
@@ -189,7 +189,7 @@ _drawHelperLine(uint16_t const x, vStaffPos_t const positionOnStaff, uint16_t co
 }
 
 static void
-_drawNote(uint_least8_t const hpos, pitch_t const * const pitch, bool const erase)
+_drawNote(uint_least8_t const hpos, Pitch & pitch, bool const erase)
 {
     vStaffPos_t const n = _getVStaffPos(pitch);
     if (n == 0) {
@@ -230,7 +230,7 @@ _drawNote(uint_least8_t const hpos, pitch_t const * const pitch, bool const eras
     }
 
     // draw flat symbol
-    if (_isFlat(pitch_notenr(pitch))) {
+    if (_isFlat(pitch.get_notenr())) {
         staffsymbol_draw(x, y, STAFFSYMBOL_NAME_FLAT, noteColor);
     }
 
@@ -239,14 +239,18 @@ _drawNote(uint_least8_t const hpos, pitch_t const * const pitch, bool const eras
     //_my.tft->fillCircle(x, y, _my.distance.noteRadius, noteColor);
 }
 
+/**
+ * @brief 
+ * 
+ * @param pitch     Note measured
+ * @param amplitude Amplitude measured
+ */
 void
-staff_draw_note(pitch_t const * const pitch,       // note measured
-                amplitude_t const     amplitude)   // amplitude measured
+staff_draw_note(Pitch & pitch)
 {
-    (void)amplitude;
     static boolean        scroll = false;
     static uint_least8_t  curScreenPos = 0;
-    static pitch_t        notesOnScreen[MAX_NOTES_ON_SCREEN];
+    static Pitch          notesOnScreen[MAX_NOTES_ON_SCREEN];
 
         // if screen is full, shift to left
 
@@ -254,18 +258,17 @@ staff_draw_note(pitch_t const * const pitch,       // note measured
         for (uint_least8_t ii = 0; ii < MAX_NOTES_ON_SCREEN; ii++) {
 
                 // erase old note from screen position
-            _drawNote(ii, &notesOnScreen[ii], true);
+            _drawNote(ii, notesOnScreen[ii], true);
 
                 // draw new note in same screen position 
             if (ii < MAX_NOTES_ON_SCREEN - 1) {
                 notesOnScreen[ii] = notesOnScreen[ii + 1];
-                _drawNote(ii, &notesOnScreen[ii], false);
+                _drawNote(ii, notesOnScreen[ii], false);
             }
         }
         _displayStaff();  // draw staff to cover up empty spots
     }
-    notesOnScreen[curScreenPos].octavenr = pitch->octavenr;  // remember for later
-    notesOnScreen[curScreenPos].notenr = pitch->notenr;
+    notesOnScreen[curScreenPos] = pitch;  // remember for later
 
     _drawNote(curScreenPos, pitch, false);
 

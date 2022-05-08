@@ -47,8 +47,8 @@
 #define CHAR_WIDTH (6)
 #define CHAR_HEIGHT (8)
 #define X_FIRSTNOTE (2 * CHAR_WIDTH)
-#define PITCH_MIN (pitch_freq2segment(CONFIG_MIDIMIKE_FREQ_MIN))
-#define PITCH_MAX (pitch_freq2segment(CONFIG_MIDIMIKE_FREQ_MAX))
+#define PITCH_MIN (Pitch::freq2segment(CONFIG_MIDIMIKE_FREQ_MIN))
+#define PITCH_MAX (Pitch::freq2segment(CONFIG_MIDIMIKE_FREQ_MAX))
 
 typedef struct display_t {
 	xCoordinate_t width;
@@ -63,7 +63,7 @@ typedef struct distance_t {
 typedef struct msec_t {
 	segmentRelTime_t per_pixel;
 	segmentRelTime_t on_screen;
-	absoluteTime_t start;
+	absolute_time_t start;
 } msec_t;
 
 typedef struct pianoroll_t {
@@ -81,7 +81,7 @@ _resize(int width, int height)
 	_pianoroll.display.height = height;
 	_pianoroll.display.width = width;
 
-	segmentPitch_t const nrOfPos = PITCH_MAX - PITCH_MIN + 1;
+	segment_pitch_t const nrOfPos = PITCH_MAX - PITCH_MIN + 1;
 
 	_pianoroll.distance.pitch2pitch = height / nrOfPos;
 	_pianoroll.distance.bottom2loPitch = (height - nrOfPos*_pianoroll.distance.pitch2pitch) / 2;
@@ -92,8 +92,8 @@ _resize(int width, int height)
 }
 
 static INLINE xCoordinate_t        // returns x-coordinate on display [0 .. screen width - 1]
-_time2x(absoluteTime_t const  t,   // note time
-		absoluteTime_t const  t0)  // time on left of screen
+_time2x(absolute_time_t const  t,   // note time
+		absolute_time_t const  t0)  // time on left of screen
 {
 	xCoordinate_t const distance = t - _pianoroll.msec.start > t0 ? (t - _pianoroll.msec.start - t0) / _pianoroll.msec.per_pixel : 0;
 
@@ -101,7 +101,7 @@ _time2x(absoluteTime_t const  t,   // note time
 }
 
 static INLINE yCoordinate_t           // returns y-coordinate on display
-_pitch2y(segmentPitch_t const pitch)  // midi pitch
+_pitch2y(segment_pitch_t const pitch)  // midi pitch
 {
 	yCoordinate_t const diff = (pitch - PITCH_MIN) * _pianoroll.distance.pitch2pitch;
 
@@ -114,7 +114,7 @@ _displayRoll(xCoordinate_t const xLeft,
 {
 	xCoordinate_t xRight = xLeft + xWidth;
 
-	for (segmentPitch_t ii = PITCH_MIN; ii <= PITCH_MAX; ii++) {
+	for (segment_pitch_t ii = PITCH_MIN; ii <= PITCH_MAX; ii++) {
 
 		notenr_t nr = static_cast<notenr_t>(ii % 12);
 
@@ -142,13 +142,13 @@ _displayRoll(xCoordinate_t const xLeft,
 }
 
 void
-pianoroll_draw(absoluteTime_t const  lastOffset,  // needed to calculate absolute times
+pianoroll_draw(absolute_time_t const  lastOffset,  // needed to calculate absolute times
 			   SegmentBuf * const    segmentBuf)  // segment buffer containing notes
 {
-	absoluteTime_t const now = millis();
+	absolute_time_t const now = millis();
 
-	absoluteTime_t const n = (now - _pianoroll.msec.start) / _pianoroll.msec.on_screen;  // #times cursor wrapped around
-	absoluteTime_t const t0 = n * _pianoroll.msec.on_screen;  // time corresponding to the most left position on screen
+	absolute_time_t const n = (now - _pianoroll.msec.start) / _pianoroll.msec.on_screen;  // #times cursor wrapped around
+	absolute_time_t const t0 = n * _pianoroll.msec.on_screen;  // time corresponding to the most left position on screen
 	xCoordinate_t const cursor = _time2x(now, t0);
 	uint_least8_t const startLen = 2;  // first two pixels hi-light the note start
 
@@ -162,8 +162,8 @@ pianoroll_draw(absoluteTime_t const  lastOffset,  // needed to calculate absolut
 	// redraw a msec positions left of cursor.  This is needed because a new
 	// note is only recognized after it meets this minimum duration.  Until then, the note is shown
 	// as part of the previous note (or rest).
-	absoluteTime_t const maxLoopTime = 60;  // worst case is ~60msec per chunk [msec], increase if you see empty columns in the piano roll
-	absoluteTime_t const drawInMsec = min(CONFIG_MIDIMIKE_MIN_SEGMENT_DURATION + maxLoopTime, (cursor - X_FIRSTNOTE)*_pianoroll.msec.per_pixel);
+	absolute_time_t const maxLoopTime = 60;  // worst case is ~60msec per chunk [msec], increase if you see empty columns in the piano roll
+	absolute_time_t const drawInMsec = min(CONFIG_MIDIMIKE_MIN_SEGMENT_DURATION + maxLoopTime, (cursor - X_FIRSTNOTE)*_pianoroll.msec.per_pixel);
 	xCoordinate_t const drawInPixels = (xCoordinate_t)drawInMsec / _pianoroll.msec.per_pixel;                             // 38 msec
 	_pianoroll.tft->fillRect(cursor - drawInPixels, 0, drawInPixels, _pianoroll.display.height, COLOR_BG);  // erase, in case the pitch changed
 	_displayRoll(cursor - drawInPixels, drawInPixels);
@@ -171,12 +171,12 @@ pianoroll_draw(absoluteTime_t const  lastOffset,  // needed to calculate absolut
 	uint_least8_t ii = 0;
 	segment_t const * note;
 
-	absoluteTime_t offset = lastOffset;
+	absolute_time_t offset = lastOffset;
 
-	while ((note = segmentBuf->headPtr(ii++)) &&  // there are more notes to show &&
+	while ((note = segmentBuf->head_ptr(ii++)) &&  // there are more notes to show &&
 			(offset > now - drawInMsec)) {        // the note should be on screen
 
-		absoluteTime_t const onset = offset - note->duration;
+		absolute_time_t const onset = offset - note->duration;
 
 		xCoordinate_t const xLeft = _time2x(onset, t0);
 		xCoordinate_t const xWidth = _time2x(offset, t0) - xLeft;

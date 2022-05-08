@@ -6,18 +6,45 @@
 #include "../../segment_t.h"
 #include "../../pitch_t.h"
 
-pitch_t pitch_get(char const * const fullname);
-pitch_t pitch_get(notenr_t const number, octavenr_t const octave);
-pitch_t pitch_get(frequency_t const freq);
+typedef uint_least8_t  octavenr_t;
 
-char const * pitch_shortname(pitch_t const * const pitch);
-octavenr_t pitch_octavenr(pitch_t const * const pitch);
-notenr_t pitch_notenr(pitch_t const * const pitch);
-segmentPitch_t pitch_segment(pitch_t const * const pitch);
-frequency_t pitch_frequency(pitch_t const * const pitch);
-segmentPitch_t pitch_freq2segment(frequency_t const freq);
+typedef enum notenr_t {
+    NOTENR_C = 0,
+    NOTENR_Db,
+    NOTENR_D,
+    NOTENR_Eb,
+    NOTENR_E,
+    NOTENR_F,
+    NOTENR_Gb,
+    NOTENR_G,
+    NOTENR_Ab,
+    NOTENR_A,
+    NOTENR_Bb,
+    NOTENR_B,
+    NOTENR_COUNT
+} notenr_t;
 
+class Pitch {
+
+    public:
+        Pitch(void);
+        Pitch(char const * const fullname);
+        Pitch(notenr_t const number, octavenr_t const octave);
+        Pitch(frequency_t const freq);
+        char const * get_shortname();
+        octavenr_t get_octavenr();
+        notenr_t get_notenr();
+        segment_pitch_t get_segment();
+        frequency_t get_frequency();
+        static segment_pitch_t freq2segment(frequency_t const freq);
 #if DST == DST_SERIAL
-void pitch_write_serial_hdr(void);
-void pitch_write_serial(pitch_t const * const pitch, char const * const instrument, frequency_t freq, amplitude_t const amplitude);
+        static void write_serial_hdr(void);
+        void write_serial(char const * const instrument, Pitch & in_pitch, frequency_t freq);
 #endif
+
+    private:
+        struct class_variables_t {
+            octavenr_t octavenr;
+            notenr_t notenr;
+        } _ = {};
+};

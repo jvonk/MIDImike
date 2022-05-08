@@ -147,7 +147,7 @@ public:
     }
 
     // returns ptr to entry at the tail (least recent)
-    EntryType * popPtr( void)
+    EntryType * pop_ptr( void)
     {
         return &(entry[popIdx++ & (size - 1)]);
     }
@@ -260,7 +260,7 @@ private:
 #define CBUF_GetEnd(cbuf, idx)  (cbuf.m_entry)[( cbuf.m_pushIdx - n - 1 ) & (( cbuf##_SIZE ) - 1 )]
 
 // returns a pointer to the next spot to push
-#define CBUF_tailPtr(cbuf)  &(cbuf.m_entry)[ cbuf.m_popIdx & (( cbuf##_SIZE ) - 1 )]
+#define CBUF_tail_ptr(cbuf)  &(cbuf.m_entry)[ cbuf.m_popIdx & (( cbuf##_SIZE ) - 1 )]
 
 // determines if the circular buffer is empty.
 #define CBUF_IsEmpty(cbuf)  ( CBUF_Len( cbuf ) == 0 )

@@ -28,27 +28,28 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include <SPI.h>
-
-#include "cbuf.h"
 #include "../../config.h"
 #include "../../segment_t.h"
 #include "../pitch/pitch.h"
+#include "cbuf.h"
 #include "segment.h"
 #include "segmentbuf.h"
 
-/*
- * Create a new segment, and initialize the pitch, velocity, onset, offset
+/**
+ * @brief Create a new segment, and initialize the pitch, velocity, onset, offset
+ * 
+ * @param onset     relative onset time
+ * @param duration  relative duration time
+ * @param pitch 
+ * @param energy 
+ * @return segment_t* 
  */
-
 segment_t *
-SegmentBuf::noteStart( segmentRelTime_t const  onset,    // relative onset time
-                       segmentRelTime_t const  duration, // relative duration time
-                       segmentPitch_t const    pitch,
-                       segmentEnergy_t const   energy )
+SegmentBuf::note_start(segmentRelTime_t const onset, segmentRelTime_t const duration, segment_pitch_t const pitch, segment_energy_t const energy)
 {
     // drop the oldest entry if full
 
-    if ( this->ring.isFull() ) {
+    if (this->ring.isFull()) {
         this->ring.popAdvanceIdx();
     }
 
@@ -59,20 +60,22 @@ SegmentBuf::noteStart( segmentRelTime_t const  onset,    // relative onset time
     segment->energy = energy;
     segment->onset = onset;
     segment->duration = duration;
+
     this->ring.pushAdvanceIdx();  // good enough for now; will be updated as we go on
 
     return segment;  // piano roll display needs to start showing the note before it is finished
 }
 
-
-/*
- * Finish a segment, and update the offset
+/**
+ * @brief Finish a segment, and update the offset
+ * 
+ * @param duration 
+ * @param energy 
+ * @param ring 
+ * @return segment_t* 
  */
-
 segment_t *
-SegmentBuf::noteEnd( segmentRelTime_t const  duration,
-                     segmentEnergy_t const   energy,
-                     segment_t * const       ring )
+SegmentBuf::note_end(segmentRelTime_t const duration, segment_energy_t const energy, segment_t * const ring)
 {
     ring->energy = energy;
     ring->duration = duration;
@@ -80,36 +83,35 @@ SegmentBuf::noteEnd( segmentRelTime_t const  duration,
     return NULL;
 }
 
-
 segment_t *
-SegmentBuf::headPtr( segmentBufIdx_t const n )
+SegmentBuf::head_ptr(segmentBufIdx_t const n)
 {
-    if ( n < this->ring.len() ) {
-        return this->ring.getHeadPtr( n );
+    if (n < this->ring.len()) {
+        return this->ring.getHeadPtr(n);
     }
     return NULL;
 }
 
 segment_t *
-SegmentBuf::tailPtr( segmentBufIdx_t const n )
+SegmentBuf::tail_ptr(segmentBufIdx_t const n)
 {
-    if ( n < this->ring.len() ) {
-        return this->ring.getTailPtr( n );
+    if (n < this->ring.len()) {
+        return this->ring.getTailPtr(n);
     }
     return NULL;
 }
 
 segment_t *
-SegmentBuf::popPtr( void )
+SegmentBuf::pop_ptr(void)
 {
-    if ( this->ring.isEmpty() ) {
+    if (this->ring.isEmpty()) {
         return NULL;
     }
-    return this->ring.popPtr();
+    return this->ring.pop_ptr();
 }
 
 segmentBufIdx_t
-SegmentBuf::len( void )
+SegmentBuf::len(void)
 {
     return this->ring.len();
 }

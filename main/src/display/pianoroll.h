@@ -6,4 +6,4 @@
 
 void pianoroll_init(uint_least8_t tftCS_pin, uint_least8_t dc_pin, uint_least8_t reset_pin);
 void pianoroll_clear(void);
-void pianoroll_draw(absoluteTime_t const lastOffset, SegmentBuf * const segmentBuf);
+void pianoroll_draw(absolute_time_t const lastOffset, SegmentBuf * const segmentBuf);
