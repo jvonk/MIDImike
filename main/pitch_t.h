@@ -1,8 +1,20 @@
 #pragma once
 
-enum class noteNr_t {
-    C = 0, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B, COUNT
-};
+typedef enum noteNr_t {
+    NOTENR_C = 0,
+    NOTENR_Db,
+    NOTENR_D,
+    NOTENR_Eb,
+    NOTENR_E,
+    NOTENR_F,
+    NOTENR_Gb,
+    NOTENR_G,
+    NOTENR_Ab,
+    NOTENR_A,
+    NOTENR_Bb,
+    NOTENR_B,
+    NOTENR_COUNT
+} noteNr_t;
 
 typedef uint_least8_t  octaveNr_t;
 

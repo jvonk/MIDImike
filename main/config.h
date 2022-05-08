@@ -27,9 +27,10 @@
 // choice: input source
 #define SRC_MICR (1)
 #define SRC_FILE (2)
-#define SRC (SRC_FILE)
+#define SRC (SRC_MICR)
 
 // choice: output destination (must be DST_PIANOROLL for USB-MIDI output)
+//  DST_SERIAL in combination with SRC_FILE and outputs freq and notes notes recognized, for offline analysis
 #define DST_STAFF      (1)
 #define DST_PIANOROLL  (2)
 #define DST_SERIAL     (3)

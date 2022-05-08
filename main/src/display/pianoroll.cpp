@@ -118,8 +118,8 @@ _displayRoll(xCoordinate_t const xLeft,
 
 		noteNr_t nr = static_cast<noteNr_t>(ii % 12);
 
-		bool isC = (nr == noteNr_t::C);
-		bool isG = (nr == noteNr_t::G);
+		bool isC = (nr == NOTENR_C);
+		bool isG = (nr == NOTENR_G);
 
 		color_t const color = isC ? COLOR_ROLLC : isG ? COLOR_ROLLG : COLOR_ROLLOTHER;
 

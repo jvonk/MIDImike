@@ -30,13 +30,13 @@
 #include "pitch.h"
 
 typedef struct note_t {
-	char const * const   name;
-	frequency_t const    freq;
-	frequency_t const    freq_max; // up to, but not including
+	char const * const name;
+	frequency_t const  freq;
+	frequency_t const  freq_max; // up to, but not including
 } note_t;
 
 // note: calculating the values would probably take up more memory
-static note_t const _notes[static_cast<int>(noteNr_t::COUNT)] = {
+static note_t const _notes[NOTENR_COUNT] = {
 	{"C",  16.35159783, 16.83073622},
 	{"Db", 17.32391444, 17.83154388},
 	{"D",  18.35404799, 18.89186265},
@@ -55,7 +55,7 @@ static note_t const _notes[static_cast<int>(noteNr_t::COUNT)] = {
 
 Pitch::Pitch(void)
 {
-	cv.noteNr = noteNr_t::C;
+	cv.noteNr = NOTENR_C;
 	cv.octaveNr = 0;
 }
 
@@ -68,7 +68,7 @@ Pitch::Pitch(char const * const fullname)  // construct based on note name w/ oc
 	// chars before octave# are the note name itself
 	bool found = false;
 	note_t const * nn = _notes;
-	uint_least8_t max = static_cast<int>(noteNr_t::COUNT);
+	uint_least8_t max = static_cast<int>(NOTENR_COUNT);
 
 	for (uint_least8_t ii = 0; ii < max && !found; ii++, nn++) {
 		if ((nn->name[0] == fullname[0]) &&
@@ -80,7 +80,7 @@ Pitch::Pitch(char const * const fullname)  // construct based on note name w/ oc
 	}
 
 	if (!found) {
-		cv.noteNr = noteNr_t::C;
+		cv.noteNr = NOTENR_C;
 		cv.octaveNr = 0;
 	}
 }
@@ -107,19 +107,19 @@ Pitch::Pitch(frequency_t const freq)  // construct based on frequency
 		}
 
 	} else {
-		cv.noteNr = noteNr_t::C;
+		cv.noteNr = NOTENR_C;
 		cv.octaveNr = 0;
 	}
 }
 
 Pitch::Pitch(noteNr_t const number,    // note# with the octave
-			  octaveNr_t const octave) // octave#
+			 octaveNr_t const octave) // octave#
 {
-	if (number < noteNr_t::COUNT) {
+	if (number < NOTENR_COUNT) {
 		cv.noteNr = number;
 		cv.octaveNr = octave;
 	} else {
-		cv.noteNr = noteNr_t::C;
+		cv.noteNr = NOTENR_C;
 		cv.octaveNr = 0;
 	}
 }
@@ -191,7 +191,7 @@ Pitch::getFrequency(void) const
 	uint_least8_t const idx = static_cast<uint_least8_t>(cv.noteNr);
 
 	if (idx >= notesCnt ||
-		(cv.noteNr == noteNr_t::C && cv.octaveNr == 0)) {
+		(cv.noteNr == NOTENR_C && cv.octaveNr == 0)) {
 		return 0;
 	}
 	float freq = _notes[idx].freq;

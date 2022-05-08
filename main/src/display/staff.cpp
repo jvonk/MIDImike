@@ -76,7 +76,7 @@ typedef struct position_t {
 
 typedef struct staff_t {
     Adafruit_ST7735 * tft;
-    staffnote_t const notes[static_cast<int>(noteNr_t::COUNT)];
+    staffnote_t const notes[static_cast<int>(NOTENR_COUNT)];
     display_t display;
     distance_t distance;
     position_t position;
@@ -292,13 +292,13 @@ staff_init(uint_least8_t tftCS_pin,   // GPIO# for SPI TFT Chip Select
 
     _my.position = {
         { _freq2vStaffPos(CONFIG_MIDIMIKE_FREQ_MIN), _freq2vStaffPos(CONFIG_MIDIMIKE_FREQ_MAX)},
-        { _nr2vStaffPos(noteNr_t::E, 4), _nr2vStaffPos(noteNr_t::F, 5) }   // 30, 38
+        { _nr2vStaffPos(NOTENR_E, 4), _nr2vStaffPos(NOTENR_F, 5) }   // 30, 38
     };
 
     staffsymbol_init(_my.tft,
                       _my.display.width, _my.display.height,
                       _my.distance.noteRadius, _my.distance.bottom2loStaff, _my.distance.top2hiStaff,
-                      _vStaffPos2y(_nr2vStaffPos(noteNr_t::G, 4)));
+                      _vStaffPos2y(_nr2vStaffPos(NOTENR_G, 4)));
 
 #if GKEY != GKEY_NONE
     staffsymbol_draw(_hStaffPos2x(0), 0, (staffSymbolName_t)STAFFSYMBOL_NAME_GKEY, COLOR_STAFF);

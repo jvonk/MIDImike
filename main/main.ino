@@ -177,7 +177,7 @@ namespace {
             float freq = frequency_calculate(samples);
 
             // find note from frequency
-            Pitch pitch(freq);
+            Pitch pitch(freq);  // instantiate using the `freq`
 
 # if DST == DST_STAFF
 
@@ -194,7 +194,7 @@ namespace {
 # elif DST == DST_SERIAL
 
             // show note on Serial monitor
-            Pitch pitchIn(noteName);
+            Pitch pitchIn(noteName);  // instantiate using the `noteName`
             pitch.serialOut(instrument, pitchIn, freq, amplitude);
 # endif
         }
@@ -286,7 +286,7 @@ loop()
     }
 
     // find corresponding note
-    Pitch pitch(freq);
+    Pitch pitch(freq);  // instantiate using the `freq`
 
 # if DST == DST_STAFF
 
@@ -306,15 +306,15 @@ loop()
         pianoroll_clear();
     }
 
-#if 0
+#  if 0
     if (midifile_write(mv.segmentBuf, "arduino.mid") != 0) {
         Serial.println("midifile_write is mad");
     }
-#endif
+#  endif
 
 # elif DST == DST_SERIAL
 
-    Pitch pitchIn(noteNr_t::C,0);
+    Pitch pitchIn(NOTENR_C, 0);  // instantiate another using the `noteNr`
     pitch.serialOut("microphone", pitchIn, freq, amplitude);
 
 # endif
