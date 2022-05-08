@@ -17,8 +17,8 @@ struct segment_t {
     segmentRelTime_t   duration;  // time since the onset of this note [msec]
 };
 
-enum class segment_energystate_t {
-    findNegSlope = 0,  // find negative energy slope
-    findPosSlope,      // find positive energy slope
-    foundPosSlope      // found positive energy slope, new note perhaps?
-};
+typedef enum segment_energystate_t {
+    SEGMENT_ENERGYSTATE_FIND_NEG_SLOPE,
+    SEGMENT_ENERGYSTATE_FIND_POS_SLOPE,
+    SEGMENT_ENERGYSTATE_FOUND_POS_SLOPE
+} segment_energystate_t;

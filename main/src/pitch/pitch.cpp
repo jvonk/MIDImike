@@ -187,8 +187,6 @@ Pitch::freq2segment(frequency_t const freq)  // returns the midi pitch for a giv
 	return freq < CONFIG_MIDIMIKE_FREQ_MIN ? 0 : 69.0 + 12.0 * log(freq / 440.0) / log(2);
 }
 
-#if DST == DST_SERIAL
-
 void
 Pitch::write_serial_hdr(void)
 {
@@ -237,4 +235,3 @@ Pitch::write_serial(char const * const instrument, Pitch & in_pitch, frequency_t
 	}
 	Serial.println();
 }
-#endif

@@ -34,21 +34,13 @@
 #define DST_STAFF      (1)
 #define DST_PIANOROLL  (2)
 #define DST_SERIAL     (3)
-#define DST (DST_PIANOROLL)
+#define DST (DST_STAFF)
 
 // enable USB-midi output on the USB connector (requires DST=DST_PIANOROLL, and CONFIG_MIDIMIKE_SERIAL_RATE=31250)
 // after changing to USB-midi, connect MOSI2-to-GND and power cycle the Arduino
 #define USB_MIDI (1)
 
-// choice: resolution of G-key symbol to show
-#if DST == DST_STAFF
-# define GKEY_NONE  (1)
-# define GKEY_LORES (2)     /* requires ~88 bytes of SDRAM */
-# define GKEY_HIRES (3)     /* requires ~362 bytes of SDRAM */
-# define GKEY (GKEY_LORES)
-#endif
-
-// help reduce the number of #if statements in other files
+// help reduce the number of #if statements in elsewhere
 #if SHOW_MEMORY_USAGE
 #  define SHOW_MEMORY_USAGE_ONLY(a) do { a; } while (0)
 #else

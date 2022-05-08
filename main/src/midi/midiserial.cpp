@@ -60,24 +60,24 @@ void
 midiserial_send_note_on(segment_pitch_t const pitch,
               segment_energy_t const energy)
 {
-	_send_3byte_event(midiEvent_t::noteOn, pitch, energy);
+	_send_3byte_event(MIDIEVENT_NOTE_ON, pitch, energy);
 }
 
 void
 midiserial_send_note_off(segment_pitch_t const pitch,
                segment_energy_t const energy)
 {
-	_send_3byte_event(midiEvent_t::noteOff, pitch, energy);
+	_send_3byte_event(MIDIEVENT_NOTE_OFF, pitch, energy);
 }
 
 void
 midiserial_send_program_change(midiInstrument_t instrument)
 {
-	_send_2byte_event(midiEvent_t::programChange, instrument);
+	_send_2byte_event(MIDIEVENT_PROGRAM_CHANGE, instrument);
 }
 
 void
-midiserial_send_notes(SegmentBuf * const  segmentBuf)  // buffer with segmented notes
+midiserial_send_notes(SegmentBuf * const segmentBuf)  // buffer with segmented notes
 {
 	midiserial_send_program_change(CONFIG_MIDIMIKE_MIDI_INSTRUMENT);
 
@@ -88,7 +88,6 @@ midiserial_send_notes(SegmentBuf * const  segmentBuf)  // buffer with segmented 
 
 		delay(note->duration);
 		midiserial_send_note_off(note->pitch, note->energy);
-
 	}
 }
 #endif

@@ -15,11 +15,11 @@
  *   http://www.midi.org/techspecs/midimessages.php
  */
 
-enum class midiEvent_t : uint8_t PACK8 {
-	noteOff = 0x8,
-	noteOn = 0x9,
-	programChange = 0xC
-};
+typedef enum midiEvent_t {
+	MIDIEVENT_NOTE_OFF = 0x8,
+	MIDIEVENT_NOTE_ON = 0x9,
+	MIDIEVENT_PROGRAM_CHANGE = 0xC
+} PACK8 midiEvent_t;
 
 typedef uint8_t midiChannel_t;
 
@@ -35,7 +35,7 @@ typedef uint8_t midiChannel_t;
 //     MTrk <length of track data><track data>
 
 
-uint_least8_t const FOURCC_LEN = 4;
+#define FOURCC_LEN (4)
 typedef char midiFourcc_t[FOURCC_LEN];
 
 
@@ -47,19 +47,19 @@ typedef char midiFourcc_t[FOURCC_LEN];
 
 typedef uint32_t midiLen_t;
 
-struct midiChunkHdr_t {
+typedef struct midiChunkHdr_t {
 	midiFourcc_t    type;  // four cc type ("MHdr")
 	midiLen_t       len;   // #bytes of data to follow
-} PACK8;
+} PACK8 midiChunkHdr_t;
 
-struct midiHeader_t {
+typedef struct midiHeader_t {
 	midiChunkHdr_t  hdr;            // chunk type and length
 	struct midiHeaderValue_t {
 		int32_t     type;           // format type (0 = one, single multi-channel track)
 		uint16_t    numTracks;      // # of tracks (1 for format type 0 )
 		uint16_t    ticksPerQnote;  // # of MIDI delta time ticks in a quarter
 	} PACK(uint8_t) value;
-} PACK8;
+} PACK8 midiHeader_t;
 
 
 // MIDI track
@@ -84,34 +84,31 @@ struct midiHeader_t {
 
 // MIDI events
 
-struct midiEventNote_t {
+typedef struct midiEventNote_t {
 	uint8_t channel : 4; // MIDI channel # (0..15)
 	uint8_t event : 4;   // MIDI event # (note on, note off, instrument change, ..)
 	uint8_t pitch;       // MIDI note number to key-on (0..127)
 	uint8_t velocity;    // how hard to press the note (0..127)
-} PACK8;
+} PACK8 midiEventNote_t;
 
+typedef enum midiSysExTag_t {
+	MIDI_SYSEX_TAG_META = 0xFF
+} PACK8 midiSysExTag_t;
 
-enum class midiSysExTag_t : uint8_t PACK8 {
-	meta = 0xFF
-};
-
-
-enum class midiMetaType_t : uint8_t PACK8 {
-	setTempo = 0x51,
-	trackEnd = 0x2F
-};
-
+typedef enum midiMetaType_t {
+	MIDI_META_TYPE_SET_TEMPO = 0x51,
+	MIDI_META_TYPE_TRACK_END = 0x2F
+} PACK8 midiMetaType_t;
 
 typedef uint32_t midiTime_t;   // [msec], wraps at ~64 seconds
 typedef uint8_t midiMetaLen_t;
 
-struct midiMeta_t {
+typedef struct midiMeta_t {
 	midiSysExTag_t  sysEx;     // sysEx tag, 0xFF for META data
 	midiMetaType_t  type;      // type
 	midiMetaLen_t   len;       // len (really a variable length, but we only have values < 0x7F)
 	uint8_t         value[3];  // len indicates length, the size 3 is just a max
-} PACK8;
+} PACK8 midiMeta_t;
 
 midiMetaLen_t const META_TEMPOCHANGE_LEN = 3;
 midiMetaLen_t const META_TRACKEND_LEN = 0;

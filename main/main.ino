@@ -83,19 +83,15 @@ namespace {
         JOYSTICK_IN = 3       // ---wire-to--- on TFT/SD/joystick shield (NOT NEEDED, unused)
     };                        // ----n.c.----- AR on Microphone Amp breakout
 
-#if DST == DST_PIANOROLL
     struct mainvariables_t {
         Segment *     segment;
         SegmentBuf *  segmentBuf;
     };  // file scope variables
     static mainvariables_t mv;
-#endif
 
     /************************
      * Read samples from file
      ************************/
-
-#if SRC == SRC_FILE
 
     INLINE uint_least8_t                             // return 0 if successful
     _readSamplesFromFile(File &        f,            // file to read samples from [in]
@@ -138,8 +134,6 @@ namespace {
             }
         }
         *amplitude = (int16_t)max - min; // top-top
-
-        //SHOW_MEMORY_USAGE_ONLY((Debug::showMemUsage()));
         return 0;
     }
 
@@ -173,30 +167,27 @@ namespace {
             // find note from frequency
             Pitch pitch(freq);  // instantiate using the `freq`
 
-# if DST == DST_STAFF
+            if (DST == DST_STAFF) {
 
-            // show note on TFT display
-            staff_draw_note(pitch);
+                // show note on TFT display
+                staff_draw_note(pitch);
 
-# elif DST == DST_PIANOROLL
+            } else if (DST == DST_PIANOROLL) {
 
-            // need it twice, otherwise it doesn't meet the minimum note duration
-			mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
-			mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
-			pianoroll_draw(mv.segment->get_last_offset(), mv.segmentBuf);
+                // need it twice, otherwise it doesn't meet the minimum note duration
+                mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
+                mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
+                pianoroll_draw(mv.segment->get_last_offset(), mv.segmentBuf);
 
-# elif DST == DST_SERIAL
+            } else if (DST == DST_SERIAL) {
 
-            // show note on Serial monitor
-            Pitch pitch_in(noteName);
-            pitch.write_serial(instrument, pitch_in, freq);
-# endif
+                // show note on Serial monitor
+                Pitch pitch_in(noteName);
+                pitch.write_serial(instrument, pitch_in, freq);
+            }
         }
-        //SHOW_MEMORY_USAGE_ONLY((Debug::showMemUsage()));
         return 0;
     }
-#endif
-
 } // name space
 
 
@@ -208,44 +199,35 @@ void
 setup()
 {
     Serial.begin(CONFIG_MIDIMIKE_SERIAL_RATE);
-#if 0    
-    while (!Serial) {
-        ; // wait until the serial port connects
+
+    if (SRC == SRC_FILE) {
+        if (sddir_init(SPI_SD_CS) != 0) {
+            Serial.println("No SD Card");  // uSD card inserted/formatted  ??
+        }
     }
-#endif    
+    if (DST == DST_STAFF) {
 
-    //Serial.println("setup()");
-#if SRC == SRC_FILE
-    if (sddir_init(SPI_SD_CS) != 0) {
-        Serial.println("No SD Card");  // uSD card inserted/formatted  ??
-    }
-#endif
+        staff_init(SPI_TFT_CS, SPI_DC, SPI_RST);
+        //Midi::begin();
 
-#if DST == DST_STAFF
+    } else if (DST == DST_PIANOROLL) {
 
-    staff_init(SPI_TFT_CS, SPI_DC, SPI_RST);
-    //Midi::begin();
-
-#elif DST == DST_PIANOROLL
-
-    mv.segment = new Segment();
-    mv.segmentBuf = new SegmentBuf();
-    pianoroll_init(SPI_TFT_CS, SPI_DC, SPI_RST);
+        mv.segment = new Segment();
+        mv.segmentBuf = new SegmentBuf();
+        pianoroll_init(SPI_TFT_CS, SPI_DC, SPI_RST);
 
 #if 0
-    if (midifile_init(SPI_SD_CS) != 0) {
-        Serial.println("No SD Card");  // uSD card inserted/formatted  ??
+        if (midifile_init(SPI_SD_CS) != 0) {
+            Serial.println("No SD Card");  // uSD card inserted/formatted  ??
+        }
+#endif
+
+        pinMode(BUTTON_IN, INPUT_PULLUP);
     }
-#endif
 
-    pinMode(BUTTON_IN, INPUT_PULLUP);
-
-#endif
-
-#if SRC == SRC_MICR
-    microphone_begin(MICROPHONE_IN);
-#endif
-    // loop() never stops, so there is no need for corresponding end() methods
+    if (SRC == SRC_MICR) {
+        microphone_begin(MICROPHONE_IN);
+    }
 }
 
 
@@ -256,49 +238,49 @@ setup()
 void 
 loop()
 {
-#if SRC == SRC_MICR
+    if (SRC == SRC_MICR) {
 
-    // 2BD show % error compared to note recognized, so it can be used as a tuner
-    // 2BD apply note level segmentation.  See segment.cpp for suggestions
+        // 2BD show % error compared to note recognized, so it can be used as a tuner
+        // 2BD apply note level segmentation.  See segment.cpp for suggestions
 
-    // ASSERT((Debug::getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 60));  // rough estimate
+        // ASSERT((Debug::getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 60));  // very rough estimate
 
-    // get samples from microphone, samples will be dynamically allocated on first invocation
+        // get samples from microphone, samples will be dynamically allocated on first invocation
 
-    amplitude_t amplitude;
-    samples_t samples = microphone_get_samples(&amplitude);
+        amplitude_t amplitude;
+        samples_t samples = microphone_get_samples(&amplitude);
 
-    // find frequency from samples
-    float freq = frequency_calculate(samples);
+        // find frequency from samples
+        float freq = frequency_calculate(samples);
 
-    // no longer need the samples, so reuse it and start gathering samples for next time around
-    microphone_start();  // async
+        // no longer need the samples, so reuse it and start gathering samples for next time around
+        microphone_start();  // async
 
-    // ignore notes under audible threshold (2BD: already done in getSamples())
-    if (amplitude < CONFIG_MIDIMIKE_AUDIBLE_THRESHOLD) {
-        freq = 0;
-    }
+        // ignore notes under audible threshold (2BD: already done in getSamples())
+        if (amplitude < CONFIG_MIDIMIKE_AUDIBLE_THRESHOLD) {
+            freq = 0;
+        }
 
-    // find corresponding note
-    Pitch pitch(freq);  // instantiate using the `freq`
+        // find corresponding note
+        Pitch pitch(freq);  // instantiate using the `freq`
 
-# if DST == DST_STAFF
+        if (DST== DST_STAFF) {
 
-    // show note on TFT display
-    staff_draw_note(pitch);
+            // show note on TFT display
+            staff_draw_note(pitch);
 
-# elif DST == DST_PIANOROLL
+        } else if (DST == DST_PIANOROLL) {
 
-    mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
-    pianoroll_draw(mv.segment->get_last_offset(), mv.segmentBuf);
+            mv.segment->put(millis(), pitch.get_segment(), amplitude, mv.segmentBuf);
+            pianoroll_draw(mv.segment->get_last_offset(), mv.segmentBuf);
 
-    // 2BD should clear the buffer if 64 seconds of silence,
-    // or maybe just start playing the buffer over MIDI ..
+            // 2BD should clear the buffer if 64 seconds of silence,
+            // or maybe just start playing the buffer over MIDI ..
 
-    if (USB_MIDI && digitalRead(BUTTON_IN) == 0) {
-        midiserial_send_notes(mv.segmentBuf);
-        pianoroll_clear();
-    }
+            if (USB_MIDI && digitalRead(BUTTON_IN) == 0) {
+                midiserial_send_notes(mv.segmentBuf);
+                pianoroll_clear();
+            }
 
 #  if 0
     if (midifile_write(mv.segmentBuf, "arduino.mid") != 0) {
@@ -306,24 +288,21 @@ loop()
     }
 #  endif
 
-# elif DST == DST_SERIAL
+        } else if (DST == DST_SERIAL) {
 
-    Pitch pitch_in(NOTENR_C, 0);
-    pitch.write_serial("microphone", pitch_in, freq);
+            Pitch pitch_in(NOTENR_C, 0);
+            pitch.write_serial("microphone", pitch_in, freq);
+        }
+    }   
 
-# endif
-
-    //SHOW_MEMORY_USAGE_ONLY((Debug::showMemUsage()));
-#endif
-
-#if SRC == SRC_FILE
-# if DST == DST_SERIAL
-    Pitch::write_serial_hdr();
-# endif
-    // for each file at sample rate, call _calcNoteFromFile()
-    char dir[13] = "/notes/\012345";
-    utoa(CONFIG_MIDIMIKE_SAMPLE_RATE, &dir[7], 10);
-    //Serial.println(dir);
-    sddir_for_each_file(dir, _calcNoteFromFile);
-#endif
+    if (SRC == SRC_FILE) {
+        if (DST == DST_SERIAL) {
+            Pitch::write_serial_hdr();
+        }
+        // for each file at sample rate, call _calcNoteFromFile()
+        char dir[13] = "/notes/\012345";
+        utoa(CONFIG_MIDIMIKE_SAMPLE_RATE, &dir[7], 10);
+        //Serial.println(dir);
+        sddir_for_each_file(dir, _calcNoteFromFile);
+    }
 }

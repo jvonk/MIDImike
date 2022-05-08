@@ -41,31 +41,31 @@ Segment::_energy_init(segment_energytrend_t * const trend)
 {
 	midiserial_send_program_change(CONFIG_MIDIMIKE_MIDI_INSTRUMENT);
 	trend->previous = 0;
-	trend->state = segment_energystate_t::findNegSlope;
+	trend->state = segment_energystate_t::SEGMENT_ENERGYSTATE_FIND_NEG_SLOPE;
 }
 
 void
 Segment::_energy_update(segment_energytrend_t * const trend, segment_energy_t const energy)
 {
 	switch (trend->state) {
-		case segment_energystate_t::findNegSlope:
+		case segment_energystate_t::SEGMENT_ENERGYSTATE_FIND_NEG_SLOPE:
 			if (energy < trend->previous) {  // downward slope started
 				trend->min = energy;
-				trend->state = segment_energystate_t::findPosSlope;
+				trend->state = segment_energystate_t::SEGMENT_ENERGYSTATE_FIND_POS_SLOPE;
 			} else {
 				trend->max = energy;
 			}
 			break;
-		case segment_energystate_t::findPosSlope:
+		case segment_energystate_t::SEGMENT_ENERGYSTATE_FIND_POS_SLOPE:
 			if (energy > trend->previous) {  // energy increasing again
 				if (energy > ((100 + SEGMENT_ENERGY_INCR_THRESHOLD) * trend->min) / 100) {
-					trend->state = segment_energystate_t::foundPosSlope;  // trend on the rise again
+					trend->state = segment_energystate_t::SEGMENT_ENERGYSTATE_FOUND_POS_SLOPE;  // trend on the rise again
 				}
 			} else {
 				trend->min = energy;
 			}
 			break;
-		case segment_energystate_t::foundPosSlope:
+		case segment_energystate_t::SEGMENT_ENERGYSTATE_FOUND_POS_SLOPE:
 			break;
 	}
 	trend->previous = energy;
@@ -124,7 +124,7 @@ Segment::put(absolute_time_t const now, segment_pitch_t const pitch, segment_ene
 			bool const meetsMinDuration = now - cv.candidate.start_time > CONFIG_MIDIMIKE_MIN_SEGMENT_DURATION;
 			bool const noteFollowingRest = !cv.note;
 			bool const pitchChanged = cv.candidate.pitch != cv.note->pitch;
-			bool const energyIncreasing = cv.energy_trend.state == segment_energystate_t::foundPosSlope;
+			bool const energyIncreasing = cv.energy_trend.state == segment_energystate_t::SEGMENT_ENERGYSTATE_FOUND_POS_SLOPE;
 
 			if (meetsMinDuration && (noteFollowingRest || pitchChanged || energyIncreasing)) {
 				t = cv.candidate.start_time;

@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include "../../sample_t.h"
 #include "../../segment_t.h"
-#include "../../pitch_t.h"
 
 typedef uint_least8_t  octavenr_t;
 
@@ -37,10 +36,8 @@ class Pitch {
         segment_pitch_t get_segment();
         frequency_t get_frequency();
         static segment_pitch_t freq2segment(frequency_t const freq);
-#if DST == DST_SERIAL
         static void write_serial_hdr(void);
         void write_serial(char const * const instrument, Pitch & in_pitch, frequency_t freq);
-#endif
 
     private:
         struct class_variables_t {
