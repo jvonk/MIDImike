@@ -122,11 +122,11 @@ namespace {
             noteName[1] = 'b';
         }
 
-        sampleCnt_t nrOfSamplesInFile;
+        sample_cnt_t nrOfSamplesInFile;
 
-        if (Wave::readHeader(f, &nrOfSamplesInFile) != 0 ||
-            Wave::readSamples(f, CONFIG_MIDIMIKE_SAMPLE_RATE * CONFIG_MIDIMIKE_FILE_SEC2SKIP, NULL) != 0 ||
-            Wave::readSamples(f, CONFIG_MIDIMIKE_WINDOW_SIZE, samples) != 0) {
+        if (wave_read_hdr(f, &nrOfSamplesInFile) != 0 ||
+            wave_read_samples(f, CONFIG_MIDIMIKE_SAMPLE_RATE * CONFIG_MIDIMIKE_FILE_SEC2SKIP, NULL) != 0 ||
+            wave_read_samples(f, CONFIG_MIDIMIKE_WINDOW_SIZE, samples) != 0) {
 
             return 2;
         }
@@ -134,7 +134,7 @@ namespace {
         // determine peak-to-peak value
         sample_t min = SCHAR_MAX;
         sample_t max = SCHAR_MIN;
-        for (sampleCnt_t ii = 0; ii < CONFIG_MIDIMIKE_WINDOW_SIZE; ii++) {
+        for (sample_cnt_t ii = 0; ii < CONFIG_MIDIMIKE_WINDOW_SIZE; ii++) {
             sample_t const s = samples[ii];
             if (s < min) {
                 min = s;
@@ -222,7 +222,7 @@ setup()
 
     //Serial.println("setup()");
 #if SRC == SRC_FILE
-    if (SdDir::begin(SPI_SD_CS) != 0) {
+    if (sddir_init(SPI_SD_CS) != 0) {
         Serial.println("No SD Card");  // uSD card inserted/formatted  ??
     }
 #endif
@@ -334,6 +334,6 @@ loop()
     char dir[13] = "/notes/\012345";
     utoa(CONFIG_MIDIMIKE_SAMPLE_RATE, &dir[7], 10);
     //Serial.println(dir);
-    SdDir::forEachFile(dir, _calcNoteFromFile);
+    sddir_for_each_file(dir, _calcNoteFromFile);
 #endif
 }

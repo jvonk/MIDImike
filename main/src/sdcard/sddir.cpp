@@ -31,49 +31,42 @@
 #include "../../config.h"
 #include "sddir.h"
 
-namespace {
-	// maximum level of sub directories to search
-#define DIRLEVEL_MAX 2
+// maximum level of sub directories to search
+#define DIRLEVEL_MAX (2)
 
-	sddir_callback_t _callback = NULL;
+sddir_callback_t _callback = NULL;
 
+static uint_least8_t
+_walkDirectory(File &dir,                // directory to start
+			   uint_least8_t const lvl)  // current level
+{
+	File f;
+	uint_least8_t err = 0;
+	static char instrumentName[8 + 1 + 3 + 1];
 
-	// Recursive search for files
+	while ((f = dir.openNextFile()) && !err && _callback) {
 
-	uint_least8_t
-	_walkDirectory( File &dir,                 // directory to start
-		            uint_least8_t const lvl )  // current level
-	{
-		File f;
-		uint_least8_t err = 0;
-		static char instrumentName[8 + 1 + 3 + 1];
-
-		while ( (f = dir.openNextFile()) && !err && _callback ) {
-
-			if ( f.isDirectory() ) {
-				if ( lvl < DIRLEVEL_MAX ) {
-					if ( lvl == 0 ) {
-						strcpy( instrumentName, f.name() );
-					}
-					err = _walkDirectory( f, lvl + 1 );  // recursive function call
-				} else {
+		if (f.isDirectory()) {
+			if (lvl < DIRLEVEL_MAX) {
+				if (lvl == 0) {
+					strcpy(instrumentName, f.name());
 				}
+				err = _walkDirectory(f, lvl + 1);  // recursive function call
 			} else {
-				err = _callback( f, instrumentName );  // call back registered function
 			}
-			f.close();
+		} else {
+			err = _callback(f, instrumentName);  // call back registered function
 		}
-		return err;
+		f.close();
 	}
+	return err;
+}
 
-}  // name space
+// for each file in Directory
 
-
-// For each file in Directory
-
-uint_least8_t                             // returns 0 if successful
-SdDir::forEachFile( char const * const dirName,  // directory (and its sub directories) to search
-				    sddir_callback_t cb )        // function to call for each file found
+uint_least8_t                                    // returns 0 if successful
+sddir_for_each_file(char const * const dirName,  // directory (and its sub directories) to search
+				    sddir_callback_t cb)         // function to call for each file found
 {
 	_callback = cb;
 
@@ -85,9 +78,9 @@ SdDir::forEachFile( char const * const dirName,  // directory (and its sub direc
 }
 
 uint_least8_t
-SdDir::begin( uint_least8_t const cs )
+sddir_init(uint_least8_t const cs_pin)
 {
-	if ( SD.begin( cs ) == false ) {  // declared in SD.cpp
+	if (SD.begin(cs_pin) == false) {
 		return 1;
 	}
 	return 0;

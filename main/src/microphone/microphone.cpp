@@ -38,7 +38,7 @@ typedef struct amplitudeRange_t {
 } amplitudeRange_t;
 
 typedef struct microphone_t {
-    sampleCnt_t cnt;
+    sample_cnt_t cnt;
     amplitudeRange_t range;
     sample_t * samples;
     uint8_t analogPort;

@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-
 #include "../../sample_t.h"
 
 #if 0

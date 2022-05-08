@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7735.h>
-
 #include "../../config.h"
 #include "display.h"
 

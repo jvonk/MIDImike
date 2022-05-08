@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-
 #include "../../segment_t.h"
 
 int_least8_t midifile_begin(uint_least8_t const cs);

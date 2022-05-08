@@ -35,7 +35,7 @@ typedef enum state_t {
 	STATE_FIND_SECOND_PEAK,
 } state_t;
 
-typedef sampleCnt_t samplesLag_t;
+typedef sample_cnt_t samplesLag_t;
 typedef int32_t autoCorr_t;
 
 // calculate auto correlation for "lag"
@@ -51,7 +51,7 @@ _auto_corr(samples_t const    samples,  // pointer to signed 8-bit data samples
 
 	autoCorr_t ac = 0;
 
-	for (sampleCnt_t ii = 0; ii < CONFIG_MIDIMIKE_WINDOW_SIZE - lag; ii++) {
+	for (sample_cnt_t ii = 0; ii < CONFIG_MIDIMIKE_WINDOW_SIZE - lag; ii++) {
 		ac += ((int16_t)samples[ii] * samples[ii + lag]);
 	}
 	return ac;

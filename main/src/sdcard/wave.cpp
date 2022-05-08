@@ -40,164 +40,133 @@
 #include "../../sample_t.h"
 #include "wave.h"
 
-namespace {
+struct wave_hdr_t {
+	char     id[4];
+	uint32_t len;
+} PACK8;
 
-	/************
-	 * Local data
-	 ************/
+struct wave_chunk_t {
+	wave_hdr_t hdr;
+	char       fmt[4];
+} PACK8;
 
-	// main chunk
+struct wave_fmtvalue_t {
+	uint16_t audio_format;
+	uint16_t num_of_channels;
+	uint32_t sample_rate;
+	uint32_t byte_rate;
+	uint16_t block_align;
+	uint16_t bits_per_sample; // maybe followed by extra parameters
+} PACK8;
 
-	struct hdr_t {
-		char      id[4];
-		uint32_t  len;
-	} PACK8;
+typedef uint8_t dataValue_t;
 
-	struct chunk_t {
-		hdr_t     hdr;
-		char      fmt[4];
-	} PACK8;
+typedef enum idType_t {
+	IDTYPE_TIFF,
+	IDTYPE_WAVE,
+	IDTYPE_FMT,
+	IDTYPE_DATA,
+	IDTYPE_COUNT
+} idType_t;
 
-	// sub chunk "fmt "
+static char const _ids[IDTYPE_COUNT][4] = {
+	{'R', 'I', 'F', 'F'},
+	{'W', 'A', 'V', 'E'},
+	{'f', 'm', 't', ' '},
+	{'d', 'a', 't', 'a'}
+};
 
-	struct fmtValue_t {
-		uint16_t  audioFormat;
-		uint16_t  numChannels;
-		uint32_t  sampleRate;
-		uint32_t  byteRate;
-		uint16_t  blockAlign;
-		uint16_t  bitsPerSample; // maybe followed by extra parameters
-	} PACK8;
-
-	struct fmt_t {
-		hdr_t      hdr;
-		fmtValue_t value;
-	} PACK8;
-
-	// sub chunk "data"
-
-	typedef uint8_t dataValue_t;
-
-	struct data_t {
-		hdr_t       hdr;
-		dataValue_t value[0];
-	} PACK8;
-
-	// identifiers
-
-	enum idType_t {
-		riff,
-		wave,
-		fmt,
-		data,
-		COUNT  // terminator
-	};
-
-	char const _ids[static_cast<int>(idType_t::COUNT)][4] = {
-		{'R', 'I', 'F', 'F'},
-		{'W', 'A', 'V', 'E'},
-		{'f', 'm', 't', ' '},
-		{'d', 'a', 't', 'a'}
-	};
-
-
-	/*****************
-	 * Local functions
-	 *****************/
-
-	uint_least8_t
-	_readBytes( File &         f,       // in: file to read from
-	 	        uint16_t const len,     // in: number of bytes to read
-				int16_t const  offset,  // in: offset to add to each byte
-				char * const   data )   // out: data read
-	{
-		char * buf = data;
-
-		for ( uint16_t ii = 0; ii < len; ii++ ) {
-			int const d = f.read();
-			if ( d < 0 ) {
-				return 1;
-			}
-			if ( buf ) {
-				*(buf++) = d + offset;
-			}
-		}
-		return 0;
-	}
-
-}  // name space
-
-
-	/************************
-	 * Read/parse wave header
-	 ************************/
-
-uint_least8_t                                        // returns 0 if successful
-Wave::readHeader( File &               f,            // file to read from [in]
-				  sampleCnt_t * const  pSampleCnt )  // total number of samples in file [out]
+/**
+ * @brief read a specified number of bytes from file
+ * 
+ * @param f              in: file to read from
+ * @param len            in: number of bytes to read
+ * @param offset         in: offset to add to each byte
+ * @param data           out: data read
+ * @return uint_least8_t returns # of bytes read
+ */
+static uint_least8_t
+_read_bytes(File &f, uint16_t const len, int16_t const offset, char * const data)
 {
-		// main chunk
-	{
-		::chunk_t chunk;
-		if (_readBytes(f, sizeof(chunk), 0, (char *)&chunk) != 0 ||
-			memcmp(&chunk.hdr.id, _ids[ idType_t::riff ], sizeof(chunk.hdr.id)) != 0 ||
-			memcmp(&chunk.fmt, _ids[ idType_t::wave ], sizeof(chunk.fmt)) != 0 ) {
+	char * buf = data;
 
+	for (uint16_t ii = 0; ii < len; ii++) {
+		int const d = f.read();
+		if (d < 0) {
 			return 1;
 		}
-	}
-	
-		// sub chunk "fmt "
-	{
-		::hdr_t hdr;
-		::fmtValue_t fmtValue;
-		if (_readBytes(f, sizeof(hdr), 0, (char *)&hdr) ||
-			memcmp(&hdr.id, _ids[idType_t::fmt], sizeof(hdr.id)) != 0) {
-
-			return 2;
-		}
-		if (hdr.len < sizeof(fmtValue) ||
-			_readBytes(f, sizeof(fmtValue), 0, (char *)&fmtValue) != 0 ||
-			_readBytes(f, hdr.len - sizeof(fmtValue), 0, NULL) != 0) {
-
-			return 3;
-		}
-
-		if (fmtValue.audioFormat != 1 ||                    // PCM
-			fmtValue.numChannels != 1 ||                    // mono
-			fmtValue.bitsPerSample != 8 ||                  // 8 bits/sample
-			fmtValue.sampleRate != CONFIG_MIDIMIKE_SAMPLE_RATE ) {  // sample rate
-			return 4;
+		if (buf) {
+			*(buf++) = d + offset;
 		}
 	}
-	
-		// sub chunk "data"
-	{
-		::hdr_t hdr;
-		if (_readBytes(f, sizeof(hdr), 0, (char *)&hdr) != 0 ||
-			memcmp(&hdr.id, _ids[idType_t::data], sizeof(hdr.id)) != 0) {
-
-			return 5;
-		}
-		*pSampleCnt = hdr.len;
-	}
-		// leave the rest of the file to Wave::readSamples()
 	return 0;
 }
 
-
-	/**************
-	 * Read samples
-	 **************/
-
-uint_least8_t                                       // returns 0 if successful
-Wave::readSamples( File &             f,            // file to read from [in]
-				   sampleCnt_t const  nrOfSamples,  // number of samples to [in]
-				   samples_t          samples )     // samples read [out]
+/**
+ * @brief read WAV header
+ * 
+ * @param f              file to read from [in]
+ * @param sample_cnt_p   total number of samples in file [out]
+ * @return uint_least8_t returns 0 if successful
+ */
+uint_least8_t
+wave_read_hdr(File &f, sample_cnt_t * const sample_cnt_p)
 {
-		// remove bias by changing values from [0..255] to [-128..127]
+	// main chunk
 
-	if (_readBytes(f, nrOfSamples, SCHAR_MIN, (char *)samples) != 0) {
+	wave_chunk_t chunk;
+	if (_read_bytes(f, sizeof(chunk), 0, (char *) &chunk) != 0 ||
+		memcmp(&chunk.hdr.id, _ids[ IDTYPE_TIFF ], sizeof(chunk.hdr.id)) != 0 ||
+		memcmp(&chunk.fmt, _ids[ IDTYPE_WAVE ], sizeof(chunk.fmt)) != 0) {
+
+		return 1;
+	}
+	
+	// sub chunk "fmt "
+
+	wave_hdr_t hdr;
+	wave_fmtvalue_t fmtValue;
+	if (_read_bytes(f, sizeof(hdr), 0, (char *)&hdr) ||
+		memcmp(&hdr.id, _ids[IDTYPE_FMT], sizeof(hdr.id)) != 0) {
+		return 2;
+	}
+	if (hdr.len < sizeof(fmtValue) ||
+		_read_bytes(f, sizeof(fmtValue), 0, (char *)&fmtValue) != 0 ||
+		_read_bytes(f, hdr.len - sizeof(fmtValue), 0, NULL) != 0) {
+		return 3;
+	}
+
+	if (fmtValue.audio_format != 1 ||     // PCM
+		fmtValue.num_of_channels != 1 ||  // mono
+		fmtValue.bits_per_sample != 8 ||  // 8 bits/sample
+		fmtValue.sample_rate != CONFIG_MIDIMIKE_SAMPLE_RATE) {
+		return 4;
+	}
+	
+	// sub chunk "data"
+
+	if (_read_bytes(f, sizeof(hdr), 0, (char *) &hdr) != 0 ||
+		memcmp(&hdr.id, _ids[IDTYPE_DATA], sizeof(hdr.id)) != 0) {
+
+		return 5;
+	}
+
+	*sample_cnt_p = hdr.len;  // leave the rest of the file to wave_read_samples()		
+	return 0;
+}
+
+/**
+ * @brief remove bias by changing values from [0..255] to [-128..127]
+ * 
+ * @param f              returns 0 if successful
+ * @param sample_cnt     number of samples to [in]
+ * @param samples        samples read [out]
+ * @return uint_least8_t returns 0 if successful
+ */
+uint_least8_t
+wave_read_samples(File &f, sample_cnt_t const sample_cnt, samples_t samples)
+{
+	if (_read_bytes(f, sample_cnt, SCHAR_MIN, (char *)samples) != 0) {
 		return 1;
 	}
 	return 0;
