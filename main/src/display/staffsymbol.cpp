@@ -119,16 +119,16 @@ symbol_t _symbols[STAFFSYMBOL_NAME_COUNT] = {
 #endif
 };
 
-typedef struct my_t {
+typedef struct staffsymbol_t {
     Adafruit_ST7735 * tft;
     symbolCoordXY_t displaySize;
     yCoordinate_t noteRadius;
     yCoordinate_t bottom2loStaff;
     yCoordinate_t top2hiStaff;
     yCoordinate_t yG4;
-} my_t;
+} staffsymbol_t;
 
-static my_t _my = {};
+static staffsymbol_t _my = {};
 
 void
 staffsymbol_init(Adafruit_ST7735 * const tft, 

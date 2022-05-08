@@ -37,15 +37,15 @@ typedef struct amplitudeRange_t {
     sample_t max;
 } amplitudeRange_t;
 
-typedef struct my_t {
+typedef struct microphone_t {
     sampleCnt_t cnt;
     amplitudeRange_t range;
     sample_t * samples;
     uint8_t analogPort;
     uint8_t prescaler;
-} my_t;
+} microphone_t;
 
-my_t volatile _my = {};  // data updates in ISR
+microphone_t volatile _my = {};  // data updates in ISR
 
 void
 microphone_begin(uint8_t const port)
@@ -69,7 +69,7 @@ void
 microphone_start(void)
 {
     // init private date for ISR (so we don't have to test for ii==0 inside the ISR)
-    my_t volatile * const my = &_my;
+    microphone_t volatile * const my = &_my;
     my->cnt = 0;
 
     // start gathering new samples (no need to disable interrupts, after all this interrupt is off, and we're turning it on here)
@@ -98,7 +98,7 @@ microphone_get_samples(amplitude_t * const amplitudePtr)
         // spin wait until all samples are available
     }
 
-    my_t volatile * const my = &_my;
+    microphone_t volatile * const my = &_my;
 
     bool clipping = (my->range.max == SCHAR_MIN) || (my->range.max == SCHAR_MAX);
     amplitude_t amplitude = (int16_t)my->range.max - my->range.min; // top-top [0..255]
@@ -111,7 +111,7 @@ microphone_get_samples(amplitude_t * const amplitudePtr)
 // interrupt service routine
 ISR (ADC_vect)
 {
-    ::my_t volatile * const my = &_my;
+    microphone_t volatile * const my = &_my;
     sample_t const s = ADCH + SCHAR_MIN;  // remove voltage bias by changing range from [0..255] to [-128..127]
 
         // update min and max, so peak-to-peak value can be determined

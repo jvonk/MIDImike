@@ -27,7 +27,7 @@
 // choice: input source
 #define SRC_MICR (1)
 #define SRC_FILE (2)
-#define SRC (SRC_MICR)
+#define SRC (SRC_FILE)
 
 // choice: output destination (must be DST_PIANOROLL for USB-MIDI output)
 #define DST_STAFF      (1)

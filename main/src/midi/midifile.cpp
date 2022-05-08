@@ -180,6 +180,8 @@ midifile_init(uint_least8_t const cs)
     if (SD.begin(cs) == false) {  // declared in SD.cpp
         return -1;
     }
+#else  
+    (void) cs;
 #endif
     return 0;
 }

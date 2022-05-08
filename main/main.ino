@@ -103,11 +103,11 @@ namespace {
 
 #if SRC == SRC_FILE
 
-    INLINE uint_least8_t const                       // return 0 if successful
-    _readSamplesFromFile(File &        f,           // file to read samples from [in]
-                          char * const  noteName,    // note name derived from file name [out]
-                          char * const  samples,     // samples read from file [out]
-                          amplitude_t * amplitude)  // signal amplitude [out]
+    INLINE uint_least8_t                             // return 0 if successful
+    _readSamplesFromFile(File &        f,            // file to read samples from [in]
+                         char * const  noteName,     // note name derived from file name [out]
+                         sample_t * const  samples,  // samples read from file [out]
+                         amplitude_t * amplitude)    // signal amplitude [out]
     {
         strcpy(noteName, f.name());
 
@@ -158,12 +158,13 @@ namespace {
      * 3. match the frequency to a note
      */
 
-    uint_least8_t const                   // returns 0 when successful
+    uint_least8_t                         // returns 0 when successful
     _calcNoteFromFile(File & f,           // file to read samples from
-                      char * instrument) // name of instrument (for CSV monitor only)
+                      char * instrument)  // name of instrument (for CSV monitor only)
     {
+        (void) instrument;
         //ASSERT((Debug::getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 65));  // very rough estimate
-        char samples[CONFIG_MIDIMIKE_WINDOW_SIZE];
+        sample_t samples[CONFIG_MIDIMIKE_WINDOW_SIZE];
 
         // read samples from file
 
@@ -173,7 +174,7 @@ namespace {
         if (_readSamplesFromFile(f, noteName, samples, &amplitude) == 0) {
 
             // find frequency from samples
-            float freq = Frequency::calculate(samples);
+            float freq = frequency_calculate(samples);
 
             // find note from frequency
             Pitch pitch(freq);
@@ -186,11 +187,6 @@ namespace {
 # elif DST == DST_PIANOROLL
 
             // need it twice, otherwise it doesn't meet the minimum note duration
-#if 0
-			mv.segmentBuf->put(note.getPitch(), amplitude);
-            mv.segmentBuf->put(note.getPitch(), amplitude);
-            pianoroll_draw(mv.segment->getLastOffset(), mv.segmentBuf);
-#endif
 			mv.segment->put(millis(), pitch.getPitch(), amplitude, mv.segmentBuf);
 			mv.segment->put(millis(), pitch.getPitch(), amplitude, mv.segmentBuf);
 			pianoroll_draw(mv.segment->getLastOffset(), mv.segmentBuf);
@@ -279,7 +275,7 @@ loop()
     samples_t samples = microphone_get_samples(&amplitude);
 
     // find frequency from samples
-    float freq = Frequency::calculate(samples);
+    float freq = frequency_calculate(samples);
 
     // no longer need the samples, so reuse it and start gathering samples for next time around
     microphone_start();  // async
@@ -319,7 +315,7 @@ loop()
 # elif DST == DST_SERIAL
 
     Pitch pitchIn(noteNr_t::C,0);
-    note.serialOut("microphone", pitchIn, freq, amplitude);
+    pitch.serialOut("microphone", pitchIn, freq, amplitude);
 
 # endif
 

@@ -46,10 +46,10 @@
 typedef uint_least8_t hStaffPos_t;
 typedef int16_t vStaffPos_t;  // 2BD not 100% sure if this should be signed
 
-typedef struct note_t {
+typedef struct staffnote_t {
     uint_least8_t  posInOctave;  // staff position within octave
     bool           flat;
-} note_t;
+} staffnote_t;
 
 typedef struct display_t {
     int16_t height;
@@ -74,12 +74,9 @@ typedef struct position_t {
     positionHiLo_t staff;
 } position_t;
 
-vStaffPos_t _nr2vStaffPos(noteNr_t const number, octaveNr_t const octave);
-vStaffPos_t _freq2vStaffPos(frequency_t const freq);
-
 typedef struct staff_t {
     Adafruit_ST7735 * tft;
-    note_t const notes[static_cast<int>(noteNr_t::COUNT)];
+    staffnote_t const notes[static_cast<int>(noteNr_t::COUNT)];
     display_t display;
     distance_t distance;
     position_t position;
@@ -133,7 +130,7 @@ _isFlat(noteNr_t const noteNr)
 
 static INLINE vStaffPos_t
 _nr2vStaffPos(noteNr_t const number,
-                octaveNr_t const octave)
+              octaveNr_t const octave)
 {
     uint16_t const staffPositionsInOctave = 7;
     return staffPositionsInOctave * octave + _my.notes[static_cast<int>(number)].posInOctave;
