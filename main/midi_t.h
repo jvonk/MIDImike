@@ -81,7 +81,6 @@ typedef struct midiHeader_t {
 //   Variable-length numbers are represented 7 bits per byte, most significant bits first.  All
 //   bytes except the last have bit 7 set, and the last byte has bit 7 clear.
 
-
 // MIDI events
 
 typedef struct midiEventNote_t {
