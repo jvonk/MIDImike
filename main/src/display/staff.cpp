@@ -30,6 +30,7 @@
 #include "../../config.h"
 #include "../../sample_t.h"
 #include "../pitch/pitch.h"
+#include "../pitch/frequency.h"
 #include "../segment/segmentbuf.h"
 #include "staffsymbol.h"
 #include "staff.h"

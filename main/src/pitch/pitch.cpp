@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "../../config.h"
+#include "frequency.h"
 #include "pitch.h"
 
 namespace {
@@ -97,7 +98,7 @@ Pitch::Pitch(frequency_t const freq)
 {
 	frequency_t f = freq;
 
-	if (f) { //2BD:  f > FREQ_MIN && f < FREQ_MAX) {
+	if (f) {  // 2BD:  > CONFIG_MIDIMIKE_FREQ_MIN && f < CONFIG_MIDIMIKE_FREQ_MAX) {
 
 			// scale down frequency to octave 0, noting the # of octaves shifted
 		_.octavenr = 0;
@@ -112,6 +113,8 @@ Pitch::Pitch(frequency_t const freq)
 				break;
 			}
 		}
+		Serial.print(_notes[_.notenr].name);
+		Serial.println(_.octavenr);
 
 	} else {
 		_.notenr = NOTENR_C;
@@ -126,7 +129,7 @@ Pitch::Pitch(frequency_t const freq)
  * @param octave  Octave number
  */
 Pitch::Pitch(notenr_t const number,
-			octavenr_t const octave)
+			 octavenr_t const octave)
 {
 	if (number < NOTENR_COUNT) {
 		_.notenr = number;

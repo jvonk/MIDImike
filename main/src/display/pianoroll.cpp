@@ -29,6 +29,7 @@
 
 #include "../../config.h"
 #include "../../sample_t.h"
+#include "../pitch/frequency.h"
 #include "../pitch/pitch.h"
 #include "../segment/segmentbuf.h"
 #include "display.h"

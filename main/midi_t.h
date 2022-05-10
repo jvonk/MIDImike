@@ -2,18 +2,17 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-
 #include "mapping.h"
 
 
-/***************
- * MIDI commands
- ***************
- *
- * see 
- *   http://www.cs.cmu.edu/~music/cmsip/readings/MIDI%20tutorial%20for%20programmers.html
- *   http://www.midi.org/techspecs/midimessages.php
- */
+	/***************
+	 * MIDI commands
+	 ***************
+	 *
+	 * see 
+	 *   http://www.cs.cmu.edu/~music/cmsip/readings/MIDI%20tutorial%20for%20programmers.html
+	 *   http://www.midi.org/techspecs/midimessages.php
+	 */
 
 typedef enum midiEvent_t {
 	MIDIEVENT_NOTE_OFF = 0x8,
@@ -24,26 +23,29 @@ typedef enum midiEvent_t {
 typedef uint8_t midiChannel_t;
 
 
-// MIDI File Format
-//
-//   MIDI formats files use IFF type-length-value chunks.  This structure allows new chunk
-//   types to be introduced.
-//   Integers are stored most-significant-byte-first.
-//   A MIDI File always starts with a header chunk, and is followed by one or more track
-//   chunks:
-//     MThd <length of header data><header data>
-//     MTrk <length of track data><track data>
-
+	/******************
+	 * MIDI File Format
+	 ******************
+	 *   MIDI formats files use IFF type-length-value chunks.  This structure allows new chunk
+	 *   types to be introduced.
+	 *   Integers are stored most-significant-byte-first.
+	 *   A MIDI File always starts with a header chunk, and is followed by one or more track
+	 *   chunks:
+	 *     MThd <length of header data><header data>
+	 *     MTrk <length of track data><track data>
+	 */
 
 #define FOURCC_LEN (4)
 typedef char midiFourcc_t[FOURCC_LEN];
 
 
-// MIDI header
-//
-//   The header chunk gives some basic information about the data in the file.
-//     <Header Chunk> = <type> <len> <format> <numTracks> <ticksPerNote>
-//   see http://www.music.mcgill.ca/~ich/classes/mumt306/midiformat.pdf
+	/*************
+	 * MIDI header
+	 *************
+	 *   The header chunk gives some basic information about the data in the file.
+	 *     <Header Chunk> = <type> <len> <format> <numTracks> <ticksPerNote>
+	 *   see http://www.music.mcgill.ca/~ich/classes/mumt306/midiformat.pdf
+	 */
 
 typedef uint32_t midiLen_t;
 
@@ -62,26 +64,27 @@ typedef struct midiHeader_t {
 } PACK8 midiHeader_t;
 
 
-// MIDI track
-//
-//   The track chunks (type MTrk) are where actual music data is stored. Each track chunk 
-//   is stream of event.
-//     <Track Chunk> = <chunk type> <length> <MTrk event>+
-//   Track events include
-//     - MIDI events --- any MIDI channel message
-//                         <varlen encoded delta-time><....>
-//     - meta event ---- non-MIDI information (for this format, or sequencers)
-//                         FF <type> <length> <bytes>, such as
-//                         FF 51 03 tttttt, to set Tempo (in microseconds per MIDI
-//                         quarter-note)
-//
-//   Delta-time is stored as a variable-length quantity. It represents the amount of time before
-//   the following event.If the first event in a track occurs at the very beginning of a track,
-//   or if two events occur simultaneously, a delta - time of zero is used.
-//   Variable-length numbers are represented 7 bits per byte, most significant bits first.  All
-//   bytes except the last have bit 7 set, and the last byte has bit 7 clear.
-
-// MIDI events
+	/*************
+	 *  MIDI track
+	 ************* 
+	*
+	*   The track chunks (type MTrk) are where actual music data is stored. Each track chunk 
+	*   is stream of event.
+	*     <Track Chunk> = <chunk type> <length> <MTrk event>+
+	*   Track events include
+	*     - MIDI events --- any MIDI channel message
+	*                         <varlen encoded delta-time><....>
+	*     - meta event ---- non-MIDI information (for this format, or sequencers)
+	*                         FF <type> <length> <bytes>, such as
+	*                         FF 51 03 tttttt, to set Tempo (in microseconds per MIDI
+	*                         quarter-note)
+	*
+	*   Delta-time is stored as a variable-length quantity. It represents the amount of time before
+	*   the following event.If the first event in a track occurs at the very beginning of a track,
+	*   or if two events occur simultaneously, a delta - time of zero is used.
+	*   Variable-length numbers are represented 7 bits per byte, most significant bits first.  All
+	*   bytes except the last have bit 7 set, and the last byte has bit 7 clear.
+	*/
 
 typedef struct midiEventNote_t {
 	uint8_t channel : 4; // MIDI channel # (0..15)

@@ -34,8 +34,6 @@
 // maximum level of sub directories to search
 #define DIRLEVEL_MAX (2)
 
-sddir_callback_t _callback = NULL;
-
 /**
  * @brief Recursively walk directory, calling registered `_callback` for files
  * 
@@ -44,24 +42,24 @@ sddir_callback_t _callback = NULL;
  * @return uint_least8_t Returns 0 if successful
  */
 static uint_least8_t
-_walkDirectory(File &dir, uint_least8_t const lvl)
+_walkDirectory(File &dir, uint_least8_t const lvl, sddir_callback_t cb_fnc)
 {
 	File f;
 	uint_least8_t err = 0;
 	static char instrumentName[8 + 1 + 3 + 1];
 
-	while ((f = dir.openNextFile()) && !err && _callback) {
+	while ((f = dir.openNextFile()) && !err && cb_fnc) {
 
 		if (f.isDirectory()) {
 			if (lvl < DIRLEVEL_MAX) {
 				if (lvl == 0) {
 					strcpy(instrumentName, f.name());
 				}
-				err = _walkDirectory(f, lvl + 1);  // recursive function call
+				err = _walkDirectory(f, lvl + 1, cb_fnc);  // recursive function call
 			} else {
 			}
 		} else {
-			err = _callback(f, instrumentName);  // call back registered function
+			err = cb_fnc(f, instrumentName);  // call back registered function
 		}
 		f.close();
 	}
@@ -76,12 +74,12 @@ _walkDirectory(File &dir, uint_least8_t const lvl)
  * @return uint_least8_t Returns 0 if successful
  */
 uint_least8_t
-sddir_for_each_file(char const * const dirName, sddir_callback_t cb)
+sddir_for_each_file(char const * const dirName, sddir_callback_t cb_fnc)
 {
-	_callback = cb;
+	//_callback = cb;
 
 	File f = SD.open(dirName);
-	uint_least8_t err = _walkDirectory(f, 0);
+	uint_least8_t err = _walkDirectory(f, 0, cb_fnc);
 
 	f.close();
 	return err;

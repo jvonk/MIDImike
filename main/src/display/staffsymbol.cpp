@@ -112,11 +112,13 @@ namespace {
         { 8,  4, {{}, {}}, {1, 1}, _symbol_bitmap_to_low},
         { 8,  4, {{}, {}}, {1, 1}, _symbol_bitmap_to_heigh},
         {10, 10, {{}, {}}, {1, 1}, _symbol_bitmap_note},
-    #if GKEY == GKEY_LORES
+#if DST == DST_STAFF
+# if GKEY == GKEY_LORES
         {16, 44, {{}, {}}, {2, 2}, _symbol_bitmap_gkey},
-    #elif GKEY == GKEY_HIRES
+# elif GKEY == GKEY_HIRES
         {32, 88, {{}, {}}, {1, 1}, _symbol_bitmap_gkey},
-    #endif
+# endif
+#endif
     };
 
     typedef struct staffsymbol_t {

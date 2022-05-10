@@ -6,7 +6,7 @@
 
 #pragma GCC diagnostic error "-Wall"
 
-#define CONFIG_MIDIMIKE_SERIAL_RATE (31250)        // [baud], must be 31250 for USB-midi, 115200 for HairlessMIDI
+#define CONFIG_MIDIMIKE_SERIAL_RATE (115200)       // [baud], must be 31250 for USB-midi, 115200 for HairlessMIDI
 #define CONFIG_MIDIMIKE_SAMPLE_RATE (9615)         // 9615, 19231, 38462, 76923, 153846, 307692, 615384}
 #define CONFIG_MIDIMIKE_WINDOW_SIZE (200)          // short-time window size (restricted by avail memory)
 #define CONFIG_MIDIMIKE_FILE_SEC2SKIP (1)          // [s] #seconds to skip when reading note file
@@ -14,12 +14,6 @@
 #define CONFIG_MIDIMIKE_MIN_SEGMENT_DURATION (3)   // #times the same freq is detected, before we consider it stable
 #define CONFIG_MIDIMIKE_MIDI_CHANNEL (1 -1)        // MIDI output channel# (tx 0-based)
 #define CONFIG_MIDIMIKE_MIDI_INSTRUMENT (53 -1)    // * MIDI output instrument# (tx 0-based), 1=Grand Piano 53=Choir Ahhs, 61=French Horn
-
-// values below are calculated
-#define CONFIG_MIDIMIKE_LAG_MIN (6)                                                       // [samples] (not seconds!), 10 samples gives a +/-5% error rate (before interpolation)
-#define CONFIG_MIDIMIKE_LAG_MAX (CONFIG_MIDIMIKE_WINDOW_SIZE / 2)                         // [samples] (not seconds!), at least two waveforms
-#define CONFIG_MIDIMIKE_FREQ_MIN (CONFIG_MIDIMIKE_SAMPLE_RATE / CONFIG_MIDIMIKE_LAG_MAX)  // 96 Hz @ 9615 S/s
-#define CONFIG_MIDIMIKE_FREQ_MAX (CONFIG_MIDIMIKE_SAMPLE_RATE / CONFIG_MIDIMIKE_LAG_MIN)  // 1602 Hz @ 9615 S/s and 6 min lag
 
 // show memory usage
 #define SHOW_MEMORY_USAGE (0)            
@@ -34,11 +28,11 @@
 #define DST_STAFF      (1)
 #define DST_PIANOROLL  (2)
 #define DST_SERIAL     (3)
-#define DST (DST_STAFF)
+#define DST (DST_PIANOROLL)
 
 // enable USB-midi output on the USB connector (requires DST=DST_PIANOROLL, and CONFIG_MIDIMIKE_SERIAL_RATE=31250)
 // after changing to USB-midi, connect MOSI2-to-GND and power cycle the Arduino
-#define USB_MIDI (1)
+#define USB_MIDI (0)
 
 // help reduce the number of #if statements in elsewhere
 #if SHOW_MEMORY_USAGE

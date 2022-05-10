@@ -58,14 +58,14 @@ _send_3byte_event(midiEvent_t const     event,
 
 void
 midiserial_send_note_on(segment_pitch_t const pitch,
-              segment_energy_t const energy)
+                        segment_energy_t const energy)
 {
 	_send_3byte_event(MIDIEVENT_NOTE_ON, pitch, energy);
 }
 
 void
 midiserial_send_note_off(segment_pitch_t const pitch,
-               segment_energy_t const energy)
+                         segment_energy_t const energy)
 {
 	_send_3byte_event(MIDIEVENT_NOTE_OFF, pitch, energy);
 }

@@ -39,7 +39,9 @@ namespace {
 void
 Segment::_energy_init(segment_energytrend_t * const trend)
 {
-	midiserial_send_program_change(CONFIG_MIDIMIKE_MIDI_INSTRUMENT);
+	if (USB_MIDI) {
+		midiserial_send_program_change(CONFIG_MIDIMIKE_MIDI_INSTRUMENT);
+	}
 	trend->previous = 0;
 	trend->state = segment_energystate_t::SEGMENT_ENERGYSTATE_FIND_NEG_SLOPE;
 }
@@ -151,15 +153,19 @@ Segment::put(absolute_time_t const now, segment_pitch_t const pitch, segment_ene
 	}
 
 	if (stop_current_note) {
-		midiserial_send_note_off(cv.note->pitch, 0);
-		//midiserial_send_program_change(random(1, 52));
+		if (USB_MIDI) {
+			midiserial_send_note_off(cv.note->pitch, 0);
+			//midiserial_send_program_change(random(1, 52));
+		}
 		cv.note = segmentBuf->note_end(_diff_time(t), cv.energy_trend.max, cv.note);
 		cv.time.last_offset = t;
 
 	}
 
 	if (start_new_note) {
-		midiserial_send_note_on(pitch, energy);
+		if (USB_MIDI) {
+			midiserial_send_note_on(pitch, energy);
+		}
 		if (segmentBuf->len() == 0) {  // first segment should have relative time=0
 			cv.time.last_event = t;
 		}
