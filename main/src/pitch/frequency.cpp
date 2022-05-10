@@ -66,7 +66,7 @@ _quad_interp_adj(autoCorr_t const left,   // sample value left of the peak
 	return adj;
 }
 
-#define INTERPOLATE (0)
+#define INTERPOLATE (1)
 #define NORMALIZE (0)
 
 #pragma GCC diagnostic push
@@ -108,6 +108,8 @@ frequency_calculate(samples_t const  samples)  // pointer to signed 8-bit data s
 						period = lag - 1 + _quad_interp_adj(
 							_auto_corr(samples, lag - 2), 
 							acPrev, ac);
+                        Serial.print(lag-1); Serial.print(" -> ");
+                        Serial.print(period); Serial.print(" -> ");
 					} else {
 						period = lag - 1;  // we got 1 past it
 					}
@@ -118,7 +120,7 @@ frequency_calculate(samples_t const  samples)  // pointer to signed 8-bit data s
 	}
 
 	if (state != STATE_FOUND_PEAK) {
-		Serial.println("peak not found");
+		//Serial.println("peak not found");
 		return 0;
 	}
 

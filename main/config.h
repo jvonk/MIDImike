@@ -7,7 +7,7 @@
 #pragma GCC diagnostic error "-Wall"
 
 #define CONFIG_MIDIMIKE_SERIAL_RATE (115200)       // [baud], must be 31250 for USB-midi, 115200 for HairlessMIDI
-#define CONFIG_MIDIMIKE_SAMPLE_RATE (9615)         // 9615, 19231, 38462, 76923, 153846, 307692, 615384}
+#define CONFIG_MIDIMIKE_SAMPLE_RATE (9615)         // 9615, 19231, 38462, 76923, ..}
 #define CONFIG_MIDIMIKE_WINDOW_SIZE (200)          // short-time window size (restricted by avail memory)
 #define CONFIG_MIDIMIKE_FILE_SEC2SKIP (1)          // [s] #seconds to skip when reading note file
 #define CONFIG_MIDIMIKE_AUDIBLE_THRESHOLD (20)     // audible threshold [0 .. 255]
