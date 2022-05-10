@@ -180,12 +180,13 @@
 <wire x1="10.16" y1="44.45" x2="10.16" y2="31.75" width="0" layer="20"/>
 <wire x1="10.16" y1="31.75" x2="0" y2="31.75" width="0" layer="20"/>
 <wire x1="0" y1="31.75" x2="0" y2="0" width="0" layer="20"/>
-<text x="81.28" y="40.64" size="0.762" layer="22" rot="R90" align="center">USB-MIDI</text>
-<text x="71.12" y="40.64" size="0.762" layer="21" rot="R90" align="center">USB-SERIAL</text>
+<text x="83.82" y="33.02" size="0.762" layer="22" rot="R90" align="center">USB-MIDI</text>
+<text x="83.82" y="27.305" size="0.762" layer="21" rot="R90" align="center">USB-SERIAL</text>
 <text x="74.93" y="52.07" size="1.016" layer="21" align="center">Arduino Pitch Detector</text>
 <text x="74.93" y="50.8" size="1.016" layer="21" align="center">Johan Vonk</text>
 <text x="74.93" y="49.53" size="1.016" layer="21" align="center">2016</text>
 <text x="53.34" y="25.4" size="1.27" layer="22" rot="MR0">https://github.com/jvonk/Arduino_Pitch-Detector</text>
+<text x="75.565" y="46.355" size="0.762" layer="21" rot="R180" align="center">SHIFT</text>
 </plain>
 <libraries>
 <library name="Coert-Vonk">
@@ -490,6 +491,32 @@ Includes mounting holes, and holes for ICSP header
 <rectangle x1="-2.8448" y1="-0.3048" x2="-2.2352" y2="0.3048" layer="51"/>
 <rectangle x1="-0.3048" y1="-0.3048" x2="0.3048" y2="0.3048" layer="51"/>
 <rectangle x1="2.2352" y1="-0.3048" x2="2.8448" y2="0.3048" layer="51"/>
+</package>
+<package name="SW_RDS-16S-1045-SMT-TR">
+<circle x="-8.735" y="2.54" radius="0.1" width="0.2" layer="21"/>
+<circle x="-8.735" y="2.54" radius="0.1" width="0.2" layer="51"/>
+<wire x1="-5" y1="5" x2="5" y2="5" width="0.127" layer="51"/>
+<wire x1="-5" y1="-5" x2="5" y2="-5" width="0.127" layer="51"/>
+<wire x1="-5" y1="5" x2="-5" y2="-5" width="0.127" layer="51"/>
+<wire x1="5" y1="5" x2="5" y2="-5" width="0.127" layer="51"/>
+<wire x1="-7.95" y1="5.25" x2="7.95" y2="5.25" width="0.05" layer="39"/>
+<wire x1="-7.95" y1="-5.25" x2="7.95" y2="-5.25" width="0.05" layer="39"/>
+<wire x1="-7.95" y1="5.25" x2="-7.95" y2="-5.25" width="0.05" layer="39"/>
+<wire x1="7.95" y1="5.25" x2="7.95" y2="-5.25" width="0.05" layer="39"/>
+<text x="-7.5" y="-5.5" size="1.27" layer="27" align="top-left">&gt;VALUE</text>
+<text x="-7.41" y="5.327" size="1.27" layer="25">&gt;NAME</text>
+<wire x1="-5" y1="5" x2="5" y2="5" width="0.127" layer="21"/>
+<wire x1="-5" y1="-5" x2="5" y2="-5" width="0.127" layer="21"/>
+<wire x1="-5" y1="5" x2="-5" y2="3.36" width="0.127" layer="21"/>
+<wire x1="-5" y1="-3.36" x2="-5" y2="-5" width="0.127" layer="21"/>
+<wire x1="5" y1="5" x2="5" y2="3.36" width="0.127" layer="21"/>
+<wire x1="5" y1="-3.36" x2="5" y2="-5" width="0.127" layer="21"/>
+<smd name="1" x="-6.35" y="2.54" dx="2.7" dy="1" layer="1"/>
+<smd name="C_1" x="-6.35" y="0" dx="2.7" dy="1" layer="1"/>
+<smd name="4" x="-6.35" y="-2.54" dx="2.7" dy="1" layer="1"/>
+<smd name="2" x="6.35" y="-2.54" dx="2.7" dy="1" layer="1"/>
+<smd name="C_2" x="6.35" y="0" dx="2.7" dy="1" layer="1"/>
+<smd name="8" x="6.35" y="2.54" dx="2.7" dy="1" layer="1"/>
 </package>
 </packages>
 <packages3d>
@@ -1732,7 +1759,7 @@ design rules under a new name.</description>
 <param name="PrefDir.13" value="0"/>
 <param name="PrefDir.14" value="0"/>
 <param name="PrefDir.15" value="0"/>
-<param name="PrefDir.16" value="-"/>
+<param name="PrefDir.16" value="*"/>
 <param name="cfVia" value="8"/>
 <param name="cfNonPref" value="5"/>
 <param name="cfChangeDir" value="2"/>
@@ -1816,35 +1843,47 @@ design rules under a new name.</description>
 <attribute name="NAME" x="33.02" y="38.1" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center"/>
 <attribute name="VALUE" x="33.02" y="-1.27" size="0.6096" layer="27" font="vector" ratio="20" align="top-center"/>
 </element>
-<element name="SW1" library="Coert-Vonk" package="TE_1-1825910-4" value="PUSH-BTN" x="76.2" y="33.02" smashed="yes">
-<attribute name="COMMENT" value="1-1825910-4" x="119.38" y="-88.9" size="1.778" layer="27" display="off"/>
-<attribute name="DESCRIPTION" value=" Switch Tactile OFF (ON) SPST Round Button PC Pins 0.05A 24VDC 100000Cycles 1.56N Thru-Hole " x="119.38" y="-88.9" size="1.778" layer="27" display="off"/>
-<attribute name="DIGI-KEY_PART_NUMBER" value="450-1653-ND" x="119.38" y="-88.9" size="1.778" layer="27" display="off"/>
-<attribute name="MF" value="TE Connectivity" x="119.38" y="-88.9" size="1.778" layer="27" display="off"/>
-<attribute name="MP" value="1-1825910-4" x="119.38" y="-88.9" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="71.84291875" y="36.406059375" size="0.80100625" layer="25"/>
-<attribute name="PACKAGE" value="None" x="119.38" y="-88.9" size="1.778" layer="27" display="off"/>
-<attribute name="PURCHASE-URL" value="https://pricing.snapeda.com/search/part/1-1825910-4/?ref=eda" x="119.38" y="-88.9" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="71.769490625" y="28.65893125" size="0.800415625" layer="27"/>
+<element name="SW1" library="Coert-Vonk" package="TE_1-1825910-4" value="PUSH-BTN" x="74.295" y="30.48" smashed="yes">
+<attribute name="COMMENT" value="1-1825910-4" x="117.475" y="-91.44" size="1.778" layer="27" display="off"/>
+<attribute name="DESCRIPTION" value=" Switch Tactile OFF (ON) SPST Round Button PC Pins 0.05A 24VDC 100000Cycles 1.56N Thru-Hole " x="117.475" y="-91.44" size="1.778" layer="27" display="off"/>
+<attribute name="DIGI-KEY_PART_NUMBER" value="450-1653-ND" x="117.475" y="-91.44" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="TE Connectivity" x="117.475" y="-91.44" size="1.778" layer="27" display="off"/>
+<attribute name="MP" value="1-1825910-4" x="117.475" y="-91.44" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="69.93791875" y="33.866059375" size="0.80100625" layer="25"/>
+<attribute name="PACKAGE" value="None" x="117.475" y="-91.44" size="1.778" layer="27" display="off"/>
+<attribute name="PURCHASE-URL" value="https://pricing.snapeda.com/search/part/1-1825910-4/?ref=eda" x="117.475" y="-91.44" size="1.778" layer="27" display="off"/>
+<attribute name="VALUE" x="69.864490625" y="26.11893125" size="0.800415625" layer="27"/>
 </element>
-<element name="JP1" library="Coert-Vonk" package="JP2" package3d_urn="urn:adsk.eagle:package:15452/1" value="" x="76.2" y="40.64" smashed="yes">
-<attribute name="NAME" x="72.644" y="42.291" size="1.27" layer="25" ratio="10"/>
-<attribute name="POPULARITY" value="34" x="76.2" y="40.64" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="72.644" y="36.322" size="1.27" layer="27" ratio="10"/>
+<element name="JP1" library="Coert-Vonk" package="JP2" package3d_urn="urn:adsk.eagle:package:15452/1" value="" x="81.28" y="31.115" smashed="yes" rot="R90">
+<attribute name="NAME" x="79.629" y="27.559" size="1.27" layer="25" ratio="10" rot="R90"/>
+<attribute name="POPULARITY" value="34" x="81.28" y="31.115" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VALUE" x="85.598" y="27.559" size="1.27" layer="27" ratio="10" rot="R90"/>
 </element>
-<element name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="330Ω" x="76.2" y="45.72" smashed="yes" rot="R180">
-<attribute name="MANF" value="Bourns" x="76.2" y="45.72" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MANF#" value="CRM0805-JW-1R5ELF" x="76.2" y="45.72" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MOUSER#" value="652-CRM0805JW1R5ELF" x="76.2" y="45.72" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="78.105" y="48.26" size="1.27" layer="25" rot="R180"/>
-<attribute name="POPULARITY" value="86" x="76.2" y="45.72" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="SPICEPREFIX" value="R" x="76.2" y="45.72" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VALUE" x="76.835" y="48.26" size="1.27" layer="27" rot="R180"/>
+<element name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" package="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="330Ω" x="80.01" y="48.26" smashed="yes" rot="R180">
+<attribute name="MANF" value="Bourns" x="80.01" y="48.26" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MANF#" value="CRM0805-JW-1R5ELF" x="80.01" y="48.26" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MOUSER#" value="652-CRM0805JW1R5ELF" x="80.01" y="48.26" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="NAME" x="84.455" y="48.26" size="1.27" layer="25" rot="R180"/>
+<attribute name="POPULARITY" value="86" x="80.01" y="48.26" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="SPICEPREFIX" value="R" x="80.01" y="48.26" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" x="80.645" y="50.8" size="1.27" layer="27" rot="R180"/>
 </element>
-<element name="LED1" library="OPNpool" package="CHIPLED_0805" package3d_urn="urn:adsk.eagle:package:15821/2" value="AMBER" x="71.12" y="45.72" smashed="yes" rot="R270">
-<attribute name="NAME" x="69.85" y="46.99" size="1.27" layer="25"/>
-<attribute name="POPULARITY" value="52" x="71.12" y="45.72" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="VALUE" x="69.85" y="43.18" size="1.27" layer="27"/>
+<element name="LED1" library="OPNpool" package="CHIPLED_0805" package3d_urn="urn:adsk.eagle:package:15821/2" value="AMBER" x="70.485" y="48.26" smashed="yes" rot="R270">
+<attribute name="NAME" x="66.675" y="49.53" size="1.27" layer="25"/>
+<attribute name="POPULARITY" value="52" x="70.485" y="48.26" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="VALUE" x="69.215" y="45.72" size="1.27" layer="27"/>
+</element>
+<element name="SW2" library="Coert-Vonk" package="SW_RDS-16S-1045-SMT-TR" value="SH-7030TB" x="75.565" y="40.64" smashed="yes">
+<attribute name="AVAILABILITY" value="In Stock" x="75.565" y="40.64" size="1.778" layer="27" display="off"/>
+<attribute name="CUI_PURCHASE_URL" value="https://www.cuidevices.com/product/switches/dip-switches/rds-1045-smt-series?utm_source=snapeda.com&amp;utm_medium=referral&amp;utm_campaign=snapedaBOM" x="75.565" y="40.64" size="1.778" layer="27" display="off"/>
+<attribute name="DESCRIPTION" value=" 10 and 16 Positions, Surface Mount, 2.54 mm Pitch, Rotary Actuator, DIP Switch " x="75.565" y="40.64" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="CUI Devices" x="75.565" y="40.64" size="1.778" layer="27" display="off"/>
+<attribute name="MP" value="RDS-16S-1045-SMT-TR" x="75.565" y="40.64" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="68.155" y="45.967" size="1.27" layer="25"/>
+<attribute name="PACKAGE" value="Package " x="75.565" y="40.64" size="1.778" layer="27" display="off"/>
+<attribute name="PRICE" value="None" x="75.565" y="40.64" size="1.778" layer="27" display="off"/>
+<attribute name="PURCHASE-URL" value="https://pricing.snapeda.com/search/part/RDS-16S-1045-SMT-TR/?ref=eda" x="75.565" y="40.64" size="1.778" layer="27" display="off"/>
+<attribute name="VALUE" x="68.065" y="35.14" size="1.27" layer="27" align="top-left"/>
 </element>
 </elements>
 <signals>
@@ -1861,8 +1900,6 @@ design rules under a new name.</description>
 <contactref element="PCB2" pad="GND@2"/>
 <contactref element="PCB2" pad="GND@3"/>
 <contactref element="PCB2" pad="GND@4"/>
-<contactref element="SW1" pad="2"/>
-<contactref element="SW1" pad="2@1"/>
 <contactref element="JP1" pad="2"/>
 <polygon width="0.254" layer="16" isolate="0.3048">
 <vertex x="0" y="44.45"/>
@@ -1886,6 +1923,10 @@ design rules under a new name.</description>
 </polygon>
 <contactref element="R1" pad="1"/>
 <contactref element="PCB1" pad="3"/>
+<contactref element="SW1" pad="1"/>
+<contactref element="SW1" pad="1@1"/>
+<contactref element="SW2" pad="C_2" route="any" routetag="G$1.C"/>
+<contactref element="SW2" pad="C_1" route="any" routetag="G$1.C"/>
 </signal>
 <signal name="5V">
 <contactref element="PCB2" pad="5V"/>
@@ -1956,39 +1997,80 @@ design rules under a new name.</description>
 <contactref element="PCB3" pad="D4"/>
 <contactref element="PCB2" pad="D4"/>
 </signal>
-<signal name="REPLAY">
-<contactref element="SW1" pad="1"/>
-<contactref element="SW1" pad="1@1"/>
-<contactref element="PCB2" pad="D5"/>
-<wire x1="50.8" y1="50.8" x2="50.8" y2="48.26" width="0.1524" layer="16"/>
-<wire x1="50.8" y1="48.26" x2="54.61" y2="44.45" width="0.1524" layer="16"/>
-<wire x1="54.61" y1="44.45" x2="79.375" y2="44.45" width="0.1524" layer="16"/>
-<wire x1="79.375" y1="44.45" x2="80.645" y2="43.18" width="0.1524" layer="16"/>
-<wire x1="80.645" y1="36.465" x2="79.45" y2="35.27" width="0.1524" layer="16"/>
-<wire x1="80.645" y1="43.18" x2="80.645" y2="36.465" width="0.1524" layer="16"/>
-<wire x1="79.45" y1="35.27" x2="72.95" y2="35.27" width="0.1524" layer="16"/>
-</signal>
 <signal name="N$3">
 <contactref element="PCB2" pad="MOSI2"/>
 <contactref element="JP1" pad="3"/>
-<wire x1="18.27560625" y1="44.9587875" x2="19.54481875" y2="46.228" width="0.1524" layer="16"/>
-<wire x1="51.308" y1="46.228" x2="54.229" y2="43.307" width="0.1524" layer="16"/>
-<wire x1="77.851" y1="43.307" x2="78.74" y2="42.418" width="0.1524" layer="16"/>
-<wire x1="78.74" y1="42.418" x2="78.74" y2="40.64" width="0.1524" layer="16"/>
-<wire x1="19.54481875" y1="46.228" x2="51.308" y2="46.228" width="0.1524" layer="16"/>
-<wire x1="54.229" y1="43.307" x2="77.851" y2="43.307" width="0.1524" layer="16"/>
-</signal>
-<signal name="N$1">
-<contactref element="PCB2" pad="D2"/>
-<contactref element="LED1" pad="A"/>
-<wire x1="58.42" y1="50.8" x2="58.42" y2="48.26" width="0.1524" layer="1"/>
-<wire x1="58.42" y1="48.26" x2="60.96" y2="45.72" width="0.1524" layer="1"/>
-<wire x1="60.96" y1="45.72" x2="70.07" y2="45.72" width="0.1524" layer="1"/>
+<wire x1="81.28" y1="33.655" x2="78.0025375" y2="33.655" width="0.1524" layer="1"/>
+<wire x1="78.0025375" y1="33.655" x2="77.9499375" y2="33.7076" width="0.1524" layer="1"/>
+<wire x1="77.9499375" y1="33.7076" x2="74.3476" y2="33.7076" width="0.1524" layer="1"/>
+<wire x1="74.3476" y1="33.7076" x2="71.755" y2="31.115" width="0.1524" layer="1"/>
+<wire x1="71.755" y1="31.115" x2="68.58" y2="31.115" width="0.1524" layer="1"/>
+<wire x1="68.58" y1="31.115" x2="66.8147" y2="32.8803" width="0.1524" layer="1"/>
+<wire x1="42.6847" y1="32.8803" x2="38.1" y2="37.465" width="0.1524" layer="1"/>
+<wire x1="66.8147" y1="32.8803" x2="42.6847" y2="32.8803" width="0.1524" layer="1"/>
+<via x="38.1" y="37.465" extent="1-16" drill="0.35"/>
+<wire x1="38.1" y1="37.465" x2="32.385" y2="37.465" width="0.1524" layer="16"/>
+<via x="32.385" y="37.465" extent="1-16" drill="0.35"/>
+<wire x1="25.76939375" y1="37.465" x2="18.27560625" y2="44.9587875" width="0.1524" layer="1"/>
+<wire x1="32.385" y1="37.465" x2="25.76939375" y2="37.465" width="0.1524" layer="1"/>
 </signal>
 <signal name="N$8">
 <contactref element="LED1" pad="C"/>
 <contactref element="R1" pad="2"/>
-<wire x1="72.17" y1="45.72" x2="75.25" y2="45.72" width="0.1524" layer="1"/>
+<wire x1="71.535" y1="48.26" x2="79.06" y2="48.26" width="0.1524" layer="1"/>
+</signal>
+<signal name="D8">
+<contactref element="LED1" pad="A"/>
+<contactref element="PCB2" pad="D8"/>
+<wire x1="69.435" y1="48.26" x2="65.4572" y2="52.2378" width="0.1524" layer="1"/>
+<wire x1="41.656" y1="50.8" x2="41.7422" y2="50.8" width="0.1524" layer="1"/>
+<wire x1="43.18" y1="52.2378" x2="41.7422" y2="50.8" width="0.1524" layer="1"/>
+<wire x1="65.4572" y1="52.2378" x2="43.18" y2="52.2378" width="0.1524" layer="1"/>
+</signal>
+<signal name="N$13">
+<contactref element="PCB2" pad="D5"/>
+<contactref element="SW2" pad="4"/>
+<wire x1="50.8" y1="50.8" x2="63.5" y2="38.1" width="0.1524" layer="1"/>
+<wire x1="63.5" y1="38.1" x2="69.215" y2="38.1" width="0.1524" layer="1"/>
+</signal>
+<signal name="N$14">
+<contactref element="PCB2" pad="D6"/>
+<contactref element="SW2" pad="8"/>
+<wire x1="81.915" y1="43.18" x2="80.01" y2="43.18" width="0.1524" layer="1"/>
+<wire x1="80.01" y1="43.18" x2="78.105" y2="45.085" width="0.1524" layer="1"/>
+<via x="78.105" y="45.085" extent="1-16" drill="0.35"/>
+<wire x1="74.93" y1="45.085" x2="78.105" y2="45.085" width="0.1524" layer="16"/>
+<wire x1="48.26" y1="50.8" x2="51.435" y2="47.625" width="0.1524" layer="16"/>
+<wire x1="51.435" y1="47.625" x2="72.39" y2="47.625" width="0.1524" layer="16"/>
+<wire x1="72.39" y1="47.625" x2="74.93" y2="45.085" width="0.1524" layer="16"/>
+</signal>
+<signal name="D7">
+<contactref element="PCB2" pad="D7"/>
+<contactref element="SW1" pad="2@1"/>
+<contactref element="SW1" pad="2"/>
+<wire x1="45.72" y1="50.8" x2="63.5" y2="33.02" width="0.1524" layer="16"/>
+<wire x1="63.5" y1="33.02" x2="66.675" y2="33.02" width="0.1524" layer="16"/>
+<wire x1="66.675" y1="33.02" x2="71.045" y2="28.65" width="0.1524" layer="16"/>
+<wire x1="71.045" y1="28.65" x2="71.045" y2="28.23" width="0.1524" layer="16"/>
+<wire x1="77.545" y1="28.23" x2="71.045" y2="28.23" width="0.1524" layer="16"/>
+</signal>
+<signal name="N$1">
+<contactref element="PCB2" pad="D2"/>
+<contactref element="SW2" pad="1"/>
+<wire x1="58.42" y1="50.8" x2="66.04" y2="43.18" width="0.1524" layer="1"/>
+<wire x1="66.04" y1="43.18" x2="69.215" y2="43.18" width="0.1524" layer="1"/>
+</signal>
+<signal name="N$10">
+<contactref element="PCB2" pad="D3"/>
+<contactref element="SW2" pad="2"/>
+<wire x1="81.915" y1="38.1" x2="81.28" y2="38.1" width="0.1524" layer="1"/>
+<wire x1="81.28" y1="38.1" x2="76.835" y2="42.545" width="0.1524" layer="1"/>
+<wire x1="76.835" y1="50.165" x2="74.7622" y2="52.2378" width="0.1524" layer="16"/>
+<wire x1="55.88" y1="50.8" x2="57.3178" y2="52.2378" width="0.1524" layer="16"/>
+<wire x1="57.3178" y1="52.2378" x2="74.7622" y2="52.2378" width="0.1524" layer="16"/>
+<wire x1="76.835" y1="42.545" x2="76.835" y2="46.99" width="0.1524" layer="1"/>
+<via x="76.835" y="46.99" extent="1-16" drill="0.35"/>
+<wire x1="76.835" y1="46.99" x2="76.835" y2="50.165" width="0.1524" layer="16"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
