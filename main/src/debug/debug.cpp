@@ -27,6 +27,14 @@
 #include "../../config.h"
 #include "debug.h"
 
+extern char *__brkval;
+
+int 
+Debug::freeMemory() {
+  char top;
+  return &top - __brkval;
+}
+
 #if 0
 
 	/********
@@ -95,19 +103,18 @@ Debug::getMemFree(void)
 {
 	int free_memory;
 	free_memory = __brkval ? ((unsigned int)&free_memory) - ((unsigned int)__brkval)
-		: ((unsigned int)&free_memory) - ((unsigned int)&__bss_end);
+		                   : ((unsigned int)&free_memory) - ((unsigned int)&__bss_end);
 
 	return free_memory;
 }
 
-
 void
 Debug::getMemInUse(unsigned int const ramend,
-					unsigned int const sp,
-					unsigned int * const dataSize,
-					unsigned int * const bssSize,
-					unsigned int * const heapSize,
-					unsigned int * const stackSize)
+				   unsigned int const sp,
+				   unsigned int * const dataSize,
+				   unsigned int * const bssSize,
+				   unsigned int * const heapSize,
+				   unsigned int * const stackSize)
 {
 	*dataSize = (unsigned int)&__data_end - (unsigned int)&__data_start;
 	*bssSize = (unsigned int)&__bss_end - (unsigned int)&__bss_start;

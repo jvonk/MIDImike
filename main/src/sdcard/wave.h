@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-#include <SD.h>
+#include <SdFat.h>
 #include "../../config.h"
 #include "../../sample_t.h"
 

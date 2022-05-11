@@ -12,8 +12,6 @@
 #include "../display/pianoroll.h"
 #include "../debug/debug.h"
 
-#if (DST == DST_SERIAL)
-
 void
 calcnote_write_serial_hdr(void)
 {
@@ -79,7 +77,13 @@ uint_least8_t                          // returns 0 if successful, otherwise ret
 calcnote_from_file(File & f,           // file to read samples from
                    char * instrument)  // name of instrument (for CSV monitor only)
 {
-    if (USB == USB_SERIAL && DST == DST_SERIAL) {
+    //Serial.println(f.name());
+
+    if (USB == USB_SERIAL && DST == DST_TEXT) {
+
+        //
+        // sorry doesn't work .. we run out of mem
+        //
 
         //ASSERT((Debug::getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 65));  // very rough estimate
 
@@ -91,8 +95,6 @@ calcnote_from_file(File & f,           // file to read samples from
         char noteName[8 + 1 + 3 + 1];
         if (wave_read_samples(f, noteName, samples, &amplitude) == 0) {
 
-            // Serial.println(noteName);
-
             // find frequency from samples
             float freq = frequency_calculate(samples);
 
@@ -102,11 +104,9 @@ calcnote_from_file(File & f,           // file to read samples from
             Pitch pitch_in(noteName);
             calcnote_write_serial(instrument, pitch_in, pitch, freq);
         } else {
-            // Serial.println("wave_read_samples() err");
+            Serial.println("wave_read_samples() err");
         }
         return 0;
     }
     return 1;
 }
-
-#endif

@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-#include <SD.h>
+#include <SdFat.h>
 
 typedef uint_least8_t (* sddir_callback_t)(File & f, char * instrument);
 

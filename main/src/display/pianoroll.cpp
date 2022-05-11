@@ -35,7 +35,6 @@
 #include "display_t.h"
 #include "pianoroll.h"
 
-#if (DST == DST_PIANOROLL)
  								 //   rrrr rggg gggb bbbb
 #define COLOR_NOTESTART (0xF800) // 0b1111 1000 0000 0000  red
 #define COLOR_NOTE (0x0700)      // 0b0000 0111 0000 0000  dark green
@@ -214,5 +213,3 @@ pianoroll_init(uint_least8_t tftCS_pin,  // GPIO# for SPI TFT Chip Select
 	_resize(_.tft->width(), _.tft->height());
 	pianoroll_clear();
 }
-
-#endif

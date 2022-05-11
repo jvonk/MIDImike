@@ -17,6 +17,9 @@ void debug_assertPrint(char const * const func, int const lineno);
 
 namespace Debug {
 
+    int 
+        freeMemory(void);
+
     unsigned int
         getMemFree(void);
 

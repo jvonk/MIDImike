@@ -23,11 +23,9 @@
  */
 
 
-#if (DST == DST_PIANOROLL)
-
 #include <Arduino.h>
 #include <stdint.h>
-#include <SD.h>
+#include <SdFat.h>
 
 #include "../../config.h"
 #include "../../sample_t.h"
@@ -90,4 +88,3 @@ midiserial_send_notes(SegmentBuf * const segmentBuf)  // buffer with segmented n
 		midiserial_send_note_off(note->pitch, note->energy);
 	}
 }
-#endif

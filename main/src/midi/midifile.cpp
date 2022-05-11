@@ -24,7 +24,7 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-#include <SD.h>
+#include <SdFat.h>
 
 #include "../../config.h"
 #include "../../sample_t.h"
@@ -34,7 +34,8 @@
 #include "midiserial.h"
 #include "midifile.h"
 
-#if (FILE == FILE_MIDI)
+#if 0
+    // 2BD this is still for the regular SD.h instead of SdFat.h
 
 midiMetaLen_t const META_TEMPOCHANGE_LEN = 3;
 midiMetaLen_t const META_TRACKEND_LEN = 0;
@@ -169,7 +170,7 @@ int_least8_t
 midifile_write(SegmentBuf * const segmentBuf,  // buffer with segmented notes
                char const * const fname)       // file name to write to on SD card
 {
-    File f = SD.open(fname, FILE_WRITE);
+    File f = sd.open(fname, FILE_WRITE);
     if (!f) {
         return -1;
     }

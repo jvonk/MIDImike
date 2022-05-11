@@ -41,8 +41,6 @@
 #include "../../sample_t.h"
 #include "wave.h"
 
-#if (SRC == SRC_FILE)
-
 namespace {
 	struct wave_hdr_t {
 		char     id[4];
@@ -177,11 +175,11 @@ wave_read_samples(File &        f,            // file to read samples from [in]
 				  sample_t * const  samples,  // samples read from file [out]
 				  amplitude_t * amplitude)    // signal amplitude [out]
 {
-	strcpy(noteName, f.name());
+    f.getName8(noteName, 13);
 
 	// remove file name extension
 	char * const ext = strrchr(noteName, '.');
-	if (!ext || strncmp(ext, ".WAV", 4) != 0) {
+	if (!ext || strncmp(ext, ".wav", 4) != 0) {  // 2BD should be case insensitive
 		return 1;
 	}
 	*ext = '\0';
@@ -214,5 +212,3 @@ wave_read_samples(File &        f,            // file to read samples from [in]
 	*amplitude = (int16_t)max - min; // top-top
 	return 0;
 }
-
-#endif
