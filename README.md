@@ -63,6 +63,7 @@ This to totally overkill, but the `.brd` file can be found the in `hardware` dir
 | R1   | Resistor, 330 Ω, 1/8 W, 0805 | YAGEO RC0805FR-0768RL | [$0.10](https://www.digikey.com/en/products/detail/yageo/RC0805FR-07330RL/727866)
 | JP1  | Connector header, vertical 3 pos, 2.54mm | Metz Connect PR20203VBNN | [$0.10](https://www.digikey.com/en/products/detail/metz-connect-usa-inc/PR20203VBNN/7794768)
 | SW1  | Switch tactile, SPST-NO, 0.05A/24V | TE Connectivity 1825910-3 | [$0.15](https://www.digikey.com/en/products/detail/te-connectivity-alcoswitch-switches/1825910-3/2400476)
+| SW2  | Switch rotary dip BDC comp, 100mA/5V | Nidec Copal SH-7030TB | [$2.00](https://www.digikey.com/en/products/detail/nidec-copal-electronics/SH-7030TB/2057869)
 
 ### Notes
 
