@@ -31,18 +31,33 @@
 #include "../../config.h"
 #include "sddir.h"
 
+
+    /************
+     * initialize
+     ************/
+
+uint_least8_t                           // returns 0 if successful
+sddir_init(uint_least8_t const cs_pin)  // GPIO# used for SD Chip Select pin
+{
+	if (SD.begin(cs_pin) == false) {
+		return 1;
+	}
+	return 0;
+}
+
+#if (SRC == SRC_FILE)
+
 // maximum level of sub directories to search
 #define DIRLEVEL_MAX (2)
 
-/**
- * @brief Recursively walk directory, calling registered `_callback` for files
- * 
- * @param dir            Directory to start at
- * @param lvl            Current level
- * @return uint_least8_t Returns 0 if successful
- */
-static uint_least8_t
-_walkDirectory(File &dir, uint_least8_t const lvl, sddir_callback_t cb_fnc)
+    /****************************
+     * recursively walk directory
+     ****************************/ 
+
+static uint_least8_t                     // returns 0 if successful
+_walkDirectory(File & dir,               // directory to start at
+               uint_least8_t const lvl,  // current level
+               sddir_callback_t cb_fnc)  // function to call for each file
 {
 	File f;
 	uint_least8_t err = 0;
@@ -56,8 +71,7 @@ _walkDirectory(File &dir, uint_least8_t const lvl, sddir_callback_t cb_fnc)
 					strcpy(instrumentName, f.name());
 				}
 				err = _walkDirectory(f, lvl + 1, cb_fnc);  // recursive function call
-			} else {
-			}
+            }
 		} else {
 			err = cb_fnc(f, instrumentName);  // call back registered function
 		}
@@ -66,36 +80,23 @@ _walkDirectory(File &dir, uint_least8_t const lvl, sddir_callback_t cb_fnc)
 	return err;
 }
 
-/**
- * @brief For each file in directory
- * 
- * @param dirName        Directory (and its sub directories) to search
- * @param cb             Function to call for each file found
- * @return uint_least8_t Returns 0 if successful
- */
-uint_least8_t
-sddir_for_each_file(char const * const dirName, sddir_callback_t cb_fnc)
-{
-	//_callback = cb;
+    /****************************
+     * for each file in directory
+     **************************** 
+     * Problems?  Try using a >= 2G formatted as FAT using https://www.sdcard.org/downloads/formatter/
+     */
 
+uint_least8_t                                           // returns 0 if successful
+sddir_for_each_file_in_dir(char const * const dirName,  // directory (and its sub directories) to search
+                           sddir_callback_t cb_fnc)     // function to call for each file found
+{
 	File f = SD.open(dirName);
+
 	uint_least8_t err = _walkDirectory(f, 0, cb_fnc);
 
 	f.close();
 	return err;
 }
 
-/**
- * @brief Initialize
- * 
- * @param cs_pin         GPIO pin used for SD Chip Select
- * @return uint_least8_t Returns 0 if successful
- */
-uint_least8_t
-sddir_init(uint_least8_t const cs_pin)
-{
-	if (SD.begin(cs_pin) == false) {
-		return 1;
-	}
-	return 0;
-}
+#endif
+

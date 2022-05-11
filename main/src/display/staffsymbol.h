@@ -5,7 +5,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7735.h>
 #include "../../config.h"
-#include "display.h"
+#include "display_t.h"
 
 // choice: resolution of G-key symbol to show
 #if DST == DST_STAFF

@@ -37,8 +37,11 @@
 #include <limits.h>
 
 #include "../../config.h"
+#include "../../mapping.h"
 #include "../../sample_t.h"
 #include "wave.h"
+
+#if (SRC == SRC_FILE)
 
 namespace {
 	struct wave_hdr_t {
@@ -78,17 +81,15 @@ namespace {
 	};
 }
 
-/**
- * @brief Read a specified number of bytes from file.
- * 
- * @param f              File to read from [in]
- * @param len            Number of bytes to read [in]
- * @param offset         Offset to add to each byte [in]
- * @param data           Data read [out]
- * @return uint_least8_t Returns number of of bytes read
- */
-static uint_least8_t
-_read_bytes(File &f, uint16_t const len, int16_t const offset, char * const data)
+    /********************************************
+     * Read a specified number of bytes from file
+     ********************************************/
+
+static uint_least8_t               // returns the number of bytes read
+_read_bytes(File & f,              // file to read from 
+            uint16_t const len,    // number of bytes to read
+            int16_t const offset,  // offset to add to each byte read
+            char * const data)     // data read buffer
 {
 	char * buf = data;
 
@@ -104,15 +105,13 @@ _read_bytes(File &f, uint16_t const len, int16_t const offset, char * const data
 	return 0;
 }
 
-/**
- * @brief Read WAV header.
- * 
- * @param f              file to read from [in]
- * @param sample_cnt_p   total number of samples in file [out]
- * @return uint_least8_t returns 0 if successful
- */
-static uint_least8_t
-_read_hdr(File &f, sample_cnt_t * const sample_cnt_p)
+    /*****************
+     * Read WAV header
+     *****************/
+
+static uint_least8_t                          // returns 0 if successful
+_read_hdr(File & f,                           // file to read from
+          sample_cnt_t * const sample_cnt_p)  // total number of samples in file
 {
 	// main chunk
 	wave_chunk_t chunk;
@@ -153,16 +152,14 @@ _read_hdr(File &f, sample_cnt_t * const sample_cnt_p)
 	return 0;
 }
 
-/**
- * @brief remove bias by changing values from [0..255] to [-128..127]
- * 
- * @param f              returns 0 if successful
- * @param sample_cnt     number of samples to [in]
- * @param samples        samples read [out]
- * @return uint_least8_t returns 0 if successful
- */
-static uint_least8_t
-_read_samples(File &f, sample_cnt_t const sample_cnt, samples_t samples)
+    /*************
+     * Remove bias by changing values from [0..255] to [-128..127]
+     *************/ 
+
+static uint_least8_t                          // returns 0 if successful
+_read_samples(File & f,                       // file to read from
+              sample_cnt_t const sample_cnt,  // number samples to read
+              samples_t samples)              // buffer to write samples to
 {
 	if (_read_bytes(f, sample_cnt, SCHAR_MIN, (char *)samples) != 0) {
 		return 1;
@@ -170,9 +167,9 @@ _read_samples(File &f, sample_cnt_t const sample_cnt, samples_t samples)
 	return 0;
 }
 
-/************************
- * Read samples from file
- ************************/
+    /************************
+     * Read samples from file
+     ************************/
 
 uint_least8_t                                 // returns 0 if successful
 wave_read_samples(File &        f,            // file to read samples from [in]
@@ -217,3 +214,5 @@ wave_read_samples(File &        f,            // file to read samples from [in]
 	*amplitude = (int16_t)max - min; // top-top
 	return 0;
 }
+
+#endif

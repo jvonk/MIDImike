@@ -7,6 +7,12 @@
 #include "../../segment_t.h"
 #include "segmentbuf.h"
 
+typedef enum segment_energystate_t {
+    SEGMENT_ENERGYSTATE_FIND_NEG_SLOPE,
+    SEGMENT_ENERGYSTATE_FIND_POS_SLOPE,
+    SEGMENT_ENERGYSTATE_FOUND_POS_SLOPE
+} segment_energystate_t;
+
 typedef struct segment_energytrend_t {
     segment_energystate_t state;
     segment_energy_t      min;

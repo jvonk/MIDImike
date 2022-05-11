@@ -47,6 +47,7 @@
 #include "src/pitch/pitch.h"
 #include "src/sdcard/sddir.h"
 #include "src/sdcard/wave.h"
+#include "src/sdcard/calcnote.h"
 #include "src/pitch/frequency.h"
 #include "src/segment/segment.h"
 #include "src/segment/segmentbuf.h"
@@ -86,59 +87,11 @@ namespace {
     typedef struct file_scope_variables_t {
         Segment *     segment;
         SegmentBuf *  segmentBuf;
+        bool          sdcard_ok;
     } file_scope_variables_t;
 
     static file_scope_variables_t _;
-} // name space
-
-
-    /**********************************************
-     * Calculate frequency and note pitch from file
-     **********************************************
-     * 1. read sample from uSD card
-     * 2. calculate the frequency
-     * 3. match the frequency to a note
-     */
-
-uint_least8_t                 // always returns 0
-calc_note(File & f,           // file to read samples from
-          char * instrument)  // name of instrument (for CSV monitor only)
-{
-    //ASSERT((Debug::getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 65));  // very rough estimate
-    sample_t samples[CONFIG_MIDIMIKE_WINDOW_SIZE];
-
-    amplitude_t amplitude;
-
-    char noteName[8 + 1 + 3 + 1];
-    if (wavewave_read_samples(f, noteName, samples, &amplitude) == 0) {
-
-        // find frequency from samples
-        float freq = frequency_calculate(samples);
-
-        // find note from frequency
-        Pitch pitch(freq);
-
-        switch(DST) {
-            case DST_STAFF:
-                staff_draw_note(pitch);
-                break;
-
-            case DST_PIANOROLL:
-                // call twice to meet meet the minimum note duration
-                _.segment->put(millis(), pitch.get_segment(), amplitude, _.segmentBuf);
-                _.segment->put(millis(), pitch.get_segment(), amplitude, _.segmentBuf);
-                pianoroll_draw(_.segment->get_last_offset(), _.segmentBuf);
-                break;
-
-            case DST_SERIAL:
-                Pitch pitch_in(noteName);
-                pitch.write_serial(instrument, pitch_in, freq);
-                break;
-        }
-    }
-    return 0;
 }
-
 
     /************
      * Initialize
@@ -149,27 +102,27 @@ setup()
 {
     Serial.begin(CONFIG_MIDIMIKE_SERIAL_RATE);
 
-    if (SRC == SRC_FILE) {
-        if (sddir_init(SPI_SD_CS) != 0) {
-            Serial.println("No SD Card");  // is the SD card inserted and formatted?
+    if (DST == DST_SERIAL && USB == USB_SERIAL) {
+        while (!Serial) {
+            // spin wait for serial port to connect
+        };
+    }
+
+    if (SRC == SRC_FILE || FILE == FILE_MIDI) {
+        _.sdcard_ok = sddir_init(SPI_SD_CS) == true;
+        if (!_.sdcard_ok && USB == USB_SERIAL) {
+            Serial.println("SD err");  // is the SD card inserted and formatted?
         }
     }
 
     switch(DST) {
-
         case DST_STAFF:
             staff_init(SPI_TFT_CS, SPI_DC, SPI_RST);
             break;
-
         case DST_PIANOROLL:
             _.segment = new Segment();
             _.segmentBuf = new SegmentBuf();
             pianoroll_init(SPI_TFT_CS, SPI_DC, SPI_RST);
-            if (0) {
-                if (midifile_init(SPI_SD_CS) != 0) {
-                    Serial.println("No SD Card");  // is the SD card inserted and formatted?
-                }
-            }
             pinMode(BUTTON_IN, INPUT_PULLUP);
             break;
     }
@@ -178,7 +131,6 @@ setup()
         microphone_begin(MICROPHONE_IN);
     }
 }
-
 
     /***********
      * Main loop
@@ -190,7 +142,6 @@ loop()
     switch(SRC) {
 
         case SRC_MICR: {
-
             // ASSERT((Debug::getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 60));  // very rough estimate
 
             // get samples from microphone, samples will be dynamically allocated on first invocation
@@ -220,19 +171,19 @@ loop()
                     _.segment->put(millis(), pitch.get_segment(), amplitude, _.segmentBuf);
                     pianoroll_draw(_.segment->get_last_offset(), _.segmentBuf);
 
-                    if (USB_MIDI && digitalRead(BUTTON_IN) == 0) {
+                    if ((USB == USB_MIDI) && digitalRead(BUTTON_IN) == 0) {
                         midiserial_send_notes(_.segmentBuf);
                         pianoroll_clear();
                     }
-                    if (0) {
+                    if (FILE == FILE_MIDI) {
                         if (midifile_write(_.segmentBuf, "arduino.mid") != 0) {
-                            Serial.println("midifile_write is mad");
+                            Serial.println("midi wr err");
                         }
                     }
                     break;
                 case DST_SERIAL:
                     Pitch pitch_in(NOTENR_C, 0);
-                    pitch.write_serial("microphone", pitch_in, freq);
+                    calcnote_write_serial("microphone", pitch_in, pitch, freq);
                     break;
 
             } // switch(DST)
@@ -240,15 +191,18 @@ loop()
         }
 
         case SRC_FILE: {
+            if (_.sdcard_ok) {
 
-            if (DST == DST_SERIAL) {
-                Pitch::write_serial_hdr();
+                if (DST == DST_SERIAL) {
+                    calcnote_write_serial_hdr();
+                }
+
+                // for each file at sample rate, call `calc_note()`
+                char dirname[13] = "/notes/\012345"; 
+                utoa(CONFIG_MIDIMIKE_SAMPLE_RATE, dirname + 7, 10);
+
+                sddir_for_each_file_in_dir(dirname, &calcnote_from_file);
             }
-
-            // for each file at sample rate, call `calc_note()`
-            char dir[13] = "/notes/\012345"; 
-            utoa(CONFIG_MIDIMIKE_SAMPLE_RATE, &dir[7], 10);
-            sddir_for_each_file(dir, calc_note);
             break;
         }
     } // switch(SRC)

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "../../segment_t.h"
 #include "../segment/segment.h"
+#include "midi_t.h"
 
 void midiserial_send_notes(SegmentBuf * const segmentBuf);
 void midiserial_send_program_change(midiInstrument_t instrument);

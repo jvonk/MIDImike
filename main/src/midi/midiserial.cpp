@@ -23,7 +23,7 @@
  */
 
 
-#if DST == DST_PIANOROLL
+#if (DST == DST_PIANOROLL)
 
 #include <Arduino.h>
 #include <stdint.h>
@@ -31,11 +31,11 @@
 
 #include "../../config.h"
 #include "../../sample_t.h"
-#include "../../midi_t.h"
 #include "../../segment_t.h"
 #include "../pitch/pitch.h"
 #include "../segment/segment.h"
 #include "../segment/segmentbuf.h"
+#include "midi_t.h"
 #include "midiserial.h"
 
 static void
@@ -47,7 +47,7 @@ _send_2byte_event(midiEvent_t const       event,
 }
 
 static void
-_send_3byte_event(midiEvent_t const     event,
+_send_3byte_event(midiEvent_t const      event,
 				  segment_pitch_t const  pitch,
 				  segment_energy_t const velocity)
 {

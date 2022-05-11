@@ -59,12 +59,11 @@ Pitch::Pitch(void)
 	_.octavenr = 0;
 }
 
-/**
- * @brief Construct a new Pitch:: Pitch object
- * 
- * @param fullname Note name w/ octave# e.g. "Gb4"
- */
-Pitch::Pitch(char const * const fullname)
+    /**************************************
+     * Construct a new Pitch:: Pitch object
+     **************************************/
+
+Pitch::Pitch(char const * const fullname)  // note name w/ octave# e.g. "Gb4"
 {
 	// get octave# from the last char
 	uint_fast8_t len = strlen(fullname);
@@ -89,12 +88,11 @@ Pitch::Pitch(char const * const fullname)
 	}
 }
 
-/**
- * @brief Construct a new Pitch:: Pitch object
- * 
- * @param freq Frequency
- */
-Pitch::Pitch(frequency_t const freq)
+    /**************************************
+     * Construct a new Pitch:: Pitch object
+     **************************************/
+
+Pitch::Pitch(frequency_t const freq)  // frequency
 {
 	frequency_t f = freq;
 
@@ -113,23 +111,22 @@ Pitch::Pitch(frequency_t const freq)
 				break;
 			}
 		}
-		Serial.print(_notes[_.notenr].name);
-		Serial.println(_.octavenr);
-
+        if (0 && USB == USB_SERIAL) {
+            Serial.print(_notes[_.notenr].name);
+            Serial.println(_.octavenr);
+        }
 	} else {
 		_.notenr = NOTENR_C;
 		_.octavenr = 0;
 	}
 }
 
-/**
- * @brief Construct a new Pitch:: Pitch object
- * 
- * @param number  Note number within the octave
- * @param octave  Octave number
- */
-Pitch::Pitch(notenr_t const number,
-			 octavenr_t const octave)
+    /**************************************
+     * Construct a new Pitch:: Pitch object
+     **************************************/
+
+Pitch::Pitch(notenr_t const number,    // note number within the octave
+			 octavenr_t const octave)  // octave number
 {
 	if (number < NOTENR_COUNT) {
 		_.notenr = number;
@@ -188,53 +185,4 @@ segment_pitch_t
 Pitch::freq2segment(frequency_t const freq)  // returns the midi pitch for a given frequency
 {
 	return freq < CONFIG_MIDIMIKE_FREQ_MIN ? 0 : 69.0 + 12.0 * log(freq / 440.0) / log(2);
-}
-
-void
-Pitch::write_serial_hdr(void)
-{
-	Serial.println("");
-	Serial.print("instrument samplefreq buffsize noteoctave freq => ");
-	Serial.print(CONFIG_MIDIMIKE_WINDOW_SIZE);
-	Serial.print(" ");
-	Serial.println(CONFIG_MIDIMIKE_WINDOW_SIZE);
-}
-
-/**
- * @brief 
- * 
- * @param instrument Instrument name
- * @param in_pitch   Note from file
- * @param freq       Frequency measured
- */
-void
-Pitch::write_serial(char const * const instrument, Pitch & in_pitch, frequency_t freq)
-{
-	Serial.print(instrument); Serial.print(" ");
-	Serial.print(CONFIG_MIDIMIKE_SAMPLE_RATE); Serial.print(" ");
-	Serial.print(CONFIG_MIDIMIKE_WINDOW_SIZE); Serial.print(" ");
-
-	// the value it shoud be (do not show for microphone input)
-	if (in_pitch.get_frequency()) {
-		Serial.print(in_pitch.get_shortname());
-		Serial.print(in_pitch.get_octavenr());
-		if (strlen(in_pitch.get_shortname()) < 2) {
-			Serial.print(" ");
-		}
-		Serial.print(" ");
-		Serial.print(this->get_frequency());
-	}
-
-	// value measured
-	if (this->get_segment() > 0) {
-		Serial.print(" => ");
-		Serial.print(freq);
-		Serial.print(" ");
-		Serial.print(this->get_shortname());
-		Serial.print(this->get_octavenr());
-		if (strlen(this->get_shortname()) < 2) {
-			Serial.print(" ");
-		}
-	}
-	Serial.println();
 }

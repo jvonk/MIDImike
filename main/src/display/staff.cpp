@@ -29,13 +29,14 @@
 
 #include "../../config.h"
 #include "../../sample_t.h"
+#include "../../mapping.h"
 #include "../pitch/pitch.h"
 #include "../pitch/frequency.h"
 #include "../segment/segmentbuf.h"
 #include "staffsymbol.h"
 #include "staff.h"
 
-#if DST == DST_STAFF
+#if (DST == DST_STAFF)
 
 #define COLOR_NOTES (ST7735_BLACK)
 #define COLOR_STAFF (0x8410)  // gray encoded as rrrrrggggggbbbbb
@@ -77,15 +78,15 @@ namespace {
         positionHiLo_t staff;
     } position_t;
 
-    typedef struct staff_t {
+    typedef struct file_scope_variables_t {
         Adafruit_ST7735 * tft;
         staffnote_t const notes[static_cast<int>(NOTENR_COUNT)];
         display_t display;
         distance_t distance;
         position_t position;
-    } staff_t;
+    } file_scope_variables_t;
 
-    static staff_t _ = {
+    static file_scope_variables_t _ = {
         .tft = NULL,    
         .notes = {  // calculating the values would probably take up more memory
             { 0, false },
@@ -243,14 +244,12 @@ _drawNote(uint_least8_t const hpos, Pitch & pitch, bool const erase)
     //_.tft->fillCircle(x, y, _.distance.noteRadius, noteColor);
 }
 
-/**
- * @brief 
- * 
- * @param pitch     Note measured
- * @param amplitude Amplitude measured
- */
+    /*****************
+     * staff_draw_note
+     *****************/
+
 void
-staff_draw_note(Pitch & pitch)
+staff_draw_note(Pitch & pitch)  // note measured
 {
     static boolean        scroll = false;
     static uint_least8_t  curScreenPos = 0;
@@ -285,6 +284,10 @@ staff_draw_note(Pitch & pitch)
     }
 }
 
+    /************
+     * staff_init
+     ************/
+
 void
 staff_init(uint_least8_t tftCS_pin,   // GPIO# for SPI TFT Chip Select
             uint_least8_t dc_pin,     // GPIO# for SPI Data/Command
@@ -309,7 +312,7 @@ staff_init(uint_least8_t tftCS_pin,   // GPIO# for SPI TFT Chip Select
                       _vStaffPos2y(_nr2vStaffPos(NOTENR_G, 4)));
 
 #if GKEY != GKEY_NONE
-    staffsymbol_draw(_hStaffPos2x(0), 0, (staffSymbolName_t)STAFFSYMBOL_NAME_GKEY, COLOR_STAFF);
+    staffsymbol_draw(_hStaffPos2x(0), 0, STAFFSYMBOL_NAME_GKEY, COLOR_STAFF);
 #endif
 }
 

@@ -95,19 +95,19 @@ Segment::Segment(void)
 	cv.note = NULL;
 }
 
-/**
- * @brief Updates: - when an note onset is detected, a note (with offset 0) is added to the midi buffer.
- *                 - when the amplitude peak is detected, the velocity is updated in the midi buffer.
- *                 - when the note offset is detected, the 'offset' for the note is updated in the midi buffer.
- * 
- * @param now         absolute current time (at the end of chunk) [msec]
- * @param pitch       midi pitch measured
- * @param energy      energy/loudness measured [0..127]
- * @param segmentBuf  segment buffer to write note to
- */
+    /**************
+     * Segment::put
+     **************
+     * Updates: - when an note onset is detected, a note (with offset 0) is added to the midi buffer.
+     *          - when the amplitude peak is detected, the velocity is updated in the midi buffer.
+     *          - when the note offset is detected, the 'offset' for the note is updated in the midi buffer.
+     */ 
 
 void
-Segment::put(absolute_time_t const now, segment_pitch_t const pitch, segment_energy_t const energy, SegmentBuf * const segmentBuf)
+Segment::put(absolute_time_t const now,      // absolute current time (at the end of chunk) [msec]
+             segment_pitch_t const pitch,    // MIDI pitch measured
+             segment_energy_t const energy,  // energy/loudness measured [0..127]
+             SegmentBuf * const segmentBuf)  // segment buffer to write note to
 {
 	absolute_time_t t = 0;  // init to please compiler
 	bool start_new_note = false;
@@ -120,7 +120,6 @@ Segment::put(absolute_time_t const now, segment_pitch_t const pitch, segment_ene
 
 	// note start/stop
 	if (pitch) {
-
 		if (pitch == cv.candidate.pitch) {
 
 			bool const meetsMinDuration = now - cv.candidate.start_time > CONFIG_MIDIMIKE_MIN_SEGMENT_DURATION;
@@ -142,9 +141,7 @@ Segment::put(absolute_time_t const now, segment_pitch_t const pitch, segment_ene
 			cv.candidate.pitch = pitch;
 			_energy_init(&cv.candidate.energy_trend);
 		}
-
 	} else {
-
 		if (cv.note) {  // EXISTING NOTE TERMINATED BY REST
 			cv.candidate.pitch = 0;
 			t = cv.time.prev_end;
@@ -153,7 +150,7 @@ Segment::put(absolute_time_t const now, segment_pitch_t const pitch, segment_ene
 	}
 
 	if (stop_current_note) {
-		if (USB_MIDI) {
+		if (USB == USB_MIDI) {
 			midiserial_send_note_off(cv.note->pitch, 0);
 			//midiserial_send_program_change(random(1, 52));
 		}
@@ -163,7 +160,7 @@ Segment::put(absolute_time_t const now, segment_pitch_t const pitch, segment_ene
 	}
 
 	if (start_new_note) {
-		if (USB_MIDI) {
+		if (USB == USB_MIDI) {
 			midiserial_send_note_on(pitch, energy);
 		}
 		if (segmentBuf->len() == 0) {  // first segment should have relative time=0
@@ -172,7 +169,6 @@ Segment::put(absolute_time_t const now, segment_pitch_t const pitch, segment_ene
 		cv.note = segmentBuf->note_start(_diff_time(t), now - t, pitch, energy);
 		cv.time.last_offset = now;
 		cv.energy_trend = cv.candidate.energy_trend;
-
 	}
 
 	// update energy level trend (2BD should stop when a new candidate presents itself)

@@ -36,8 +36,6 @@ class Pitch {
         segment_pitch_t get_segment();
         frequency_t get_frequency();
         static segment_pitch_t freq2segment(frequency_t const freq);
-        static void write_serial_hdr(void);
-        void write_serial(char const * const instrument, Pitch & in_pitch, frequency_t freq);
 
     private:
         struct class_variables_t {

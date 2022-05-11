@@ -1,14 +1,9 @@
 #pragma once
-
-#include <Arduino.h>
-#include <stdint.h>
-#include "mapping.h"
-
+#include "../../mapping.h"
 
 	/***************
 	 * MIDI commands
 	 ***************
-	 *
 	 * see 
 	 *   http://www.cs.cmu.edu/~music/cmsip/readings/MIDI%20tutorial%20for%20programmers.html
 	 *   http://www.midi.org/techspecs/midimessages.php
@@ -111,8 +106,5 @@ typedef struct midiMeta_t {
 	midiMetaLen_t   len;       // len (really a variable length, but we only have values < 0x7F)
 	uint8_t         value[3];  // len indicates length, the size 3 is just a max
 } PACK8 midiMeta_t;
-
-midiMetaLen_t const META_TEMPOCHANGE_LEN = 3;
-midiMetaLen_t const META_TRACKEND_LEN = 0;
 
 typedef uint_least8_t midiInstrument_t;

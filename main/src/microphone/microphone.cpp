@@ -32,26 +32,28 @@
 #include "microphone.h"
 #include "adc_t.h"
 
+#if (SRC == SRC_MICR)
+
 namespace {
     typedef struct amplitudeRange_t {
         sample_t min;
         sample_t max;
     } amplitudeRange_t;
 
-    typedef struct microphone_t {
+    typedef struct file_scope_variables_t {
         sample_cnt_t cnt;
         amplitudeRange_t range;
         sample_t * samples;
         uint8_t analogPort;
         uint8_t prescaler;
-    } microphone_t;
+    } file_scope_variables_t;
 
-    microphone_t volatile _ = {};  // volatile 'cause data updates in ISR
+    file_scope_variables_t volatile _ = {};  // volatile 'cause data updates in ISR
 }
 
-    /*******
-     * begin
-     *******/
+    /******************
+     * microphone_begin
+     ******************/
 
 void
 microphone_begin(uint8_t const port)
@@ -60,7 +62,7 @@ microphone_begin(uint8_t const port)
 
     // allocate memory (no freed, 'cause `loop` never stops)
     _.samples = new sample_t[CONFIG_MIDIMIKE_WINDOW_SIZE];
-    ASSERT((_.samples));
+    //ASSERT((_.samples));
 
     // determine prescaler setting for ADCSRA
     _.prescaler = 0;
@@ -71,9 +73,9 @@ microphone_begin(uint8_t const port)
     microphone_start();  // start gathering samples
 }
 
-    /*******
-     * start
-     *******
+    /******************
+     * microphone_start
+     ******************
      * Application signals that it no longer needs access to the samples.
      * This driver will reuse the "samples" buffer and start collecting
      * new samples.  Refer to top of file for details
@@ -103,9 +105,9 @@ microphone_start(void)
         ADCSRA_CONVERT_START;
 }
 
-    /*************
-     * get_samples
-     *************/
+    /************************
+     * microphone_get_samples
+     ************************/
 
 samples_t                                                 // returns pointer to array of data samples, NULL on failure
 microphone_get_samples(amplitude_t * const amplitudePtr)
@@ -126,7 +128,7 @@ microphone_get_samples(amplitude_t * const amplitudePtr)
      * ISR
      *****/
 
-ISR (ADC_vect)
+ISR(ADC_vect)
 {
     sample_t const s = ADCH + SCHAR_MIN;  // remove voltage bias by changing range from [0..255] to [-128..127]
 
@@ -152,3 +154,5 @@ ISR (ADC_vect)
             ADCSRA_CONVERT_ENABLE;
     }
 }
+
+#endif

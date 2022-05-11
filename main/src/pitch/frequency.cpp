@@ -26,23 +26,29 @@
 #include <stdint.h>
 #include <limits.h>
 #include "../../config.h"
+#include "../../mapping.h"
 #include "../microphone/microphone.h"
 #include "frequency.h"
 
-typedef enum state_t {
-	STATE_FIND_POS_SLOPE = 0,
-	STATE_FIND_NEG_SLOPE,
-	STATE_FOUND_PEAK,
-} state_t;
+#define INTERPOLATE (1)
+#define NORMALIZE (0)
 
-typedef sample_cnt_t samplesLag_t;
-typedef int32_t autoCorr_t;
+namespace {
+    typedef enum state_t {
+        STATE_FIND_POS_SLOPE = 0,
+        STATE_FIND_NEG_SLOPE,
+        STATE_FOUND_PEAK,
+    } state_t;
+
+    typedef sample_cnt_t samplesLag_t;
+    typedef int32_t autoCorr_t;
+}
 
 // calculate auto correlation for "lag"
 
-static INLINE autoCorr_t               // (normalized) auto correlation result
-_auto_corr(samples_t const    samples,  // pointer to signed 8-bit data samples
-  		   samplesLag_t const lag)      // lag
+static INLINE autoCorr_t
+_cal_autocorrelation(samples_t const    samples,  // pointer to signed 8-bit data samples
+  		             samplesLag_t const lag)      // lag
 {
 	// samples[ii] * samples[ii+lag], results in an int16 term
 	// sum += term, results in an int32
@@ -57,20 +63,18 @@ _auto_corr(samples_t const    samples,  // pointer to signed 8-bit data samples
 	return ac;
 }
 
-static INLINE float                       // returns interpolated peak adjustment compared to peak location
-_quad_interp_adj(autoCorr_t const left,   // sample value left of the peak
-			     autoCorr_t const mid,    // sample value at the peak
-			     autoCorr_t const right)  // sample value right of the peak
+static INLINE float                             // returns interpolated peak adjustment compared to peak location
+_cal_interpolation_adj(autoCorr_t const left,   // sample value left of the peak
+			           autoCorr_t const mid,    // sample value at the peak
+			           autoCorr_t const right)  // sample value right of the peak
 {
 	float const adj = (float)0.5 * (right - left) / (2 * mid - left - right);
 	return adj;
 }
 
-#define INTERPOLATE (1)
-#define NORMALIZE (0)
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
+    /*********************
+     * frequency_calculate
+     *********************/
 
 frequency_t                                    // returns frequency found, 0 when not found [out]
 frequency_calculate(samples_t const  samples)  // pointer to signed 8-bit data samples [in]
@@ -80,15 +84,15 @@ frequency_calculate(samples_t const  samples)  // pointer to signed 8-bit data s
 	}
 
 	float period = 0;
-	autoCorr_t const acMax = _auto_corr(samples, 0);  // initial peak = measure of the energy in the signal
-	autoCorr_t const acThreshold = (float)acMax * (NORMALIZE ? 4/5 : 2/3);  // threshold below we ignore peaks
+	autoCorr_t const acMax = _cal_autocorrelation(samples, 0);
+	autoCorr_t const acThreshold = (float)acMax * (NORMALIZE ? 4/5 : 2/3);
 	autoCorr_t acPrev = acMax;
 	state_t state = STATE_FIND_POS_SLOPE;   // ensure C++11 is enabled
 
 	for (samplesLag_t lag = CONFIG_MIDIMIKE_LAG_MIN;
  		 (lag < CONFIG_MIDIMIKE_LAG_MAX) && (state != STATE_FOUND_PEAK); lag++) {
 
-		autoCorr_t ac = _auto_corr(samples, lag);  // unnormalized autocorrelation for time "lag"
+		autoCorr_t ac = _cal_autocorrelation(samples, lag);
 
 		if (NORMALIZE) {  // normalize for introduced zeros			
 			ac = (float)ac * (float)CONFIG_MIDIMIKE_WINDOW_SIZE / (float)(CONFIG_MIDIMIKE_WINDOW_SIZE - lag);
@@ -105,30 +109,26 @@ frequency_calculate(samples_t const  samples)  // pointer to signed 8-bit data s
 				if (ac <= acPrev) {
 					state = STATE_FOUND_PEAK;
 					if (INTERPOLATE) {
-						period = lag - 1 + _quad_interp_adj(
-							_auto_corr(samples, lag - 2), 
+						period = lag - 1 + _cal_interpolation_adj(
+							_cal_autocorrelation(samples, lag - 2), 
 							acPrev, ac);
-                        Serial.print(lag-1); Serial.print(" -> ");
-                        Serial.print(period); Serial.print(" -> ");
 					} else {
 						period = lag - 1;  // we got 1 past it
 					}
 				}
 				break;
+            case STATE_FOUND_PEAK:
+                break;
 		}
 		acPrev = ac;
 	}
 
 	if (state != STATE_FOUND_PEAK) {
-		//Serial.println("peak not found");
 		return 0;
 	}
 
 	frequency_t const f = (float)CONFIG_MIDIMIKE_SAMPLE_RATE / period;
 
-	//Serial.print(period); Serial.print(", ");
-	//Serial.print(f); Serial.print(", ");
 	bool const ok = f < CONFIG_MIDIMIKE_FREQ_MAX;
 	return ok ? f : 0;
 }
-#pragma GCC diagnostic pop

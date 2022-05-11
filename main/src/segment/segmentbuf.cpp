@@ -24,7 +24,6 @@
  * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
-
 #include <Arduino.h>
 #include <stdint.h>
 #include <SPI.h>
@@ -35,17 +34,16 @@
 #include "segment.h"
 #include "segmentbuf.h"
 
-/**
- * @brief Create a new segment, and initialize the pitch, velocity, onset, offset
- * 
- * @param onset     relative onset time
- * @param duration  relative duration time
- * @param pitch 
- * @param energy 
- * @return segment_t* 
- */
+
+    /**********************
+     * Create a new segment, and initialize the pitch, velocity, onset, offset
+     **********************/
+
 segment_t *
-SegmentBuf::note_start(segmentRelTime_t const onset, segmentRelTime_t const duration, segment_pitch_t const pitch, segment_energy_t const energy)
+SegmentBuf::note_start(segmentRelTime_t const onset,     // relative onset time
+                       segmentRelTime_t const duration,  // relative duration time
+                       segment_pitch_t const pitch,
+                       segment_energy_t const energy)
 {
     // drop the oldest entry if full
 
@@ -66,16 +64,14 @@ SegmentBuf::note_start(segmentRelTime_t const onset, segmentRelTime_t const dura
     return segment;  // piano roll display needs to start showing the note before it is finished
 }
 
-/**
- * @brief Finish a segment, and update the offset
- * 
- * @param duration 
- * @param energy 
- * @param ring 
- * @return segment_t* 
- */
+    /******************
+     * Finish a segment, and update the offset
+     ******************/
+
 segment_t *
-SegmentBuf::note_end(segmentRelTime_t const duration, segment_energy_t const energy, segment_t * const ring)
+SegmentBuf::note_end(segmentRelTime_t const duration,
+                     segment_energy_t const energy,
+                     segment_t * const ring)
 {
     ring->energy = energy;
     ring->duration = duration;

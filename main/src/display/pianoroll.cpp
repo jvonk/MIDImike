@@ -26,15 +26,16 @@
 #include <stdint.h>
 #include <Adafruit_GFX.h>    // core graphics
 #include <Adafruit_ST7735.h> // hardware-specific graphics
-
 #include "../../config.h"
+#include "../../mapping.h"
 #include "../../sample_t.h"
 #include "../pitch/frequency.h"
 #include "../pitch/pitch.h"
 #include "../segment/segmentbuf.h"
-#include "display.h"
+#include "display_t.h"
 #include "pianoroll.h"
 
+#if (DST == DST_PIANOROLL)
  								 //   rrrr rggg gggb bbbb
 #define COLOR_NOTESTART (0xF800) // 0b1111 1000 0000 0000  red
 #define COLOR_NOTE (0x0700)      // 0b0000 0111 0000 0000  dark green
@@ -68,14 +69,14 @@ namespace {
 		absolute_time_t start;
 	} msec_t;
 
-	typedef struct pianoroll_t {
+	typedef struct file_scope_variables_t {
 		Adafruit_ST7735 * tft;
 		display_t display;
 		dist_t distance;
 		msec_t msec;
-	} pianoroll_t;
+	} file_scope_variables_t;
 
-	static pianoroll_t _ = {};
+	static file_scope_variables_t _ = {};
 }
 
 static void
@@ -90,11 +91,11 @@ _resize(int width, int height)
 	_.distance.bottom2loPitch = (height - nrOfPos * _.distance.pitch2pitch) / 2;
 
 	xCoordinate_t const sWidth = width - X_FIRSTNOTE;  // screen width [pixels]
-	_.msec.on_screen = 2912;                 // screen width [msec]
+	_.msec.on_screen = 2912;                           // screen width [msec]
 	_.msec.per_pixel = _.msec.on_screen / sWidth;
 }
 
-static INLINE xCoordinate_t        // returns x-coordinate on display [0 .. screen width - 1]
+static INLINE xCoordinate_t         // returns x-coordinate on display [0 .. screen width - 1]
 _time2x(absolute_time_t const  t,   // note time
 		absolute_time_t const  t0)  // time on left of screen
 {
@@ -103,7 +104,7 @@ _time2x(absolute_time_t const  t,   // note time
 	return X_FIRSTNOTE + distance;
 }
 
-static INLINE yCoordinate_t           // returns y-coordinate on display
+static INLINE yCoordinate_t            // returns y-coordinate on display
 _pitch2y(segment_pitch_t const pitch)  // midi pitch
 {
 	yCoordinate_t const diff = (pitch - PITCH_MIN) * _.distance.pitch2pitch;
@@ -146,7 +147,7 @@ _displayRoll(xCoordinate_t const xLeft,
 
 void
 pianoroll_draw(absolute_time_t const  lastOffset,  // needed to calculate absolute times
-			   SegmentBuf * const    segmentBuf)  // segment buffer containing notes
+			   SegmentBuf * const    segmentBuf)   // segment buffer containing notes
 {
 	absolute_time_t const now = millis();
 
@@ -177,7 +178,7 @@ pianoroll_draw(absolute_time_t const  lastOffset,  // needed to calculate absolu
 	absolute_time_t offset = lastOffset;
 
 	while ((note = segmentBuf->head_ptr(ii++)) &&  // there are more notes to show &&
-			(offset > now - drawInMsec)) {        // the note should be on screen
+			(offset > now - drawInMsec)) {         // the note should be on screen
 
 		absolute_time_t const onset = offset - note->duration;
 
@@ -213,3 +214,5 @@ pianoroll_init(uint_least8_t tftCS_pin,  // GPIO# for SPI TFT Chip Select
 	_resize(_.tft->width(), _.tft->height());
 	pianoroll_clear();
 }
+
+#endif
