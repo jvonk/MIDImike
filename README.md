@@ -39,11 +39,18 @@ Power
 
 Logic
 
-![Schematic](hardware/MIDImike.svg)
+![Schematic](hardware/MIDImike-io.svg)
 
 To upload the sketch, the USB-MIDI switch needs to be open. The replay button was used during development to replay stored MIDI notes.
 
 > Remember to connect the 3.3 Volt output from the Arduino to the `AREF` input on the Arduino. If you forget this, no notes will be displayed.
+
+### Board
+
+This to totally overkill, but the `.brd` file can be found the in `hardware` directory.
+
+![Top](media/pcb-top.png) 
+![Bottom](media/pcb-bottom.png)
 
 ### Bill of materials
 
@@ -52,8 +59,10 @@ To upload the sketch, the USB-MIDI switch needs to be open. The replay button wa
 | PCB1 | Electret microphone w/ auto gain control| Adafruit 1713 | [$7.95](https://www.adafruit.com/product/1713)
 | PCB2 | Arduino Uno R3, or Arduino METRO 328 |  Adafruit 2488 | [$17.50](https://www.adafruit.com/product/2488)
 | PCB3 | ST7735R 1.8" Color TFT display w/ MicroSD breakout | Adafruit 358 | [$19.95](https://www.adafruit.com/product/358)
-| SW1  | Switch toggle, SPDT, 5A/120V | E-Switch 100SP1T1B4M2QE | [$2.65](https://www.digikey.com/en/products/detail/e-switch/100SP1T1B4M2QE/378824)
-| SW2  | Switch tactile, SPST-NO, 0.05A/24V | TE Connectivity 1825910-3 | [$0.15](https://www.digikey.com/en/products/detail/te-connectivity-alcoswitch-switches/1825910-3/2400476)
+| LED1 | LED, Amber Clear 602nm, 1206 | Lite-On LTST-C150AKT | [$0.33](https://www.digikey.com/en/products/detail/lite-on-inc/LTST-C150AKT/269213)
+| R1   | Resistor, 330 Ω, 1/8 W, 0805 | YAGEO RC0805FR-0768RL | [$0.10](https://www.digikey.com/en/products/detail/yageo/RC0805FR-07330RL/727866)
+| JP1  | Connector header, vertical 3 pos, 2.54mm | Metz Connect PR20203VBNN | [$0.10](https://www.digikey.com/en/products/detail/metz-connect-usa-inc/PR20203VBNN/7794768)
+| SW1  | Switch tactile, SPST-NO, 0.05A/24V | TE Connectivity 1825910-3 | [$0.15](https://www.digikey.com/en/products/detail/te-connectivity-alcoswitch-switches/1825910-3/2400476)
 
 ### Notes
 
@@ -67,9 +76,7 @@ If you’re going to reprogramming the `Atmega16u2`, you need access the compani
 
 ## Software
 
-The implementation changes the sound wave to an electrical signal; uses autocorrelation to find frequency played; display frequency as note on screen while sending to a MIDI synthesizer.[^1]
-
-[^1]: Reprogramming the ATmega16U2 is described in [Sending MIDI Events](https://coertvonk.com/sw/arduino/pitch-detector/sending-midi-events-31581).
+The implementation changes the sound wave to an electrical signal; uses autocorrelation to find frequency played; display frequency as note on screen while sending to a MIDI synthesizer.
 
 ### Requirements
 
@@ -151,7 +158,7 @@ There are many [Software MIDI editors and sequencers](https://en.wikipedia.org/w
 
 ### Demo
 
-A video recording the MIDI with SoundCloud.
+A video recording the MIDI with SoundCloud. Clarinet excerpt by U.S. Army Field Band.
 
 [![demo_video](media/demo2-still-copy.png)](https://www.youtube.com/embed/6aWWbbG0Aqk)
 

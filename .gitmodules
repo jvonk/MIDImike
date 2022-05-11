@@ -7,3 +7,15 @@
 [submodule "hardware/components/Adafruit-MAX4466-Electret-Mic-Amplifier-PCBs"]
 	path = hardware/components/Adafruit-MAX4466-Electret-Mic-Amplifier-PCBs
 	url = https://github.com/adafruit/Adafruit-MAX4466-Electret-Mic-Amplifier-PCBs
+[submodule "main/libraries/Adafruit_BusIO"]
+	path = main/libraries/Adafruit_BusIO
+	url = git@github.com:adafruit/Adafruit_BusIO.git
+[submodule "main/libraries/Adafruit-ST7735-Library"]
+	path = main/libraries/Adafruit-ST7735-Library
+	url = git@github.com:adafruit/Adafruit-ST7735-Library.git
+[submodule "main/libraries/Adafruit-GFX-Library"]
+	path = main/libraries/Adafruit-GFX-Library
+	url = git@github.com:adafruit/Adafruit-GFX-Library.git
+[submodule "main/libraries/SD"]
+	path = main/libraries/SD
+	url = git@github.com:arduino-libraries/SD.git
