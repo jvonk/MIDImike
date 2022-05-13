@@ -36,8 +36,6 @@
 #include "staffsymbol.h"
 #include "staff.h"
 
-#if (DST == DST_STAFF)
-
 #define COLOR_NOTES (ST7735_BLACK)
 #define COLOR_STAFF (0x8410)  // gray encoded as rrrrrggggggbbbbb
 #define COLOR_BG (ST7735_WHITE)
@@ -315,5 +313,3 @@ staff_init(uint_least8_t tftCS_pin,   // GPIO# for SPI TFT Chip Select
     staffsymbol_draw(_hStaffPos2x(0), 0, STAFFSYMBOL_NAME_GKEY, COLOR_STAFF);
 #endif
 }
-
-#endif

@@ -26,23 +26,32 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-#include <SD.h>
+#include <SdFat.h>
 
 #include "../../config.h"
+#include "../debug/debug.h"
 #include "sddir.h"
+
+#define SD_FAT_TYPE (1) // FAT16/32
+#if USB == USB_SERIAL
+#  define error(s) sd.errorHalt(&Serial, F(s));
+#else
+#  define error(s) 
+#endif
+
+namespace {
+    SdFat sd;
+}
 
 
     /************
      * initialize
      ************/
 
-uint_least8_t                           // returns 0 if successful
+uint_least8_t                           // returns 0 if successful, otherwise returns 1
 sddir_init(uint_least8_t const cs_pin)  // GPIO# used for SD Chip Select pin
 {
-	if (SD.begin(cs_pin) == false) {
-		return 1;
-	}
-	return 0;
+	return !sd.begin(cs_pin);
 }
 
 #if (SRC == SRC_FILE)
@@ -59,24 +68,24 @@ _walkDirectory(File & dir,               // directory to start at
                uint_least8_t const lvl,  // current level
                sddir_callback_t cb_fnc)  // function to call for each file
 {
-	File f;
 	uint_least8_t err = 0;
 	static char instrumentName[8 + 1 + 3 + 1];
 
-	while ((f = dir.openNextFile()) && !err && cb_fnc) {
-
-		if (f.isDirectory()) {
+    File file;
+    while (file.openNext(&dir, O_RDONLY)) {
+        if (file.isDir()) {
 			if (lvl < DIRLEVEL_MAX) {
 				if (lvl == 0) {
-					strcpy(instrumentName, f.name());
+                    file.getName8(instrumentName, sizeof(instrumentName));
+                    //Serial.println(instrumentName);
 				}
-				err = _walkDirectory(f, lvl + 1, cb_fnc);  // recursive function call
+				err = _walkDirectory(file, lvl + 1, cb_fnc);  // recursive function call
             }
-		} else {
-			err = cb_fnc(f, instrumentName);  // call back registered function
-		}
-		f.close();
-	}
+        } else {            
+			err = (*cb_fnc)(file, instrumentName);  // call back registered function
+        }
+        file.close();
+    }
 	return err;
 }
 
@@ -90,13 +99,16 @@ uint_least8_t                                           // returns 0 if successf
 sddir_for_each_file_in_dir(char const * const dirName,  // directory (and its sub directories) to search
                            sddir_callback_t cb_fnc)     // function to call for each file found
 {
-	File f = SD.open(dirName);
+    File dir;
 
-	uint_least8_t err = _walkDirectory(f, 0, cb_fnc);
+    if (!dir.open(dirName)){
+        error("dir.open failed");
+    }
 
-	f.close();
+	uint_least8_t err = _walkDirectory(dir, 0, cb_fnc);
+
+	dir.close();
 	return err;
 }
 
 #endif
-

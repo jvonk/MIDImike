@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-#include <SD.h>
+#include <SdFat.h>
 #include "../pitch/pitch.h"
 
 uint_least8_t calcnote_from_file(File & f, char * instrument);

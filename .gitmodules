@@ -16,6 +16,6 @@
 [submodule "main/libraries/Adafruit-GFX-Library"]
 	path = main/libraries/Adafruit-GFX-Library
 	url = git@github.com:adafruit/Adafruit-GFX-Library.git
-[submodule "main/libraries/SD"]
-	path = main/libraries/SD
-	url = git@github.com:arduino-libraries/SD.git
+[submodule "main/libraries/SdFat"]
+	path = main/libraries/SdFat
+	url = git@github.com:greiman/SdFat.git

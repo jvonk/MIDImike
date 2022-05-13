@@ -39,29 +39,28 @@
 #include "../../config.h"
 #include "../../mapping.h"
 #include "../../sample_t.h"
+#include "../debug/debug.h"
 #include "wave.h"
 
-#if (SRC == SRC_FILE)
-
 namespace {
-	struct wave_hdr_t {
+	typedef struct wave_hdr_t {
 		char     id[4];
 		uint32_t len;
-	} PACK8;
+	} PACK8 wave_hdr_t;
 
-	struct wave_chunk_t {
+	typedef struct wave_chunk_t {
 		wave_hdr_t hdr;
 		char       fmt[4];
-	} PACK8;
+	} PACK8 wave_chunk_t;
 
-	struct wave_fmtvalue_t {
+	typedef struct wave_fmtvalue_t {
 		uint16_t audio_format;
 		uint16_t num_of_channels;
 		uint32_t sample_rate;
 		uint32_t byte_rate;
 		uint16_t block_align;
 		uint16_t bits_per_sample; // maybe followed by extra parameters
-	} PACK8;
+	} PACK8 wave_fmtvalue_t;
 
 	typedef uint8_t dataValue_t;
 
@@ -91,6 +90,7 @@ _read_bytes(File & f,              // file to read from
             int16_t const offset,  // offset to add to each byte read
             char * const data)     // data read buffer
 {
+    //Serial.print("n="); Serial.println(len);
 	char * buf = data;
 
 	for (uint16_t ii = 0; ii < len; ii++) {
@@ -100,8 +100,13 @@ _read_bytes(File & f,              // file to read from
 		}
 		if (buf) {
 			*(buf++) = d + offset;
+            // uint8_t const u8 = d & 0xFF; 
+            // debug_hex_dump(&u8, 0, 1); Serial.print(" u8=");
+            // Serial.print(u8); Serial.print(" *buf="); Serial.println((int)*(buf-1)); 
 		}
 	}
+    //Serial.println();
+
 	return 0;
 }
 
@@ -171,24 +176,25 @@ _read_samples(File & f,                       // file to read from
      * Read samples from file
      ************************/
 
-uint_least8_t                                 // returns 0 if successful
-wave_read_samples(File &        f,            // file to read samples from [in]
-				  char * const  noteName,     // note name derived from file name [out]
-				  sample_t * const  samples,  // samples read from file [out]
-				  amplitude_t * amplitude)    // signal amplitude [out]
+uint_least8_t                                      // returns 0 if successful
+wave_read_samples(File &            f,             // file to read samples from [in]
+				  char * const      note_name,     // note name derived from file name [out]
+                  size_t            note_name_len, // note name max length (including terminating '\0')
+				  sample_t * const  samples,       // samples read from file [out]
+				  amplitude_t *     amplitude)     // signal amplitude [out]
 {
-	strcpy(noteName, f.name());
+    f.getName8(note_name, note_name_len);  // returns uppercase, except extension that is lowercase
 
 	// remove file name extension
-	char * const ext = strrchr(noteName, '.');
-	if (!ext || strncmp(ext, ".WAV", 4) != 0) {
+	char * const ext = strrchr(note_name, '.');
+	if (!ext || strncmp(ext, ".wav", 4) != 0) {  // 2BD should be case insensitive
 		return 1;
 	}
 	*ext = '\0';
-
-	if (noteName[1] == 'B') {
-		noteName[1] = 'b';
+	if (note_name[1] == 'B') {
+		note_name[1] = 'b';
 	}
+    //Serial.println(note_name);
 
 	sample_cnt_t nrOfSamplesInFile;
 
@@ -211,8 +217,7 @@ wave_read_samples(File &        f,            // file to read samples from [in]
 			max = s;
 		}
 	}
+
 	*amplitude = (int16_t)max - min; // top-top
 	return 0;
 }
-
-#endif

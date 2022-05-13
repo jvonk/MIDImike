@@ -37,13 +37,14 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include <limits.h>
-#include <SD.h>
 #include <SPI.h>
+#include <SdFat.h>
 #include <Adafruit_ST7735.h>
 #include <Adafruit_GFX.h>
 
 #include "config.h"
 #include "sample_t.h"
+#include "src/debug/debug.h"
 #include "src/pitch/pitch.h"
 #include "src/sdcard/sddir.h"
 #include "src/sdcard/wave.h"
@@ -55,7 +56,6 @@
 #include "src/display/staff.h"
 #include "src/display/pianoroll.h"
 #include "src/midi/midiserial.h"
-#include "src/midi/midifile.h"
 
 namespace {
 
@@ -93,6 +93,25 @@ namespace {
     static file_scope_variables_t _;
 }
 
+#if 0
+static void
+print_addr(void * p) 
+{
+    int ptr = (int) p;
+    unsigned char tmp;
+    char string[]="0123456789ABCDEF";
+
+    tmp = *(1+ (unsigned char*) &ptr); // MSB
+    putchar( string[tmp >> 4] );
+    putchar( string[tmp & 0xF] );
+
+    tmp = *(0+ (unsigned char*) &ptr); // LSB
+    putchar( string[tmp >> 4] );
+    putchar( string[tmp & 0xF] );    
+}
+#endif
+
+
     /************
      * Initialize
      ************/
@@ -102,20 +121,22 @@ setup()
 {
     Serial.begin(CONFIG_MIDIMIKE_SERIAL_RATE);
 
-    if (DST == DST_SERIAL && USB == USB_SERIAL) {
+    if (DST == DST_TEXT && USB == USB_SERIAL) {
         while (!Serial) {
-            // spin wait for serial port to connect
+            yield();  // wait for serial port to connect
         };
     }
+    Serial.println("Welcome to MIDImike");
 
-    if (SRC == SRC_FILE || FILE == FILE_MIDI) {
-        _.sdcard_ok = sddir_init(SPI_SD_CS) == true;
+
+    if (SRC == SRC_FILE) {
+        _.sdcard_ok = sddir_init(SPI_SD_CS) == 0;
         if (!_.sdcard_ok && USB == USB_SERIAL) {
-            Serial.println("SD err");  // is the SD card inserted and formatted?
+            Serial.println("SD err");  // card inserted and formatted FAT/FAT32?
         }
     }
 
-    switch(DST) {
+    switch (DST) {
         case DST_STAFF:
             staff_init(SPI_TFT_CS, SPI_DC, SPI_RST);
             break;
@@ -124,6 +145,18 @@ setup()
             _.segmentBuf = new SegmentBuf();
             pianoroll_init(SPI_TFT_CS, SPI_DC, SPI_RST);
             pinMode(BUTTON_IN, INPUT_PULLUP);
+            break;
+        case DST_TEXT:
+            if (SRC == SRC_FILE) {
+                calcnote_write_serial_hdr();
+                // for each file at sample rate, call `calc_note()`
+                char dirname[13] = {}; 
+                strcpy(dirname,"/notes/");
+                utoa(CONFIG_MIDIMIKE_SAMPLE_RATE, dirname + strlen(dirname), 10);
+
+                //Serial.print("main free="); Serial.println(debug_freeMemory());
+                sddir_for_each_file_in_dir(dirname, calcnote_from_file);
+            }
             break;
     }
 
@@ -142,7 +175,7 @@ loop()
     switch(SRC) {
 
         case SRC_MICR: {
-            // ASSERT((Debug::getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 60));  // very rough estimate
+            // ASSERT((debug_getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 60));  // very rough estimate
 
             // get samples from microphone, samples will be dynamically allocated on first invocation
             amplitude_t amplitude;
@@ -161,29 +194,24 @@ loop()
             }
 
             // find corresponding note
-            Pitch pitch(freq);
+            Pitch pitch_measured(freq);
 
             switch(DST) {
                 case DST_STAFF:
-                    staff_draw_note(pitch);  // show note on TFT display
+                    staff_draw_note(pitch_measured);  // show note on TFT display
                     break;
                 case DST_PIANOROLL:
-                    _.segment->put(millis(), pitch.get_segment(), amplitude, _.segmentBuf);
+                    _.segment->put(millis(), pitch_measured.get_segment(), amplitude, _.segmentBuf);
                     pianoroll_draw(_.segment->get_last_offset(), _.segmentBuf);
 
                     if ((USB == USB_MIDI) && digitalRead(BUTTON_IN) == 0) {
                         midiserial_send_notes(_.segmentBuf);
                         pianoroll_clear();
                     }
-                    if (FILE == FILE_MIDI) {
-                        if (midifile_write(_.segmentBuf, "arduino.mid") != 0) {
-                            Serial.println("midi wr err");
-                        }
-                    }
                     break;
-                case DST_SERIAL:
+                case DST_TEXT:
                     Pitch pitch_in(NOTENR_C, 0);
-                    calcnote_write_serial("microphone", pitch_in, pitch, freq);
+                    calcnote_write_serial("microphone", pitch_in, pitch_measured, freq);
                     break;
 
             } // switch(DST)
@@ -191,19 +219,9 @@ loop()
         }
 
         case SRC_FILE: {
-            if (_.sdcard_ok) {
-
-                if (DST == DST_SERIAL) {
-                    calcnote_write_serial_hdr();
-                }
-
-                // for each file at sample rate, call `calc_note()`
-                char dirname[13] = "/notes/\012345"; 
-                utoa(CONFIG_MIDIMIKE_SAMPLE_RATE, dirname + 7, 10);
-
-                sddir_for_each_file_in_dir(dirname, &calcnote_from_file);
-            }
+            yield();
             break;
+
         }
     } // switch(SRC)
 }

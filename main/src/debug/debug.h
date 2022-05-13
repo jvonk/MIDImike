@@ -7,6 +7,7 @@
 #define ASSERT(x) do { if (!(x)) { debug_assertPrint(__func__, __LINE__); /*blink LED*/} } while (0)
 
 void debug_assertPrint(char const * const func, int const lineno);
+void debug_hex_dump(uint8_t const * p, uint16_t * const pos, uint16_t const n);
 
 // help reduce the number of #if statements in elsewhere
 #if SHOW_MEMORY_USAGE
@@ -14,25 +15,3 @@ void debug_assertPrint(char const * const func, int const lineno);
 #else
 #  define SHOW_MEMORY_USAGE_ONLY(a)
 #endif
-
-namespace Debug {
-
-    unsigned int
-        getMemFree(void);
-
-    void
-        getMemInUse(unsigned int const    ramend,
-                     unsigned int const   sp,
-                     unsigned int * const dataSize,
-                     unsigned int * const bssSize,
-                     unsigned int * const heapSize,
-                     unsigned int * const stackSize);
-
-    void
-        showMemUsage(void);
-
-    void
-        hexDump(uint8_t const * p,     // pointer to 1st byte to display as hexadecimal
-                 uint16_t * const pos, // number of bytes already displayed
-                 uint16_t const n);    // number of bytes to display
-};
