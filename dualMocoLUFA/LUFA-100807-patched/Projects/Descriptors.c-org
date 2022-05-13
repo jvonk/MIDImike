@@ -449,9 +449,9 @@ USB_Descriptor_String_t PROGMEM const ProductStringSerial =
 /* for MIDI */
 USB_Descriptor_String_t PROGMEM const ProductStringMIDI =
 {
-	.Header                 = {.Size = USB_STRING_LEN(7), .Type = DTYPE_String},
+	.Header                 = {.Size = USB_STRING_LEN(14), .Type = DTYPE_String},
 
-	.UnicodeString          = L"USBmike"
+	.UnicodeString          = L"Pitch Detector"
 };
 
 /** This function is called by the library when in device mode, and must be overridden (see library "USB Descriptors"
