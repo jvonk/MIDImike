@@ -15,26 +15,21 @@
 // choice: input source
 #define SRC_MICR (1)
 #define SRC_FILE (2)
-#define SRC (SRC_FILE)
+#define SRC (SRC_MICR)
 
 // choice: output destination (must be DST_PIANOROLL for USB-MIDI output)
 //  DST_TEXT in combination with SRC_FILE and outputs freq and notes notes recognized, for offline analysis
 #define DST_STAFF     (1)
 #define DST_PIANOROLL (2)
 #define DST_TEXT      (3)
-#define DST (DST_TEXT)
+#define DST (DST_PIANOROLL)
 
 // choice: USB protocol spoken
 //  USB_MIDI output requires DST_PIANOROLL
 //  after changing to USB-MIDI, connect MOSI2 to GND and power cycle the Arduino board
 #define USB_MIDI   (0)
 #define USB_SERIAL (1)
-#define USB (USB_SERIAL)
-
-// choice: save samples to sd as .mid file
-#define WRITE_NONE (0)
-#define WRITE_MIDI (1)
-#define WRITE (WRITE_NONE)
+#define USB (USB_MIDI)
 
 #if (USB == USB_MIDI)
 #define CONFIG_MIDIMIKE_SERIAL_RATE (31250)

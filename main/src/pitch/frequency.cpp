@@ -31,9 +31,10 @@
 #include "frequency.h"
 
 #define INTERPOLATE (1)
-#define NORMALIZE (0)
+#define NORMALIZE (1)
+#define DEBUG (0)
 
-namespace {
+namespace  {
     typedef enum state_t {
         STATE_FIND_POS_SLOPE = 0,
         STATE_FIND_NEG_SLOPE,
@@ -58,6 +59,7 @@ _cal_autocorrelation(samples_t const    samples,  // pointer to signed 8-bit dat
 	autoCorr_t ac = 0;
 
 	for (sample_cnt_t ii = 0; ii < CONFIG_MIDIMIKE_WINDOW_SIZE - lag; ii++) {
+
 		ac += ((int16_t)samples[ii] * samples[ii + lag]);
 	}
 	return ac;
@@ -83,9 +85,21 @@ frequency_calculate(samples_t const  samples)  // pointer to signed 8-bit data s
 		return 0;
 	}
 
+#if 0
+    for (size_t ii = 0; ii < CONFIG_MIDIMIKE_WINDOW_SIZE; ii++ ) {
+        Serial.print(samples[ii]); Serial.print(" ");
+    }
+    Serial.println();
+#endif
+
 	float period = 0;
 	autoCorr_t const acMax = _cal_autocorrelation(samples, 0);
-	autoCorr_t const acThreshold = (float)acMax * (NORMALIZE ? 4/5 : 2/3);
+	autoCorr_t const acThreshold = (float)acMax * (NORMALIZE ? (float)4/5 : (float)2/3);
+
+    if (DEBUG) {
+        Serial.print("acMax = "); Serial.print(acMax); 
+        Serial.print(", acThreshold = "); Serial.println(acThreshold); 
+    }
 	autoCorr_t acPrev = acMax;
 	state_t state = STATE_FIND_POS_SLOPE;   // ensure C++11 is enabled
 
@@ -93,6 +107,10 @@ frequency_calculate(samples_t const  samples)  // pointer to signed 8-bit data s
  		 (lag < CONFIG_MIDIMIKE_LAG_MAX) && (state != STATE_FOUND_PEAK); lag++) {
 
 		autoCorr_t ac = _cal_autocorrelation(samples, lag);
+
+        if (DEBUG) {
+            Serial.print("k="); Serial.print(lag); Serial.print(": ac = "); Serial.println(ac);
+        }
 
 		if (NORMALIZE) {  // normalize for introduced zeros			
 			ac = (float)ac * (float)CONFIG_MIDIMIKE_WINDOW_SIZE / (float)(CONFIG_MIDIMIKE_WINDOW_SIZE - lag);
@@ -129,6 +147,10 @@ frequency_calculate(samples_t const  samples)  // pointer to signed 8-bit data s
 
 	frequency_t const f = (float)CONFIG_MIDIMIKE_SAMPLE_RATE / period;
 
+    if (DEBUG) {
+        Serial.print("freq = "); Serial.print(f);
+        Serial.print(", max = "); Serial.println(CONFIG_MIDIMIKE_FREQ_MAX);
+    }
 	bool const ok = f < CONFIG_MIDIMIKE_FREQ_MAX;
 	return ok ? f : 0;
 }

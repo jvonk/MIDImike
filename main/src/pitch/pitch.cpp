@@ -63,11 +63,13 @@ Pitch::Pitch(void)
      * Construct a new Pitch:: Pitch object
      **************************************/
 
-Pitch::Pitch(char const * const fullname)  // note name w/ octave# e.g. "Gb4"
+Pitch::Pitch(char const * const full_name)  // note name w/ octave# e.g. "Gb4"
 {
+    //Serial.print(" note="); Serial.print(full_name);
+
 	// get octave# from the last char
-	uint_fast8_t len = strlen(fullname);
-	_.octavenr = fullname[len - 1] - '0';
+	uint_fast8_t len = strlen(full_name);
+	_.octavenr = full_name[len - 1] - '0';
 
 	// chars before octave# are the note name itself
 	bool found = false;
@@ -75,17 +77,19 @@ Pitch::Pitch(char const * const fullname)  // note name w/ octave# e.g. "Gb4"
 	uint_least8_t max = static_cast<int>(NOTENR_COUNT);
 
 	for (uint_least8_t ii = 0; ii < max && !found; ii++, nn++) {
-		if ((nn->name[0] == fullname[0]) &&
+		if ((nn->name[0] == full_name[0]) &&
 			((nn->name[1] == '\0' && len < 3) ||
-			(nn->name[1] == fullname[1]))) {
+			(nn->name[1] == full_name[1]))) {
 			_.notenr = static_cast<notenr_t>(ii);
 			found = true;
 		}
 	}
+
 	if (!found) {
 		_.octavenr = 0;
 		_.notenr = NOTENR_C;
 	}
+    // Serial.print(" => "); Serial.print(_notes[_.notenr].name); Serial.print(" "); Serial.println(_.octavenr);
 }
 
     /**************************************
@@ -146,6 +150,8 @@ Pitch::get_shortname(void)
 frequency_t
 Pitch::get_frequency(void)
 {
+    //Serial.println(); Serial.print("("); Serial.print(_notes[_.notenr].name); Serial.print(_.octavenr); Serial.print(" => f=");
+
 	uint8_t const notesCnt = sizeof(_notes) / sizeof(_notes[0]);
 	uint_least8_t const idx = static_cast<uint_least8_t>(_.notenr);
 
@@ -160,6 +166,7 @@ Pitch::get_frequency(void)
 		freq *= 2;
 		octave--;
 	}
+    //Serial.print(freq); Serial.println(")");
 	return freq;
 }
 

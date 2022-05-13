@@ -30,32 +30,26 @@
 extern char *__brkval;
 
 int 
-Debug::freeMemory() {
+debug_freeMemory() {
   char top;
   return &top - __brkval;
 }
 
-#if 0
-
-	/********
-	 * Assert
-	 ********/
+#if 1
 
 void
 debug_assertPrint(char const * const file, int const lineno)
 {
 	do {
-		Serial.print("ASSERT at ");
+		Serial.print(F("ASSERT at "));
 		Serial.print(file);
-		Serial.print(", ");
+		Serial.print(F(", "));
 		Serial.println(lineno, DEC);
 		Serial.flush();
 	} while (true);  // should be true for production
 	//abort();  // ABORT PROGRAM
 }
 
-
-#if 0
 	// __file is the name passed to the compiler.  Visual Micro passes the full path name,
 	// and takes up a lot of memory.  Instead we use the ASSERT macro from debug.h
 #define __ASSERT_USE_STDERR
@@ -63,13 +57,14 @@ debug_assertPrint(char const * const file, int const lineno)
 void
 __assert(const char *__func, const char *__file, int __lineno, const char *__sexp) {
 	while (true) {
-		Serial.print(" fatal error, ");
+        (void) __file;
+		Serial.print(F(" fatal error, "));
 		Serial.print(__func);  // __file takes up to much memory
 		Serial.print(":");
 		Serial.print(__lineno, DEC);
-		Serial.print(", assert(");
+		Serial.print(F(", assert("));
 		Serial.print(__sexp);
-		Serial.println(")");
+		Serial.println(F(")"));
 		Serial.flush();
 	}
 	//abort();  // ABORT PROGRAM
@@ -84,71 +79,15 @@ debug_tryAssert() {
 	// make assertion failed.
 	assert(1 == 2);
 }
-#endif
-
-
-	/*******
-	 * Memory
-	 ********/
-
-extern unsigned int __data_start;
-extern unsigned int __data_end;
-extern unsigned int __bss_start;
-extern unsigned int __bss_end;
-extern unsigned int __heap_start;
-extern void * __brkval;
-
-unsigned int
-Debug::getMemFree(void)
-{
-	int free_memory;
-	free_memory = __brkval ? ((unsigned int)&free_memory) - ((unsigned int)__brkval)
-		                   : ((unsigned int)&free_memory) - ((unsigned int)&__bss_end);
-
-	return free_memory;
-}
 
 void
-Debug::getMemInUse(unsigned int const ramend,
-				   unsigned int const sp,
-				   unsigned int * const dataSize,
-				   unsigned int * const bssSize,
-				   unsigned int * const heapSize,
-				   unsigned int * const stackSize)
-{
-	*dataSize = (unsigned int)&__data_end - (unsigned int)&__data_start;
-	*bssSize = (unsigned int)&__bss_end - (unsigned int)&__bss_start;
-	*heapSize = (unsigned int)__brkval - (unsigned int)&__heap_start;
-	*stackSize = ramend - sp;
-}
-
-void
-Debug::showMemUsage(void)
-{
-	uint16_t data, bss, heap, stack;
-	Debug::getMemInUse(RAMEND, SP, &data, &bss, &heap, &stack);
-
-	Serial.print(" data=");  Serial.print(data, DEC);
-	Serial.print(" bss=");   Serial.print(bss, DEC);
-	Serial.print(" heap=");  Serial.print(heap, DEC);
-	Serial.print(" stack="); Serial.print(stack, DEC);
-	Serial.print(" free=");  Serial.println(Debug::getMemFree(), DEC);
-	Serial.flush();  // ensure delivery
-}
-
-
-	/**********
-	 * Hex dump
-	 **********/
-
-void
-Debug::hexDump(uint8_t const * p,    // pointer to 1st byte to display as hexadecimal
-				uint16_t * const pos, // number of bytes already displayed
-				uint16_t const n)    // number of bytes to display
+debug_hex_dump(uint8_t const * p,    // pointer to 1st byte to display as hex
+			   uint16_t * const pos, // number of bytes already displayed
+			   uint16_t const n)     // number of bytes to display
 {
 	for (uint16_t ii = 0; ii < n; ii++) {
 		if (*p < 0x10) {
-			Serial.print("0");
+			Serial.print(F("0"));
 		}
 		Serial.print(*p, HEX);
 
@@ -156,9 +95,9 @@ Debug::hexDump(uint8_t const * p,    // pointer to 1st byte to display as hexade
 		if (!(*pos % 32)) {
 			Serial.println();
 		} else if (!(*pos % 4)) {
-			Serial.print(" | ");
+			Serial.print(F(" | "));
 		} else {
-			Serial.print(" ");
+			Serial.print(F(" "));
 		}
 		p++;
 	}

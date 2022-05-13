@@ -22,6 +22,9 @@
  * SPDX-FileCopyrightText: Copyright 2015-2016,2022 Johan Vonk
  **/
 
+#warning "midifile.cpp depreciated"
+#if 0
+
 #include <Arduino.h>
 #include <stdint.h>
 #include <SdFat.h>
@@ -34,21 +37,28 @@
 #include "midiserial.h"
 #include "midifile.h"
 
-#if 0
-    // 2BD this is still for the regular SD.h instead of SdFat.h
-
-midiMetaLen_t const META_TEMPOCHANGE_LEN = 3;
-midiMetaLen_t const META_TRACKEND_LEN = 0;
-
 // work towards 1 tick per msec
 #define BEATS_PER_MIN (125)
 #define TICKS_PER_BEAT (1000 / BEATS_PER_MIN)
+
+namespace {
+    SdFat sd;
+
+    // 2BD this is still for the regular SD.h instead of SdFat.h
+
+    midiMetaLen_t const META_TEMPOCHANGE_LEN = 3;
+    midiMetaLen_t const META_TRACKEND_LEN = 0;
+}
 
 static bool                            // returns true on success, false otherwise
 _write_bytes(File & f,                 // file to append to
              void const * const data,  // data to write
              size_t const dataLen)     // length of data to write
 {
+    while (sd.card()->isBusy()) {
+        yield();
+    }
+
     return f.write((uint8_t *)data, dataLen) == dataLen;
 }
 
@@ -170,37 +180,33 @@ int_least8_t
 midifile_write(SegmentBuf * const segmentBuf,  // buffer with segmented notes
                char const * const fname)       // file name to write to on SD card
 {
-    File f = sd.open(fname, FILE_WRITE);
-    if (!f) {
+    File file = sd.open(fname, O_RDWR | O_CREAT);
+    if (!file) {
         return -1;
     }
 
-    // write header
-
-    if (_write_midi_hdr(f) == false) {
+    if (_write_midi_hdr(file) == false) {
         return -2;
     }
 
-    // write track
-
-    if (_write_midi_track_begin(f, META_TEMPOCHANGE_LEN + segmentBuf->len() * sizeof(midiEventNote_t)) == false ||
-         _write_midi_tracktempo_event(f, 60000000UL / BEATS_PER_MIN) == false) {  // 60000000 usec/min
+    if (_write_midi_track_begin(file, META_TEMPOCHANGE_LEN + segmentBuf->len() * sizeof(midiEventNote_t)) == false ||
+        _write_midi_tracktempo_event(file, 60000000UL / BEATS_PER_MIN) == false) {  // 60000000 usec/min
         return -3;
     }
 
     uint_least8_t ii = 0;
     while (segment_t const * note = segmentBuf->tail_ptr(ii++)) {
-        if (_write_midi_note_event(f, note->onset, MIDIEVENT_NOTE_ON, note->pitch, note->energy) == false ||
-             _write_midi_note_event(f, note->duration, MIDIEVENT_NOTE_OFF, note->pitch, note->energy) == false) {
+        if (_write_midi_note_event(file, note->onset, MIDIEVENT_NOTE_ON, note->pitch, note->energy) == false ||
+            _write_midi_note_event(file, note->duration, MIDIEVENT_NOTE_OFF, note->pitch, note->energy) == false) {
             return -4;
         }
     }
 
-    if (_write_midi_track_end(f) == false) {
+    if (_write_midi_track_end(file) == false) {
         return -5;
     }
 
-    f.close();
+    file.close();
     return 0;
 }
 

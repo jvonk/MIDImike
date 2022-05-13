@@ -26,36 +26,22 @@
 
 #include <Arduino.h>
 #include <stdint.h>
-#define ENABLE_DEDICATED_SPI (1)
 #include <SdFat.h>
 
 #include "../../config.h"
 #include "../debug/debug.h"
 #include "sddir.h"
 
-// SD_FAT_TYPE = 0 for SdFat/File as defined in SdFatConfig.h,
-// 1 for FAT16/FAT32, 2 for exFAT, 3 for FAT16/FAT32 and exFAT.
-#define SD_FAT_TYPE 0
+#define SD_FAT_TYPE (1) // FAT16/32
+#if USB == USB_SERIAL
+#  define error(s) sd.errorHalt(&Serial, F(s));
+#else
+#  define error(s) 
+#endif
 
-// SDCARD_SS_PIN is defined for the built-in SD on some boards.
-const uint8_t SD_CS_PIN = 4;
-
-#define SPI_CLOCK SD_SCK_MHZ(50)
-
-// Try to select the best SD card configuration.
-#if HAS_SDIO_CLASS
-#define SD_CONFIG SdioConfig(FIFO_SDIO)
-#elif  ENABLE_DEDICATED_SPI
-#define SD_CONFIG SdSpiConfig(SD_CS_PIN, DEDICATED_SPI, SPI_CLOCK)
-#else  // HAS_SDIO_CLASS
-#define SD_CONFIG SdSpiConfig(SD_CS_PIN, SHARED_SPI, SPI_CLOCK)
-#endif  // HAS_SDIO_CLASS
-
-// FAT type 0 only
-SdFat sd;
-
-#define error(s) sd.errorHalt(&Serial, F(s))
-
+namespace {
+    SdFat sd;
+}
 
 
     /************
@@ -96,30 +82,10 @@ _walkDirectory(File & dir,               // directory to start at
 				err = _walkDirectory(file, lvl + 1, cb_fnc);  // recursive function call
             }
         } else {            
-            //file.printName(&Serial);
 			err = (*cb_fnc)(file, instrumentName);  // call back registered function
         }
         file.close();
     }
-
-#if 0
-	File f;
-	while ((f = dir.openNextFile()) && !err && cb_fnc) {
-
-		if (f.isDirectory()) {
-			if (lvl < DIRLEVEL_MAX) {
-				if (lvl == 0) {
-					strcpy(instrumentName, f.name());
-				}
-				err = _walkDirectory(f, lvl + 1, cb_fnc);  // recursive function call
-            }
-		} else {
-            // Serial.println(f.name());
-			err = (*cb_fnc)(f, instrumentName);  // call back registered function
-		}
-		f.close();
-	}
-#endif    
 	return err;
 }
 
@@ -135,13 +101,9 @@ sddir_for_each_file_in_dir(char const * const dirName,  // directory (and its su
 {
     File dir;
 
-    //Serial.print("for1 free="); Serial.println(Debug::freeMemory());
-
     if (!dir.open(dirName)){
         error("dir.open failed");
     }
-
-    //Serial.print("for2 free="); Serial.println(Debug::freeMemory());
 
 	uint_least8_t err = _walkDirectory(dir, 0, cb_fnc);
 
@@ -150,4 +112,3 @@ sddir_for_each_file_in_dir(char const * const dirName,  // directory (and its su
 }
 
 #endif
-

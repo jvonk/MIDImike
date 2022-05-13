@@ -56,7 +56,6 @@
 #include "src/display/staff.h"
 #include "src/display/pianoroll.h"
 #include "src/midi/midiserial.h"
-#include "src/midi/midifile.h"
 
 namespace {
 
@@ -130,7 +129,7 @@ setup()
     Serial.println("Welcome to MIDImike");
 
 
-    if (SRC == SRC_FILE || WRITE == WRITE_MIDI) {
+    if (SRC == SRC_FILE) {
         _.sdcard_ok = sddir_init(SPI_SD_CS) == 0;
         if (!_.sdcard_ok && USB == USB_SERIAL) {
             Serial.println("SD err");  // card inserted and formatted FAT/FAT32?
@@ -155,7 +154,7 @@ setup()
                 strcpy(dirname,"/notes/");
                 utoa(CONFIG_MIDIMIKE_SAMPLE_RATE, dirname + strlen(dirname), 10);
 
-                //Serial.print("main free="); Serial.println(Debug::freeMemory());
+                //Serial.print("main free="); Serial.println(debug_freeMemory());
                 sddir_for_each_file_in_dir(dirname, calcnote_from_file);
             }
             break;
@@ -176,7 +175,7 @@ loop()
     switch(SRC) {
 
         case SRC_MICR: {
-            // ASSERT((Debug::getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 60));  // very rough estimate
+            // ASSERT((debug_getMemFree() > CONFIG_MIDIMIKE_WINDOW_SIZE + 60));  // very rough estimate
 
             // get samples from microphone, samples will be dynamically allocated on first invocation
             amplitude_t amplitude;
@@ -195,29 +194,24 @@ loop()
             }
 
             // find corresponding note
-            Pitch pitch(freq);
+            Pitch pitch_measured(freq);
 
             switch(DST) {
                 case DST_STAFF:
-                    staff_draw_note(pitch);  // show note on TFT display
+                    staff_draw_note(pitch_measured);  // show note on TFT display
                     break;
                 case DST_PIANOROLL:
-                    _.segment->put(millis(), pitch.get_segment(), amplitude, _.segmentBuf);
+                    _.segment->put(millis(), pitch_measured.get_segment(), amplitude, _.segmentBuf);
                     pianoroll_draw(_.segment->get_last_offset(), _.segmentBuf);
 
                     if ((USB == USB_MIDI) && digitalRead(BUTTON_IN) == 0) {
                         midiserial_send_notes(_.segmentBuf);
                         pianoroll_clear();
                     }
-                    if (WRITE == WRITE_MIDI) {
-                        if (midifile_write(_.segmentBuf, "arduino.mid") != 0) {
-                            Serial.println("midi wr err");
-                        }
-                    }
                     break;
                 case DST_TEXT:
                     Pitch pitch_in(NOTENR_C, 0);
-                    calcnote_write_serial("microphone", pitch_in, pitch, freq);
+                    calcnote_write_serial("microphone", pitch_in, pitch_measured, freq);
                     break;
 
             } // switch(DST)
