@@ -64,7 +64,7 @@ This to totally overkill, but the `.brd` file can be found the in `hardware` dir
 |------|-------------|-------------------------|-----:|
 | PCB1 | Electret microphone w/ auto gain control| Adafruit 1713 | [$7.95](https://www.adafruit.com/product/1713)
 | PCB2 | Arduino Uno R3, or Arduino METRO 328 |  Adafruit 2488 | [$17.50](https://www.adafruit.com/product/2488)
-| PCB3 | ST7735R 1.8" Color TFT display w/ MicroSD breakout | Adafruit 802 | [$19.95](https://www.adafruit.com/product/802)
+| PCB3 | ST7735R 1.8" Color TFT display w/ MicroSD breakout | Adafruit 802 | [$34.95](https://www.adafruit.com/product/802)
 | LED1 | LED, Amber Clear 602nm, 1206 | Lite-On LTST-C150AKT | [$0.33](https://www.digikey.com/en/products/detail/lite-on-inc/LTST-C150AKT/269213)
 | R1   | Resistor, 330 Ω, 1/8 W, 0805 | YAGEO RC0805FR-0768RL | [$0.10](https://www.digikey.com/en/products/detail/yageo/RC0805FR-07330RL/727866)
 | JP1  | Connector header, vertical 3 pos, 2.54mm | Metz Connect PR20203VBNN | [$0.10](https://www.digikey.com/en/products/detail/metz-connect-usa-inc/PR20203VBNN/7794768)
