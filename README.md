@@ -58,6 +58,8 @@ This to totally overkill, but the `.brd` file can be found the in `hardware` dir
 ![Top](media/pcb/top.png) 
 ![Bottom](media/pcb/bottom.png)
 
+Note that the footprint of `PCB1` is mirrored by accident in rev 1.
+
 ### Bill of materials
 
 | Name | Description | Suggested mfr and part# | Paid |
@@ -122,7 +124,7 @@ This is important that the Arduino can still behave as USB-SERIAL, because this 
 
 ### Match the USB IDs
 
-I patched dualMocoLUFA, so that it matches what is reported by Windows Device Manager's property details.
+I patched dualMocoLUFA, so that it matches what is reported by Windows Device Manager's detail `hardware Ids`.
 
 ```
 USB\VID_2341&PID_0043&REV_0001
@@ -138,13 +140,13 @@ To install the modified dualMocoLUFA firmware on the ATmega16U2m.
 
 - Put the Arduino Uno R3 in DFU mode by briefly connecting the `RESET2*` to `GND` on the atmega16u2 ICSP1 header. These are the leftmost pins, near the USB connector, as shown above.
 
-- In Windows Device Manager, it should show up as “Atmel USB Devices > ATmega16U2“. If you encounter “unknown device“, install the driver from `U:\Program Files (x86)\Atmel\Flip 3.4.7\usb\atmel_usb_dfu.inf`.
+- In Windows Device Manager, it should show up as “Atmel USB Devices > ATmega16U2“. If it shows up as "Unknown device", install the driver from `U:\Program Files (x86)\Atmel\Flip 3.4.7\usb\atmel_usb_dfu.inf`.
 
 - Start Atmel FLIP
     - Device » Select » `ATmega16U2`
     - Settings » Communication » `USB`
     - File » Load HEX File » `dualMocoLUFA/LUFA-100807-patched/Projects/dualMoco.hex`
-    - 
+    - Click `Run`
     
 ### Connect
 
