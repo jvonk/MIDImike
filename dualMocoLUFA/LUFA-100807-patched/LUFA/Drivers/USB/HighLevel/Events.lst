@@ -1,0 +1,95 @@
+   1               		.file	"Events.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.USB_Event_Stub,"ax",@progbits
+  11               	.global	USB_Event_Stub
+  13               	USB_Event_Stub:
+  14               	.LFB4:
+  15               		.file 1 "../LUFA/Drivers/USB/HighLevel/Events.c"
+   1:../LUFA/Drivers/USB/HighLevel/Events.c **** /*
+   2:../LUFA/Drivers/USB/HighLevel/Events.c ****              LUFA Library
+   3:../LUFA/Drivers/USB/HighLevel/Events.c ****      Copyright (C) Dean Camera, 2010.
+   4:../LUFA/Drivers/USB/HighLevel/Events.c ****               
+   5:../LUFA/Drivers/USB/HighLevel/Events.c ****   dean [at] fourwalledcubicle [dot] com
+   6:../LUFA/Drivers/USB/HighLevel/Events.c ****       www.fourwalledcubicle.com
+   7:../LUFA/Drivers/USB/HighLevel/Events.c **** */
+   8:../LUFA/Drivers/USB/HighLevel/Events.c **** 
+   9:../LUFA/Drivers/USB/HighLevel/Events.c **** /*
+  10:../LUFA/Drivers/USB/HighLevel/Events.c ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:../LUFA/Drivers/USB/HighLevel/Events.c **** 
+  12:../LUFA/Drivers/USB/HighLevel/Events.c ****   Permission to use, copy, modify, distribute, and sell this 
+  13:../LUFA/Drivers/USB/HighLevel/Events.c ****   software and its documentation for any purpose is hereby granted
+  14:../LUFA/Drivers/USB/HighLevel/Events.c ****   without fee, provided that the above copyright notice appear in 
+  15:../LUFA/Drivers/USB/HighLevel/Events.c ****   all copies and that both that the copyright notice and this
+  16:../LUFA/Drivers/USB/HighLevel/Events.c ****   permission notice and warranty disclaimer appear in supporting 
+  17:../LUFA/Drivers/USB/HighLevel/Events.c ****   documentation, and that the name of the author not be used in 
+  18:../LUFA/Drivers/USB/HighLevel/Events.c ****   advertising or publicity pertaining to distribution of the 
+  19:../LUFA/Drivers/USB/HighLevel/Events.c ****   software without specific, written prior permission.
+  20:../LUFA/Drivers/USB/HighLevel/Events.c **** 
+  21:../LUFA/Drivers/USB/HighLevel/Events.c ****   The author disclaim all warranties with regard to this
+  22:../LUFA/Drivers/USB/HighLevel/Events.c ****   software, including all implied warranties of merchantability
+  23:../LUFA/Drivers/USB/HighLevel/Events.c ****   and fitness.  In no event shall the author be liable for any
+  24:../LUFA/Drivers/USB/HighLevel/Events.c ****   special, indirect or consequential damages or any damages
+  25:../LUFA/Drivers/USB/HighLevel/Events.c ****   whatsoever resulting from loss of use, data or profits, whether
+  26:../LUFA/Drivers/USB/HighLevel/Events.c ****   in an action of contract, negligence or other tortious action,
+  27:../LUFA/Drivers/USB/HighLevel/Events.c ****   arising out of or in connection with the use or performance of
+  28:../LUFA/Drivers/USB/HighLevel/Events.c ****   this software.
+  29:../LUFA/Drivers/USB/HighLevel/Events.c **** */
+  30:../LUFA/Drivers/USB/HighLevel/Events.c **** 
+  31:../LUFA/Drivers/USB/HighLevel/Events.c **** #define  __INCLUDE_FROM_EVENTS_C
+  32:../LUFA/Drivers/USB/HighLevel/Events.c **** #define  __INCLUDE_FROM_USB_DRIVER
+  33:../LUFA/Drivers/USB/HighLevel/Events.c **** #include "Events.h"
+  34:../LUFA/Drivers/USB/HighLevel/Events.c **** 
+  35:../LUFA/Drivers/USB/HighLevel/Events.c **** void USB_Event_Stub(void)
+  36:../LUFA/Drivers/USB/HighLevel/Events.c **** {
+  16               		.loc 1 36 0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  22 0000 0895      		ret
+  23               		.cfi_endproc
+  24               	.LFE4:
+  26               		.weak	EVENT_USB_Device_StartOfFrame
+  27               		.set	EVENT_USB_Device_StartOfFrame,USB_Event_Stub
+  28               		.weak	EVENT_USB_Device_Reset
+  29               		.set	EVENT_USB_Device_Reset,USB_Event_Stub
+  30               		.weak	EVENT_USB_Device_WakeUp
+  31               		.set	EVENT_USB_Device_WakeUp,USB_Event_Stub
+  32               		.weak	EVENT_USB_Device_Suspend
+  33               		.set	EVENT_USB_Device_Suspend,USB_Event_Stub
+  34               		.weak	EVENT_USB_Device_ConfigurationChanged
+  35               		.set	EVENT_USB_Device_ConfigurationChanged,USB_Event_Stub
+  36               		.weak	EVENT_USB_Device_UnhandledControlRequest
+  37               		.set	EVENT_USB_Device_UnhandledControlRequest,USB_Event_Stub
+  38               		.weak	EVENT_USB_Device_Disconnect
+  39               		.set	EVENT_USB_Device_Disconnect,USB_Event_Stub
+  40               		.weak	EVENT_USB_Device_Connect
+  41               		.set	EVENT_USB_Device_Connect,USB_Event_Stub
+  42               		.text
+  43               	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 Events.c
+     /tmp/ccX5prK8.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccX5prK8.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccX5prK8.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccX5prK8.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccX5prK8.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 USB_Event_Stub
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 EVENT_USB_Device_StartOfFrame
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 EVENT_USB_Device_Reset
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 EVENT_USB_Device_WakeUp
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 EVENT_USB_Device_Suspend
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 EVENT_USB_Device_ConfigurationChanged
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 EVENT_USB_Device_UnhandledControlRequest
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 EVENT_USB_Device_Disconnect
+     /tmp/ccX5prK8.s:13     .text.USB_Event_Stub:0000000000000000 EVENT_USB_Device_Connect
+
+NO UNDEFINED SYMBOLS

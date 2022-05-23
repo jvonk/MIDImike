@@ -1,0 +1,3087 @@
+   1               		.file	"dualMoco.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.RingBuffer_Insert,"ax",@progbits
+  12               	RingBuffer_Insert:
+  13               	.LFB77:
+  14               		.file 1 "Lib/LightweightRingBuff.h"
+   1:Lib/LightweightRingBuff.h **** /*
+   2:Lib/LightweightRingBuff.h ****              LUFA Library
+   3:Lib/LightweightRingBuff.h ****      Copyright (C) Dean Camera, 2010.
+   4:Lib/LightweightRingBuff.h ****               
+   5:Lib/LightweightRingBuff.h ****   dean [at] fourwalledcubicle [dot] com
+   6:Lib/LightweightRingBuff.h ****       www.fourwalledcubicle.com
+   7:Lib/LightweightRingBuff.h **** */
+   8:Lib/LightweightRingBuff.h **** 
+   9:Lib/LightweightRingBuff.h **** /*
+  10:Lib/LightweightRingBuff.h ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:Lib/LightweightRingBuff.h **** 
+  12:Lib/LightweightRingBuff.h ****   Permission to use, copy, modify, distribute, and sell this 
+  13:Lib/LightweightRingBuff.h ****   software and its documentation for any purpose is hereby granted
+  14:Lib/LightweightRingBuff.h ****   without fee, provided that the above copyright notice appear in 
+  15:Lib/LightweightRingBuff.h ****   all copies and that both that the copyright notice and this
+  16:Lib/LightweightRingBuff.h ****   permission notice and warranty disclaimer appear in supporting 
+  17:Lib/LightweightRingBuff.h ****   documentation, and that the name of the author not be used in 
+  18:Lib/LightweightRingBuff.h ****   advertising or publicity pertaining to distribution of the 
+  19:Lib/LightweightRingBuff.h ****   software without specific, written prior permission.
+  20:Lib/LightweightRingBuff.h **** 
+  21:Lib/LightweightRingBuff.h ****   The author disclaim all warranties with regard to this
+  22:Lib/LightweightRingBuff.h ****   software, including all implied warranties of merchantability
+  23:Lib/LightweightRingBuff.h ****   and fitness.  In no event shall the author be liable for any
+  24:Lib/LightweightRingBuff.h ****   special, indirect or consequential damages or any damages
+  25:Lib/LightweightRingBuff.h ****   whatsoever resulting from loss of use, data or profits, whether
+  26:Lib/LightweightRingBuff.h ****   in an action of contract, negligence or other tortious action,
+  27:Lib/LightweightRingBuff.h ****   arising out of or in connection with the use or performance of
+  28:Lib/LightweightRingBuff.h ****   this software.
+  29:Lib/LightweightRingBuff.h **** */
+  30:Lib/LightweightRingBuff.h **** 
+  31:Lib/LightweightRingBuff.h **** /** \file
+  32:Lib/LightweightRingBuff.h ****  *
+  33:Lib/LightweightRingBuff.h ****  *  Ultra lightweight ring buffer, for fast insertion/deletion.
+  34:Lib/LightweightRingBuff.h ****  */
+  35:Lib/LightweightRingBuff.h ****  
+  36:Lib/LightweightRingBuff.h **** #ifndef _ULW_RING_BUFF_H_
+  37:Lib/LightweightRingBuff.h **** #define _ULW_RING_BUFF_H_
+  38:Lib/LightweightRingBuff.h **** 
+  39:Lib/LightweightRingBuff.h **** 	/* Includes: */
+  40:Lib/LightweightRingBuff.h **** 		#include <util/atomic.h>
+  41:Lib/LightweightRingBuff.h **** 	
+  42:Lib/LightweightRingBuff.h **** 		#include <stdint.h>
+  43:Lib/LightweightRingBuff.h **** 		#include <stdbool.h>
+  44:Lib/LightweightRingBuff.h **** 
+  45:Lib/LightweightRingBuff.h **** 	/* Defines: */
+  46:Lib/LightweightRingBuff.h **** 		/** Size of each ring buffer, in data elements - must be between 1 and 255. */
+  47:Lib/LightweightRingBuff.h **** 		#define BUFFER_SIZE         128
+  48:Lib/LightweightRingBuff.h **** 		
+  49:Lib/LightweightRingBuff.h **** 		/** Maximum number of data elements to buffer before forcing a flush. 
+  50:Lib/LightweightRingBuff.h **** 		 *  Must be less than BUFFER_SIZE
+  51:Lib/LightweightRingBuff.h **** 		 */
+  52:Lib/LightweightRingBuff.h **** 		#define BUFFER_NEARLY_FULL	96
+  53:Lib/LightweightRingBuff.h **** 		
+  54:Lib/LightweightRingBuff.h **** 		/** Type of data to store into the buffer. */
+  55:Lib/LightweightRingBuff.h **** 		#define RingBuff_Data_t     uint8_t
+  56:Lib/LightweightRingBuff.h **** 
+  57:Lib/LightweightRingBuff.h **** 		/** Datatype which may be used to store the count of data stored in a buffer, retrieved
+  58:Lib/LightweightRingBuff.h **** 		 *  via a call to \ref RingBuffer_GetCount().
+  59:Lib/LightweightRingBuff.h **** 		 */
+  60:Lib/LightweightRingBuff.h **** 		#if (BUFFER_SIZE <= 0xFF)
+  61:Lib/LightweightRingBuff.h **** 			#define RingBuff_Count_t   uint8_t
+  62:Lib/LightweightRingBuff.h **** 		#else
+  63:Lib/LightweightRingBuff.h **** 			#define RingBuff_Count_t   uint16_t
+  64:Lib/LightweightRingBuff.h **** 		#endif
+  65:Lib/LightweightRingBuff.h **** 
+  66:Lib/LightweightRingBuff.h **** 	/* Type Defines: */
+  67:Lib/LightweightRingBuff.h **** 		/** Type define for a new ring buffer object. Buffers should be initialized via a call to
+  68:Lib/LightweightRingBuff.h **** 		 *  \ref RingBuffer_InitBuffer() before use.
+  69:Lib/LightweightRingBuff.h **** 		 */
+  70:Lib/LightweightRingBuff.h **** 		typedef struct
+  71:Lib/LightweightRingBuff.h **** 		{
+  72:Lib/LightweightRingBuff.h **** 			RingBuff_Data_t  Buffer[BUFFER_SIZE]; /**< Internal ring buffer data, referenced by the buffer p
+  73:Lib/LightweightRingBuff.h **** 			RingBuff_Data_t* In; /**< Current storage location in the circular buffer */
+  74:Lib/LightweightRingBuff.h **** 			RingBuff_Data_t* Out; /**< Current retrieval location in the circular buffer */
+  75:Lib/LightweightRingBuff.h **** 			RingBuff_Count_t Count;
+  76:Lib/LightweightRingBuff.h **** 		} RingBuff_t;
+  77:Lib/LightweightRingBuff.h **** 	
+  78:Lib/LightweightRingBuff.h **** 	/* Inline Functions: */
+  79:Lib/LightweightRingBuff.h **** 		/** Initializes a ring buffer ready for use. Buffers must be initialized via this function
+  80:Lib/LightweightRingBuff.h **** 		 *  before any operations are called upon them. Already initialized buffers may be reset
+  81:Lib/LightweightRingBuff.h **** 		 *  by re-initializing them using this function.
+  82:Lib/LightweightRingBuff.h **** 		 *
+  83:Lib/LightweightRingBuff.h **** 		 *  \param[out] Buffer  Pointer to a ring buffer structure to initialize
+  84:Lib/LightweightRingBuff.h **** 		 */
+  85:Lib/LightweightRingBuff.h **** 		static inline void RingBuffer_InitBuffer(RingBuff_t* const Buffer)
+  86:Lib/LightweightRingBuff.h **** 		{
+  87:Lib/LightweightRingBuff.h **** 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  88:Lib/LightweightRingBuff.h **** 			{
+  89:Lib/LightweightRingBuff.h **** 				Buffer->In  = Buffer->Buffer;
+  90:Lib/LightweightRingBuff.h **** 				Buffer->Out = Buffer->Buffer;
+  91:Lib/LightweightRingBuff.h **** 			}
+  92:Lib/LightweightRingBuff.h **** 		}
+  93:Lib/LightweightRingBuff.h **** 		
+  94:Lib/LightweightRingBuff.h **** 		/** Retrieves the minimum number of bytes stored in a particular buffer. This value is computed
+  95:Lib/LightweightRingBuff.h **** 		 *  by entering an atomic lock on the buffer while the IN and OUT locations are fetched, so that
+  96:Lib/LightweightRingBuff.h **** 		 *  the buffer cannot be modified while the computation takes place. This value should be cached
+  97:Lib/LightweightRingBuff.h **** 		 *  when reading out the contents of the buffer, so that as small a time as possible is spent
+  98:Lib/LightweightRingBuff.h **** 		 *  in an atomic lock.
+  99:Lib/LightweightRingBuff.h **** 		 *
+ 100:Lib/LightweightRingBuff.h **** 		 *  \note The value returned by this function is guaranteed to only be the minimum number of byte
+ 101:Lib/LightweightRingBuff.h **** 		 *        stored in the given buffer; this value may change as other threads write new data and s
+ 102:Lib/LightweightRingBuff.h **** 		 *        the returned number should be used only to determine how many successive reads may safe
+ 103:Lib/LightweightRingBuff.h **** 		 *        be performed on the buffer.
+ 104:Lib/LightweightRingBuff.h **** 		 *
+ 105:Lib/LightweightRingBuff.h **** 		 *  \param[in] Buffer  Pointer to a ring buffer structure whose count is to be computed
+ 106:Lib/LightweightRingBuff.h **** 		 */
+ 107:Lib/LightweightRingBuff.h **** 		static inline RingBuff_Count_t RingBuffer_GetCount(RingBuff_t* const Buffer)
+ 108:Lib/LightweightRingBuff.h **** 		{
+ 109:Lib/LightweightRingBuff.h **** 			RingBuff_Count_t Count;
+ 110:Lib/LightweightRingBuff.h **** 			
+ 111:Lib/LightweightRingBuff.h **** 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+ 112:Lib/LightweightRingBuff.h **** 			{
+ 113:Lib/LightweightRingBuff.h **** 				Count = Buffer->Count;
+ 114:Lib/LightweightRingBuff.h **** 			}
+ 115:Lib/LightweightRingBuff.h **** 			
+ 116:Lib/LightweightRingBuff.h **** 			return Count;
+ 117:Lib/LightweightRingBuff.h **** 		}
+ 118:Lib/LightweightRingBuff.h **** 		
+ 119:Lib/LightweightRingBuff.h **** 		/** Atomically determines if the specified ring buffer contains any free space. This should
+ 120:Lib/LightweightRingBuff.h **** 		 *  be tested before storing data to the buffer, to ensure that no data is lost due to a
+ 121:Lib/LightweightRingBuff.h **** 		 *  buffer overrun.
+ 122:Lib/LightweightRingBuff.h **** 		 *
+ 123:Lib/LightweightRingBuff.h **** 		 *  \param[in,out] Buffer  Pointer to a ring buffer structure to insert into
+ 124:Lib/LightweightRingBuff.h **** 		 *
+ 125:Lib/LightweightRingBuff.h **** 		 *  \return Boolean true if the buffer contains no free space, false otherwise
+ 126:Lib/LightweightRingBuff.h **** 		 */		 
+ 127:Lib/LightweightRingBuff.h **** 		static inline bool RingBuffer_IsFull(RingBuff_t* const Buffer)
+ 128:Lib/LightweightRingBuff.h **** 		{
+ 129:Lib/LightweightRingBuff.h **** 			return (RingBuffer_GetCount(Buffer) == BUFFER_SIZE);
+ 130:Lib/LightweightRingBuff.h **** 		}
+ 131:Lib/LightweightRingBuff.h **** 
+ 132:Lib/LightweightRingBuff.h **** 		/** Atomically determines if the specified ring buffer contains any data. This should
+ 133:Lib/LightweightRingBuff.h **** 		 *  be tested before removing data from the buffer, to ensure that the buffer does not
+ 134:Lib/LightweightRingBuff.h **** 		 *  underflow.
+ 135:Lib/LightweightRingBuff.h **** 		 *
+ 136:Lib/LightweightRingBuff.h **** 		 *  If the data is to be removed in a loop, store the total number of bytes stored in the
+ 137:Lib/LightweightRingBuff.h **** 		 *  buffer (via a call to the \ref RingBuffer_GetCount() function) in a temporary variable
+ 138:Lib/LightweightRingBuff.h **** 		 *  to reduce the time spent in atomicity locks.
+ 139:Lib/LightweightRingBuff.h **** 		 *
+ 140:Lib/LightweightRingBuff.h **** 		 *  \param[in,out] Buffer  Pointer to a ring buffer structure to insert into
+ 141:Lib/LightweightRingBuff.h **** 		 *
+ 142:Lib/LightweightRingBuff.h **** 		 *  \return Boolean true if the buffer contains no free space, false otherwise
+ 143:Lib/LightweightRingBuff.h **** 		 */		 
+ 144:Lib/LightweightRingBuff.h **** 		static inline bool RingBuffer_IsEmpty(RingBuff_t* const Buffer)
+ 145:Lib/LightweightRingBuff.h **** 		{
+ 146:Lib/LightweightRingBuff.h **** 			return (RingBuffer_GetCount(Buffer) == 0);
+ 147:Lib/LightweightRingBuff.h **** 		}
+ 148:Lib/LightweightRingBuff.h **** 
+ 149:Lib/LightweightRingBuff.h **** 		/** Inserts an element into the ring buffer.
+ 150:Lib/LightweightRingBuff.h **** 		 *
+ 151:Lib/LightweightRingBuff.h **** 		 *  \note Only one execution thread (main program thread or an ISR) may insert into a single buff
+ 152:Lib/LightweightRingBuff.h **** 		 *        otherwise data corruption may occur. Insertion and removal may occur from different exe
+ 153:Lib/LightweightRingBuff.h **** 		 *        threads.
+ 154:Lib/LightweightRingBuff.h **** 		 *
+ 155:Lib/LightweightRingBuff.h **** 		 *  \param[in,out] Buffer  Pointer to a ring buffer structure to insert into
+ 156:Lib/LightweightRingBuff.h **** 		 *  \param[in]     Data    Data element to insert into the buffer
+ 157:Lib/LightweightRingBuff.h **** 		 */
+ 158:Lib/LightweightRingBuff.h **** 		static inline void RingBuffer_Insert(RingBuff_t* const Buffer,
+ 159:Lib/LightweightRingBuff.h **** 		                                     const RingBuff_Data_t Data)
+ 160:Lib/LightweightRingBuff.h **** 		{
+  15               		.loc 1 160 0
+  16               		.cfi_startproc
+  17               	.LVL0:
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+ 161:Lib/LightweightRingBuff.h **** 			*Buffer->In = Data;
+  22               		.loc 1 161 0
+  23 0000 FC01      		movw r30,r24
+  24 0002 E058      		subi r30,-128
+  25 0004 FF4F      		sbci r31,-1
+  26 0006 A081      		ld r26,Z
+  27 0008 B181      		ldd r27,Z+1
+  28 000a 6C93      		st X,r22
+ 162:Lib/LightweightRingBuff.h **** 			
+ 163:Lib/LightweightRingBuff.h **** 			if (++Buffer->In == &Buffer->Buffer[BUFFER_SIZE])
+  29               		.loc 1 163 0
+  30 000c A081      		ld r26,Z
+  31 000e B181      		ldd r27,Z+1
+  32 0010 9D01      		movw r18,r26
+  33 0012 2F5F      		subi r18,-1
+  34 0014 3F4F      		sbci r19,-1
+  35 0016 3183      		std Z+1,r19
+  36 0018 2083      		st Z,r18
+  37 001a 2E17      		cp r18,r30
+  38 001c 3F07      		cpc r19,r31
+  39 001e 01F4      		brne .L2
+ 164:Lib/LightweightRingBuff.h **** 			  Buffer->In = Buffer->Buffer;
+  40               		.loc 1 164 0
+  41 0020 1296      		adiw r26,1+1
+  42 0022 9C93      		st X,r25
+  43 0024 8E93      		st -X,r24
+  44 0026 1197      		sbiw r26,1
+  45               	.L2:
+  46               	.LBB41:
+ 165:Lib/LightweightRingBuff.h **** 
+ 166:Lib/LightweightRingBuff.h **** 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  47               		.loc 1 166 0
+  48 0028 2FB7      		in r18,__SREG__
+  49               	.LVL1:
+  50               	.LBB42:
+  51               	.LBB43:
+  52               		.file 2 "/usr/lib/avr/include/util/atomic.h"
+   1:/usr/lib/avr/include/util/atomic.h **** /* Copyright (c) 2007 Dean Camera
+   2:/usr/lib/avr/include/util/atomic.h ****    All rights reserved.
+   3:/usr/lib/avr/include/util/atomic.h **** 
+   4:/usr/lib/avr/include/util/atomic.h ****    Redistribution and use in source and binary forms, with or without
+   5:/usr/lib/avr/include/util/atomic.h ****    modification, are permitted provided that the following conditions are met:
+   6:/usr/lib/avr/include/util/atomic.h **** 
+   7:/usr/lib/avr/include/util/atomic.h ****    * Redistributions of source code must retain the above copyright
+   8:/usr/lib/avr/include/util/atomic.h ****      notice, this list of conditions and the following disclaimer.
+   9:/usr/lib/avr/include/util/atomic.h **** 
+  10:/usr/lib/avr/include/util/atomic.h ****    * Redistributions in binary form must reproduce the above copyright
+  11:/usr/lib/avr/include/util/atomic.h ****      notice, this list of conditions and the following disclaimer in
+  12:/usr/lib/avr/include/util/atomic.h ****      the documentation and/or other materials provided with the
+  13:/usr/lib/avr/include/util/atomic.h ****      distribution.
+  14:/usr/lib/avr/include/util/atomic.h **** 
+  15:/usr/lib/avr/include/util/atomic.h ****    * Neither the name of the copyright holders nor the names of
+  16:/usr/lib/avr/include/util/atomic.h ****      contributors may be used to endorse or promote products derived
+  17:/usr/lib/avr/include/util/atomic.h ****      from this software without specific prior written permission.
+  18:/usr/lib/avr/include/util/atomic.h **** 
+  19:/usr/lib/avr/include/util/atomic.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  20:/usr/lib/avr/include/util/atomic.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  21:/usr/lib/avr/include/util/atomic.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  22:/usr/lib/avr/include/util/atomic.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  23:/usr/lib/avr/include/util/atomic.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  24:/usr/lib/avr/include/util/atomic.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  25:/usr/lib/avr/include/util/atomic.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  26:/usr/lib/avr/include/util/atomic.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  27:/usr/lib/avr/include/util/atomic.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  28:/usr/lib/avr/include/util/atomic.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  29:/usr/lib/avr/include/util/atomic.h ****   POSSIBILITY OF SUCH DAMAGE.
+  30:/usr/lib/avr/include/util/atomic.h **** */
+  31:/usr/lib/avr/include/util/atomic.h **** 
+  32:/usr/lib/avr/include/util/atomic.h **** /* $Id$ */
+  33:/usr/lib/avr/include/util/atomic.h **** 
+  34:/usr/lib/avr/include/util/atomic.h **** #ifndef _UTIL_ATOMIC_H_
+  35:/usr/lib/avr/include/util/atomic.h **** #define _UTIL_ATOMIC_H_ 1
+  36:/usr/lib/avr/include/util/atomic.h **** 
+  37:/usr/lib/avr/include/util/atomic.h **** #include <avr/io.h>
+  38:/usr/lib/avr/include/util/atomic.h **** #include <avr/interrupt.h>
+  39:/usr/lib/avr/include/util/atomic.h **** 
+  40:/usr/lib/avr/include/util/atomic.h **** #if !defined(__DOXYGEN__)
+  41:/usr/lib/avr/include/util/atomic.h **** /* Internal helper functions. */
+  42:/usr/lib/avr/include/util/atomic.h **** static __inline__ uint8_t __iSeiRetVal(void)
+  43:/usr/lib/avr/include/util/atomic.h **** {
+  44:/usr/lib/avr/include/util/atomic.h ****     sei();
+  45:/usr/lib/avr/include/util/atomic.h ****     return 1;
+  46:/usr/lib/avr/include/util/atomic.h **** }
+  47:/usr/lib/avr/include/util/atomic.h **** 
+  48:/usr/lib/avr/include/util/atomic.h **** static __inline__ uint8_t __iCliRetVal(void)
+  49:/usr/lib/avr/include/util/atomic.h **** {
+  50:/usr/lib/avr/include/util/atomic.h ****     cli();
+  53               		.loc 2 50 0
+  54               	/* #APP */
+  55               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+  56 002a F894      		cli
+  57               	 ;  0 "" 2
+  58               	.LVL2:
+  59               	/* #NOAPP */
+  60               	.LBE43:
+  61               	.LBE42:
+ 167:Lib/LightweightRingBuff.h **** 			{
+ 168:Lib/LightweightRingBuff.h **** 				Buffer->Count++;
+  62               		.loc 1 168 0
+  63 002c FC01      		movw r30,r24
+  64 002e EC57      		subi r30,124
+  65 0030 FF4F      		sbci r31,-1
+  66 0032 8081      		ld r24,Z
+  67               	.LVL3:
+  68 0034 8F5F      		subi r24,lo8(-(1))
+  69 0036 8083      		st Z,r24
+  70               	.LVL4:
+  71               	.LBB44:
+  72               	.LBB45:
+  51:/usr/lib/avr/include/util/atomic.h ****     return 1;
+  52:/usr/lib/avr/include/util/atomic.h **** }
+  53:/usr/lib/avr/include/util/atomic.h **** 
+  54:/usr/lib/avr/include/util/atomic.h **** static __inline__ void __iSeiParam(const uint8_t *__s)
+  55:/usr/lib/avr/include/util/atomic.h **** {
+  56:/usr/lib/avr/include/util/atomic.h ****     sei();
+  57:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+  58:/usr/lib/avr/include/util/atomic.h ****     (void)__s;
+  59:/usr/lib/avr/include/util/atomic.h **** }
+  60:/usr/lib/avr/include/util/atomic.h **** 
+  61:/usr/lib/avr/include/util/atomic.h **** static __inline__ void __iCliParam(const uint8_t *__s)
+  62:/usr/lib/avr/include/util/atomic.h **** {
+  63:/usr/lib/avr/include/util/atomic.h ****     cli();
+  64:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+  65:/usr/lib/avr/include/util/atomic.h ****     (void)__s;
+  66:/usr/lib/avr/include/util/atomic.h **** }
+  67:/usr/lib/avr/include/util/atomic.h **** 
+  68:/usr/lib/avr/include/util/atomic.h **** static __inline__ void __iRestore(const  uint8_t *__s)
+  69:/usr/lib/avr/include/util/atomic.h **** {
+  70:/usr/lib/avr/include/util/atomic.h ****     SREG = *__s;
+  73               		.loc 2 70 0
+  74 0038 2FBF      		out __SREG__,r18
+  71:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+  75               		.loc 2 71 0
+  76               	.LVL5:
+  77 003a 0895      		ret
+  78               	.LBE45:
+  79               	.LBE44:
+  80               	.LBE41:
+  81               		.cfi_endproc
+  82               	.LFE77:
+  84               		.section	.text.RingBuffer_Remove,"ax",@progbits
+  86               	RingBuffer_Remove:
+  87               	.LFB78:
+ 169:Lib/LightweightRingBuff.h **** 			}
+ 170:Lib/LightweightRingBuff.h **** 		}
+ 171:Lib/LightweightRingBuff.h **** 
+ 172:Lib/LightweightRingBuff.h **** 		/** Removes an element from the ring buffer.
+ 173:Lib/LightweightRingBuff.h **** 		 *
+ 174:Lib/LightweightRingBuff.h **** 		 *  \note Only one execution thread (main program thread or an ISR) may remove from a single buff
+ 175:Lib/LightweightRingBuff.h **** 		 *        otherwise data corruption may occur. Insertion and removal may occur from different exe
+ 176:Lib/LightweightRingBuff.h **** 		 *        threads.
+ 177:Lib/LightweightRingBuff.h **** 		 *
+ 178:Lib/LightweightRingBuff.h **** 		 *  \param[in,out] Buffer  Pointer to a ring buffer structure to retrieve from
+ 179:Lib/LightweightRingBuff.h **** 		 *
+ 180:Lib/LightweightRingBuff.h **** 		 *  \return Next data element stored in the buffer
+ 181:Lib/LightweightRingBuff.h **** 		 */
+ 182:Lib/LightweightRingBuff.h **** 		static inline RingBuff_Data_t RingBuffer_Remove(RingBuff_t* const Buffer)
+ 183:Lib/LightweightRingBuff.h **** 		{
+  88               		.loc 1 183 0
+  89               		.cfi_startproc
+  90               	.LVL6:
+  91               	/* prologue: function */
+  92               	/* frame size = 0 */
+  93               	/* stack size = 0 */
+  94               	.L__stack_usage = 0
+ 184:Lib/LightweightRingBuff.h **** 			RingBuff_Data_t Data = *Buffer->Out;
+  95               		.loc 1 184 0
+  96 0000 DC01      		movw r26,r24
+  97 0002 AE57      		subi r26,126
+  98 0004 BF4F      		sbci r27,-1
+  99 0006 ED91      		ld r30,X+
+ 100 0008 FC91      		ld r31,X
+ 101 000a 1197      		sbiw r26,1
+ 102 000c 2191      		ld r18,Z+
+ 103               	.LVL7:
+ 185:Lib/LightweightRingBuff.h **** 			
+ 186:Lib/LightweightRingBuff.h **** 			if (++Buffer->Out == &Buffer->Buffer[BUFFER_SIZE])
+ 104               		.loc 1 186 0
+ 105 000e 1196      		adiw r26,1
+ 106 0010 FC93      		st X,r31
+ 107 0012 EE93      		st -X,r30
+ 108 0014 AC01      		movw r20,r24
+ 109 0016 4058      		subi r20,-128
+ 110 0018 5F4F      		sbci r21,-1
+ 111 001a E417      		cp r30,r20
+ 112 001c F507      		cpc r31,r21
+ 113 001e 01F4      		brne .L5
+ 187:Lib/LightweightRingBuff.h **** 			  Buffer->Out = Buffer->Buffer;
+ 114               		.loc 1 187 0
+ 115 0020 8D93      		st X+,r24
+ 116 0022 9C93      		st X,r25
+ 117               	.L5:
+ 118               	.LBB46:
+ 188:Lib/LightweightRingBuff.h **** 
+ 189:Lib/LightweightRingBuff.h **** 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+ 119               		.loc 1 189 0
+ 120 0024 3FB7      		in r19,__SREG__
+ 121               	.LVL8:
+ 122               	.LBB47:
+ 123               	.LBB48:
+  50:/usr/lib/avr/include/util/atomic.h ****     return 1;
+ 124               		.loc 2 50 0
+ 125               	/* #APP */
+ 126               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+ 127 0026 F894      		cli
+ 128               	 ;  0 "" 2
+ 129               	.LVL9:
+ 130               	/* #NOAPP */
+ 131               	.LBE48:
+ 132               	.LBE47:
+ 190:Lib/LightweightRingBuff.h **** 			{
+ 191:Lib/LightweightRingBuff.h **** 				Buffer->Count--;
+ 133               		.loc 1 191 0
+ 134 0028 FC01      		movw r30,r24
+ 135 002a EC57      		subi r30,124
+ 136 002c FF4F      		sbci r31,-1
+ 137 002e 9081      		ld r25,Z
+ 138 0030 9150      		subi r25,lo8(-(-1))
+ 139 0032 9083      		st Z,r25
+ 140               	.LVL10:
+ 141               	.LBB49:
+ 142               	.LBB50:
+  70:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+ 143               		.loc 2 70 0
+ 144 0034 3FBF      		out __SREG__,r19
+ 145               		.loc 2 71 0
+ 146               	.LVL11:
+ 147               	.LBE50:
+ 148               	.LBE49:
+ 149               	.LBE46:
+ 192:Lib/LightweightRingBuff.h **** 			}
+ 193:Lib/LightweightRingBuff.h **** 			
+ 194:Lib/LightweightRingBuff.h **** 			return Data;
+ 195:Lib/LightweightRingBuff.h **** 		}
+ 150               		.loc 1 195 0
+ 151 0036 822F      		mov r24,r18
+ 152               	.LVL12:
+ 153 0038 0895      		ret
+ 154               		.cfi_endproc
+ 155               	.LFE78:
+ 157               		.section	.text.parseUSBMidiMessage,"ax",@progbits
+ 158               	.global	parseUSBMidiMessage
+ 160               	parseUSBMidiMessage:
+ 161               	.LFB91:
+ 162               		.file 3 "dualMoco.c"
+   1:dualMoco.c    **** /*
+   2:dualMoco.c    ****      dualMocoLUFA Project
+   3:dualMoco.c    ****      Copyright (C) 2013 by morecat_lab
+   4:dualMoco.c    **** 
+   5:dualMoco.c    ****      2013/09/22
+   6:dualMoco.c    ****               
+   7:dualMoco.c    ****      http://morecatlab.akiba.coocan.jp/
+   8:dualMoco.c    **** 
+   9:dualMoco.c    ****      based on LUFA-100807
+  10:dualMoco.c    **** */
+  11:dualMoco.c    **** /*
+  12:dualMoco.c    ****              LUFA Library
+  13:dualMoco.c    ****      Copyright (C) Dean Camera, 2010.
+  14:dualMoco.c    ****               
+  15:dualMoco.c    ****   dean [at] fourwalledcubicle [dot] com
+  16:dualMoco.c    ****       www.fourwalledcubicle.com
+  17:dualMoco.c    **** */
+  18:dualMoco.c    **** /*
+  19:dualMoco.c    ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  20:dualMoco.c    **** 
+  21:dualMoco.c    ****   Permission to use, copy, modify, distribute, and sell this 
+  22:dualMoco.c    ****   software and its documentation for any purpose is hereby granted
+  23:dualMoco.c    ****   without fee, provided that the above copyright notice appear in 
+  24:dualMoco.c    ****   all copies and that both that the copyright notice and this
+  25:dualMoco.c    ****   permission notice and warranty disclaimer appear in supporting 
+  26:dualMoco.c    ****   documentation, and that the name of the author not be used in 
+  27:dualMoco.c    ****   advertising or publicity pertaining to distribution of the 
+  28:dualMoco.c    ****   software without specific, written prior permission.
+  29:dualMoco.c    **** 
+  30:dualMoco.c    ****   The author disclaim all warranties with regard to this
+  31:dualMoco.c    ****   software, including all implied warranties of merchantability
+  32:dualMoco.c    ****   and fitness.  In no event shall the author be liable for any
+  33:dualMoco.c    ****   special, indirect or consequential damages or any damages
+  34:dualMoco.c    ****   whatsoever resulting from loss of use, data or profits, whether
+  35:dualMoco.c    ****   in an action of contract, negligence or other tortious action,
+  36:dualMoco.c    ****   arising out of or in connection with the use or performance of
+  37:dualMoco.c    ****   this software.
+  38:dualMoco.c    **** */
+  39:dualMoco.c    **** 
+  40:dualMoco.c    **** /** \file
+  41:dualMoco.c    ****  *
+  42:dualMoco.c    ****  *  Main source file for the dualMocoLUFA project. 
+  43:dualMoco.c    ****  * This file contains the main tasks of the project and is responsible for the initial application 
+  44:dualMoco.c    ****  */
+  45:dualMoco.c    **** 
+  46:dualMoco.c    **** #include "dualMoco.h"
+  47:dualMoco.c    **** 
+  48:dualMoco.c    **** uchar mocoMode = 0;	/* 0: Serial , 1: MIDI */
+  49:dualMoco.c    **** 
+  50:dualMoco.c    **** /** Circular buffer to hold data from the host before it is sent to the device via the serial port.
+  51:dualMoco.c    **** RingBuff_t USBtoUSART_Buffer;
+  52:dualMoco.c    **** 
+  53:dualMoco.c    **** /** Circular buffer to hold data from the serial port before it is sent to the host. */
+  54:dualMoco.c    **** RingBuff_t USARTtoUSB_Buffer;
+  55:dualMoco.c    **** 
+  56:dualMoco.c    **** /** Pulse generation counters to keep track of the number of milliseconds remaining for each pulse 
+  57:dualMoco.c    **** volatile struct
+  58:dualMoco.c    **** {
+  59:dualMoco.c    **** 	uint8_t TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
+  60:dualMoco.c    **** 	uint8_t RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
+  61:dualMoco.c    **** 	uint8_t PingPongLEDPulse; /**< Milliseconds remaining for enumeration Tx/Rx ping-pong LED pulse */
+  62:dualMoco.c    **** } PulseMSRemaining;
+  63:dualMoco.c    **** 
+  64:dualMoco.c    **** #define    RX_SIZE        (HW_CDC_BULK_IN_SIZE)
+  65:dualMoco.c    **** static uchar utxrdy = FALSE;	/* USB Packet ready in utx_buf */
+  66:dualMoco.c    **** static uchar rx_buf[RX_SIZE];	/* tempory buffer */
+  67:dualMoco.c    **** static uchar utx_buf[RX_SIZE];	/* BULK_IN buffer */
+  68:dualMoco.c    **** 
+  69:dualMoco.c    **** #define    TX_SIZE        (HW_CDC_BULK_OUT_SIZE<<2)
+  70:dualMoco.c    **** #define    TX_MASK        (TX_SIZE-1)
+  71:dualMoco.c    **** static uchar uwptr = 0, irptr = 0;
+  72:dualMoco.c    **** static uchar tx_buf[TX_SIZE];
+  73:dualMoco.c    **** 
+  74:dualMoco.c    **** /** LUFA CDC Class driver interface configuration and state information. This structure is
+  75:dualMoco.c    ****  *  passed to all CDC Class driver functions, so that multiple instances of the same class
+  76:dualMoco.c    ****  *  within a device can be differentiated from one another.
+  77:dualMoco.c    ****  */
+  78:dualMoco.c    **** /* for serial */
+  79:dualMoco.c    **** USB_ClassInfo_CDC_Device_t VirtualSerial_CDC_Interface =
+  80:dualMoco.c    **** 	{
+  81:dualMoco.c    **** 		.Config = 
+  82:dualMoco.c    **** 			{
+  83:dualMoco.c    **** 				.ControlInterfaceNumber         = 0,
+  84:dualMoco.c    **** 
+  85:dualMoco.c    **** 				.DataINEndpointNumber           = CDC_TX_EPNUM,
+  86:dualMoco.c    **** 				.DataINEndpointSize             = CDC_TXRX_EPSIZE,
+  87:dualMoco.c    **** 				.DataINEndpointDoubleBank       = false,
+  88:dualMoco.c    **** 
+  89:dualMoco.c    **** 				.DataOUTEndpointNumber          = CDC_RX_EPNUM,
+  90:dualMoco.c    **** 				.DataOUTEndpointSize            = CDC_TXRX_EPSIZE,
+  91:dualMoco.c    **** 				.DataOUTEndpointDoubleBank      = false,
+  92:dualMoco.c    **** 
+  93:dualMoco.c    **** 				.NotificationEndpointNumber     = CDC_NOTIFICATION_EPNUM,
+  94:dualMoco.c    **** 				.NotificationEndpointSize       = CDC_NOTIFICATION_EPSIZE,
+  95:dualMoco.c    **** 				.NotificationEndpointDoubleBank = false,
+  96:dualMoco.c    **** 			},
+  97:dualMoco.c    **** 	};
+  98:dualMoco.c    **** /* for MIDI */
+  99:dualMoco.c    **** USB_ClassInfo_MIDI_Device_t Keyboard_MIDI_Interface =
+ 100:dualMoco.c    ****   	{
+ 101:dualMoco.c    **** 		.Config =
+ 102:dualMoco.c    **** 			{
+ 103:dualMoco.c    **** 				.StreamingInterfaceNumber = 1,
+ 104:dualMoco.c    ****     
+ 105:dualMoco.c    **** 				.DataINEndpointNumber      = MIDI_STREAM_IN_EPNUM,
+ 106:dualMoco.c    **** 				.DataINEndpointSize        = MIDI_STREAM_EPSIZE,
+ 107:dualMoco.c    **** 				.DataINEndpointDoubleBank  = false,
+ 108:dualMoco.c    **** 
+ 109:dualMoco.c    **** 				.DataOUTEndpointNumber     = MIDI_STREAM_OUT_EPNUM,
+ 110:dualMoco.c    **** 				.DataOUTEndpointSize       = MIDI_STREAM_EPSIZE,
+ 111:dualMoco.c    **** 				.DataOUTEndpointDoubleBank = false,
+ 112:dualMoco.c    **** 			},
+ 113:dualMoco.c    **** 	};
+ 114:dualMoco.c    **** 
+ 115:dualMoco.c    **** void parseUSBMidiMessage(uchar *data, uchar len) {
+ 163               		.loc 3 115 0
+ 164               		.cfi_startproc
+ 165               	.LVL13:
+ 166 0000 CF93      		push r28
+ 167               	.LCFI0:
+ 168               		.cfi_def_cfa_offset 3
+ 169               		.cfi_offset 28, -2
+ 170 0002 DF93      		push r29
+ 171               	.LCFI1:
+ 172               		.cfi_def_cfa_offset 4
+ 173               		.cfi_offset 29, -3
+ 174               	/* prologue: function */
+ 175               	/* frame size = 0 */
+ 176               	/* stack size = 2 */
+ 177               	.L__stack_usage = 2
+ 178 0004 FC01      		movw r30,r24
+ 179 0006 9091 0000 		lds r25,uwptr
+ 180               	.LVL14:
+ 181               	.L14:
+ 116:dualMoco.c    ****   uchar cin = (*data) & 0x0f;	/* CABLE NOを無視する */
+ 182               		.loc 3 116 0
+ 183 000a 3081      		ld r19,Z
+ 184 000c 832F      		mov r24,r19
+ 185 000e 8F70      		andi r24,lo8(15)
+ 186               	.LVL15:
+ 117:dualMoco.c    ****   uchar i;
+ 118:dualMoco.c    **** 
+ 119:dualMoco.c    ****   if (cin > 1) {		/* ignore cin == 0 and cin == 1 */
+ 187               		.loc 3 119 0
+ 188 0010 8230      		cpi r24,lo8(2)
+ 189 0012 00F4      		brsh .L7
+ 190               	.L11:
+ 120:dualMoco.c    ****     for (i = 1 ; i < 4 ; i++) {
+ 121:dualMoco.c    ****       tx_buf[uwptr++] = *(data + i); /* copy to buffer */
+ 122:dualMoco.c    ****       uwptr &= TX_MASK;
+ 123:dualMoco.c    ****       if (i == 1) {
+ 124:dualMoco.c    **** 	if ((cin == 5) || /* single byte system common */
+ 125:dualMoco.c    **** 	    (cin == 15))  /* single byte */
+ 126:dualMoco.c    **** 	  break;
+ 127:dualMoco.c    ****       }
+ 128:dualMoco.c    ****       if (i == 2) {
+ 129:dualMoco.c    **** 	if ((cin == 2) ||  /* two-byte system common */
+ 130:dualMoco.c    **** 	    (cin == 6) ||  /* system ex end with 2 bytes */
+ 131:dualMoco.c    **** 	    (cin == 12) || /* program change */
+ 132:dualMoco.c    **** 	    (cin == 13))   /* channel pressure */
+ 133:dualMoco.c    **** 	  break;
+ 134:dualMoco.c    ****       }
+ 135:dualMoco.c    ****     }
+ 136:dualMoco.c    ****   }
+ 137:dualMoco.c    **** 
+ 138:dualMoco.c    ****   if (len > 4) {
+ 191               		.loc 3 138 0
+ 192 0014 6530      		cpi r22,lo8(5)
+ 193 0016 00F0      		brlo .L26
+ 139:dualMoco.c    ****     parseUSBMidiMessage(data+4, len-4);
+ 194               		.loc 3 139 0
+ 195 0018 6450      		subi r22,lo8(-(-4))
+ 196 001a 3496      		adiw r30,4
+ 197 001c 00C0      		rjmp .L14
+ 198               	.L7:
+ 199 001e EF01      		movw r28,r30
+ 200 0020 2196      		adiw r28,1
+ 119:dualMoco.c    ****     for (i = 1 ; i < 4 ; i++) {
+ 201               		.loc 3 119 0
+ 202 0022 21E0      		ldi r18,lo8(1)
+ 129:dualMoco.c    **** 	    (cin == 6) ||  /* system ex end with 2 bytes */
+ 203               		.loc 3 129 0
+ 204 0024 3B70      		andi r19,lo8(11)
+ 130:dualMoco.c    **** 	    (cin == 12) || /* program change */
+ 205               		.loc 3 130 0
+ 206 0026 44EF      		ldi r20,lo8(-12)
+ 207 0028 480F      		add r20,r24
+ 208               	.L13:
+ 209               	.LVL16:
+ 121:dualMoco.c    ****       uwptr &= TX_MASK;
+ 210               		.loc 3 121 0
+ 211 002a 5991      		ld r21,Y+
+ 212 002c A92F      		mov r26,r25
+ 213 002e B0E0      		ldi r27,0
+ 214 0030 A050      		subi r26,lo8(-(tx_buf))
+ 215 0032 B040      		sbci r27,hi8(-(tx_buf))
+ 216 0034 5C93      		st X,r21
+ 122:dualMoco.c    ****       if (i == 1) {
+ 217               		.loc 3 122 0
+ 218 0036 9F5F      		subi r25,lo8(-(1))
+ 219 0038 9F71      		andi r25,lo8(31)
+ 123:dualMoco.c    **** 	if ((cin == 5) || /* single byte system common */
+ 220               		.loc 3 123 0
+ 221 003a 2130      		cpi r18,lo8(1)
+ 222 003c 01F4      		brne .L10
+ 223               	.LVL17:
+ 124:dualMoco.c    **** 	    (cin == 15))  /* single byte */
+ 224               		.loc 3 124 0
+ 225 003e 8530      		cpi r24,lo8(5)
+ 226 0040 01F0      		breq .L11
+ 124:dualMoco.c    **** 	    (cin == 15))  /* single byte */
+ 227               		.loc 3 124 0 is_stmt 0 discriminator 1
+ 228 0042 8F30      		cpi r24,lo8(15)
+ 229 0044 01F4      		brne .L12
+ 230 0046 00C0      		rjmp .L11
+ 231               	.LVL18:
+ 232               	.L10:
+ 128:dualMoco.c    **** 	if ((cin == 2) ||  /* two-byte system common */
+ 233               		.loc 3 128 0 is_stmt 1
+ 234 0048 2230      		cpi r18,lo8(2)
+ 235 004a 01F4      		brne .L12
+ 129:dualMoco.c    **** 	    (cin == 6) ||  /* system ex end with 2 bytes */
+ 236               		.loc 3 129 0
+ 237 004c 3230      		cpi r19,lo8(2)
+ 238 004e 01F0      		breq .L11
+ 130:dualMoco.c    **** 	    (cin == 12) || /* program change */
+ 239               		.loc 3 130 0
+ 240 0050 4230      		cpi r20,lo8(2)
+ 241 0052 00F0      		brlo .L11
+ 242               	.LVL19:
+ 243               	.L12:
+ 120:dualMoco.c    ****       tx_buf[uwptr++] = *(data + i); /* copy to buffer */
+ 244               		.loc 3 120 0 discriminator 2
+ 245 0054 2F5F      		subi r18,lo8(-(1))
+ 246               	.LVL20:
+ 247 0056 2430      		cpi r18,lo8(4)
+ 248 0058 01F4      		brne .L13
+ 249 005a 00C0      		rjmp .L11
+ 250               	.LVL21:
+ 251               	.L26:
+ 252 005c 9093 0000 		sts uwptr,r25
+ 253               	/* epilogue start */
+ 140:dualMoco.c    ****   }
+ 141:dualMoco.c    **** }
+ 254               		.loc 3 141 0
+ 255 0060 DF91      		pop r29
+ 256 0062 CF91      		pop r28
+ 257 0064 0895      		ret
+ 258               		.cfi_endproc
+ 259               	.LFE91:
+ 261               		.section	.text.parseSerialMidiMessage,"ax",@progbits
+ 262               	.global	parseSerialMidiMessage
+ 264               	parseSerialMidiMessage:
+ 265               	.LFB92:
+ 142:dualMoco.c    **** 
+ 143:dualMoco.c    **** uchar parseSerialMidiMessage(uchar RxByte) {
+ 266               		.loc 3 143 0
+ 267               		.cfi_startproc
+ 268               	.LVL22:
+ 269               	/* prologue: function */
+ 270               	/* frame size = 0 */
+ 271               	/* stack size = 0 */
+ 272               	.L__stack_usage = 0
+ 273 0000 982F      		mov r25,r24
+ 144:dualMoco.c    ****   static uchar PC = 0;
+ 145:dualMoco.c    ****   static uchar SysEx = FALSE;
+ 146:dualMoco.c    ****   static uchar stateTransTable[] = {
+ 147:dualMoco.c    ****     0, 				/* 0 dummy */
+ 148:dualMoco.c    ****     0,				/* 1 dummy */
+ 149:dualMoco.c    ****     3,				/* 2->3 NOTE OFF (3) */
+ 150:dualMoco.c    ****     2 | 0x80,			/* 3->2 */
+ 151:dualMoco.c    ****     5,				/* 4->5 NOTE ON (3) */
+ 152:dualMoco.c    ****     4 | 0x80,			/* 5->4 */
+ 153:dualMoco.c    ****     7,				/* 6->7 Polyphonic key pressure (3) */
+ 154:dualMoco.c    ****     6 | 0x80,			/* 7->6 */
+ 155:dualMoco.c    ****     9,				/* 8->9 Control Change (3) */
+ 156:dualMoco.c    ****     8 | 0x80,			/* 8->9 */
+ 157:dualMoco.c    ****     10 | 0x80,			/* 10->10 program change (2) */
+ 158:dualMoco.c    ****     0,				/* dummy */
+ 159:dualMoco.c    ****     12 | 0x80,			/* 12->12 Channel Pressure (2) */
+ 160:dualMoco.c    ****     0,				/* 13 dummy */
+ 161:dualMoco.c    ****     15,				/* 14->15 Pitch Bend (3) */
+ 162:dualMoco.c    ****     14 | 0x80			/* 15->14 */
+ 163:dualMoco.c    ****   };
+ 164:dualMoco.c    **** 
+ 165:dualMoco.c    ****   if(SysEx){  /* MIDI System Message */
+ 274               		.loc 3 165 0
+ 275 0002 8091 0000 		lds r24,SysEx.3320
+ 276               	.LVL23:
+ 277 0006 8823      		tst r24
+ 278 0008 01F0      		breq .L28
+ 166:dualMoco.c    ****     if(RxByte == 0xf7){		/* MIDI_EndSysEx */
+ 279               		.loc 3 166 0
+ 280 000a 973F      		cpi r25,lo8(-9)
+ 281 000c 01F4      		brne .L36
+ 167:dualMoco.c    ****       SysEx = FALSE;
+ 282               		.loc 3 167 0
+ 283 000e 1092 0000 		sts SysEx.3320,__zero_reg__
+ 284               	.L36:
+ 168:dualMoco.c    ****     }
+ 169:dualMoco.c    ****     return FALSE;
+ 285               		.loc 3 169 0
+ 286 0012 80E0      		ldi r24,0
+ 287 0014 0895      		ret
+ 288               	.L28:
+ 170:dualMoco.c    ****   }
+ 171:dualMoco.c    ****   if (RxByte >= 0xF8){		/* Single Byte Message */
+ 289               		.loc 3 171 0
+ 290 0016 983F      		cpi r25,lo8(-8)
+ 291 0018 00F0      		brlo .L31
+ 172:dualMoco.c    ****     utx_buf[0] = 0x0f;
+ 292               		.loc 3 172 0
+ 293 001a 8FE0      		ldi r24,lo8(15)
+ 294 001c 8093 0000 		sts utx_buf,r24
+ 173:dualMoco.c    ****     utx_buf[1] = RxByte;
+ 295               		.loc 3 173 0
+ 296 0020 9093 0000 		sts utx_buf+1,r25
+ 174:dualMoco.c    ****     utx_buf[2] = 0;
+ 297               		.loc 3 174 0
+ 298 0024 1092 0000 		sts utx_buf+2,__zero_reg__
+ 175:dualMoco.c    ****     utx_buf[3] = 0;
+ 299               		.loc 3 175 0
+ 300 0028 1092 0000 		sts utx_buf+3,__zero_reg__
+ 301 002c 00C0      		rjmp .L37
+ 302               	.L31:
+ 176:dualMoco.c    ****     return TRUE;
+ 177:dualMoco.c    ****   }
+ 178:dualMoco.c    **** 
+ 179:dualMoco.c    ****   if(RxByte > 0x7F){		/* Channel message */
+ 303               		.loc 3 179 0
+ 304 002e 97FF      		sbrs r25,7
+ 305 0030 00C0      		rjmp .L32
+ 180:dualMoco.c    ****     if(RxByte == 0xf0){		/* MIDI_StartSysEx */
+ 306               		.loc 3 180 0
+ 307 0032 903F      		cpi r25,lo8(-16)
+ 308 0034 01F4      		brne .L33
+ 181:dualMoco.c    ****       SysEx = TRUE;
+ 309               		.loc 3 181 0
+ 310 0036 91E0      		ldi r25,lo8(1)
+ 311               	.LVL24:
+ 312 0038 9093 0000 		sts SysEx.3320,r25
+ 182:dualMoco.c    ****       return FALSE;
+ 313               		.loc 3 182 0
+ 314 003c 0895      		ret
+ 315               	.LVL25:
+ 316               	.L33:
+ 183:dualMoco.c    ****     }
+ 184:dualMoco.c    ****     PC = 0;
+ 317               		.loc 3 184 0
+ 318 003e 1092 0000 		sts PC.3319,__zero_reg__
+ 319               	.L32:
+ 185:dualMoco.c    ****   }
+ 186:dualMoco.c    **** 
+ 187:dualMoco.c    ****   if (PC == 0) {
+ 320               		.loc 3 187 0
+ 321 0042 8091 0000 		lds r24,PC.3319
+ 322 0046 8111      		cpse r24,__zero_reg__
+ 323 0048 00C0      		rjmp .L34
+ 188:dualMoco.c    ****     PC = (((RxByte >> 4) & 0x07) + 1) * 2;
+ 324               		.loc 3 188 0
+ 325 004a 392F      		mov r19,r25
+ 326 004c 3295      		swap r19
+ 327 004e 3F70      		andi r19,lo8(15)
+ 328 0050 232F      		mov r18,r19
+ 329 0052 2770      		andi r18,lo8(7)
+ 330 0054 220F      		lsl r18
+ 331 0056 2E5F      		subi r18,lo8(-(2))
+ 332 0058 2093 0000 		sts PC.3319,r18
+ 189:dualMoco.c    ****     // conversion
+ 190:dualMoco.c    ****     // 0x80 -> 2, 0x90 -> 4, 0xa0 -> 6, 0xb0 -> 8, 0xc0 -> 10, 0xd0 -> 12, 0xe0 -> 14
+ 191:dualMoco.c    ****     rx_buf[0] = RxByte >> 4;
+ 333               		.loc 3 191 0
+ 334 005c 3093 0000 		sts rx_buf,r19
+ 192:dualMoco.c    ****     rx_buf[1] = RxByte;
+ 335               		.loc 3 192 0
+ 336 0060 9093 0000 		sts rx_buf+1,r25
+ 193:dualMoco.c    ****     rx_buf[3] = 0;
+ 337               		.loc 3 193 0
+ 338 0064 1092 0000 		sts rx_buf+3,__zero_reg__
+ 339 0068 0895      		ret
+ 340               	.L34:
+ 341               	.LBB51:
+ 194:dualMoco.c    ****   } else {
+ 195:dualMoco.c    ****     uchar tt = stateTransTable[PC];
+ 342               		.loc 3 195 0
+ 343 006a E82F      		mov r30,r24
+ 344 006c F0E0      		ldi r31,0
+ 345 006e E050      		subi r30,lo8(-(stateTransTable.3321))
+ 346 0070 F040      		sbci r31,hi8(-(stateTransTable.3321))
+ 347 0072 4081      		ld r20,Z
+ 348               	.LVL26:
+ 196:dualMoco.c    ****     rx_buf[(PC & 1) + 2] = RxByte;
+ 349               		.loc 3 196 0
+ 350 0074 282F      		mov r18,r24
+ 351 0076 2170      		andi r18,1
+ 352 0078 30E0      		ldi r19,0
+ 353 007a F901      		movw r30,r18
+ 354 007c E050      		subi r30,lo8(-(rx_buf))
+ 355 007e F040      		sbci r31,hi8(-(rx_buf))
+ 356 0080 9283      		std Z+2,r25
+ 197:dualMoco.c    ****     PC = tt & 0x0f;
+ 357               		.loc 3 197 0
+ 358 0082 842F      		mov r24,r20
+ 359 0084 8F70      		andi r24,lo8(15)
+ 360 0086 8093 0000 		sts PC.3319,r24
+ 198:dualMoco.c    ****     if ((tt & 0x80) != 0) {
+ 361               		.loc 3 198 0
+ 362 008a 47FF      		sbrs r20,7
+ 363 008c 00C0      		rjmp .L36
+ 199:dualMoco.c    ****       memcpy(utx_buf, rx_buf, 4);
+ 364               		.loc 3 199 0
+ 365 008e 84E0      		ldi r24,lo8(4)
+ 366 0090 E0E0      		ldi r30,lo8(rx_buf)
+ 367 0092 F0E0      		ldi r31,hi8(rx_buf)
+ 368 0094 A0E0      		ldi r26,lo8(utx_buf)
+ 369 0096 B0E0      		ldi r27,hi8(utx_buf)
+ 370               		0:
+ 371 0098 0190      		ld r0,Z+
+ 372 009a 0D92      		st X+,r0
+ 373 009c 8A95      		dec r24
+ 374 009e 01F4      		brne 0b
+ 375               	.LVL27:
+ 376               	.L37:
+ 200:dualMoco.c    ****       return TRUE;
+ 377               		.loc 3 200 0
+ 378 00a0 81E0      		ldi r24,lo8(1)
+ 379               	.LBE51:
+ 201:dualMoco.c    ****     }
+ 202:dualMoco.c    ****   }
+ 203:dualMoco.c    ****   return FALSE;
+ 204:dualMoco.c    **** }
+ 380               		.loc 3 204 0
+ 381 00a2 0895      		ret
+ 382               		.cfi_endproc
+ 383               	.LFE92:
+ 385               		.section	.text.processMIDI,"ax",@progbits
+ 386               	.global	processMIDI
+ 388               	processMIDI:
+ 389               	.LFB94:
+ 205:dualMoco.c    **** 
+ 206:dualMoco.c    **** /** Main program entry point. This routine contains the overall program flow, including initial
+ 207:dualMoco.c    ****  *  setup of all components and the main program loop.
+ 208:dualMoco.c    ****  */
+ 209:dualMoco.c    **** int main(void)
+ 210:dualMoco.c    **** {
+ 211:dualMoco.c    ****   SetupHardware();
+ 212:dualMoco.c    **** 
+ 213:dualMoco.c    ****   if (mocoMode == 1) {
+ 214:dualMoco.c    ****     processMIDI();
+ 215:dualMoco.c    ****   } else {
+ 216:dualMoco.c    ****     processSerial();
+ 217:dualMoco.c    ****   }
+ 218:dualMoco.c    **** }
+ 219:dualMoco.c    **** 
+ 220:dualMoco.c    **** void processMIDI()
+ 221:dualMoco.c    **** {
+ 390               		.loc 3 221 0
+ 391               		.cfi_startproc
+ 392 0000 CF93      		push r28
+ 393               	.LCFI2:
+ 394               		.cfi_def_cfa_offset 3
+ 395               		.cfi_offset 28, -2
+ 396 0002 DF93      		push r29
+ 397               	.LCFI3:
+ 398               		.cfi_def_cfa_offset 4
+ 399               		.cfi_offset 29, -3
+ 400 0004 00D0      		rcall .
+ 401 0006 00D0      		rcall .
+ 402               	.LCFI4:
+ 403               		.cfi_def_cfa_offset 8
+ 404 0008 CDB7      		in r28,__SP_L__
+ 405 000a DEB7      		in r29,__SP_H__
+ 406               	.LCFI5:
+ 407               		.cfi_def_cfa_register 28
+ 408               	/* prologue: function */
+ 409               	/* frame size = 4 */
+ 410               	/* stack size = 6 */
+ 411               	.L__stack_usage = 6
+ 222:dualMoco.c    ****   sei();
+ 412               		.loc 3 222 0
+ 413               	/* #APP */
+ 414               	 ;  222 "dualMoco.c" 1
+ 415 000c 7894      		sei
+ 416               	 ;  0 "" 2
+ 417               	/* #NOAPP */
+ 418               	.LBB61:
+ 223:dualMoco.c    **** 
+ 224:dualMoco.c    ****   for (;;){ 
+ 225:dualMoco.c    ****     /* receive from Serial MIDI line */
+ 226:dualMoco.c    ****     if( UCSR1A & (1<<RXC1)) {
+ 227:dualMoco.c    ****       utxrdy |= parseSerialMidiMessage(UDR1);
+ 228:dualMoco.c    ****       LEDs_TurnOnLEDs(LEDMASK_TX);
+ 229:dualMoco.c    ****       PulseMSRemaining.TxLEDPulse = TX_RX_LED_PULSE_MS;
+ 419               		.loc 3 229 0
+ 420 000e 13E0      		ldi r17,lo8(3)
+ 421               	.L50:
+ 226:dualMoco.c    ****       utxrdy |= parseSerialMidiMessage(UDR1);
+ 422               		.loc 3 226 0
+ 423 0010 8091 C800 		lds r24,200
+ 424 0014 87FF      		sbrs r24,7
+ 425 0016 00C0      		rjmp .L39
+ 227:dualMoco.c    ****       LEDs_TurnOnLEDs(LEDMASK_TX);
+ 426               		.loc 3 227 0
+ 427 0018 8091 CE00 		lds r24,206
+ 428 001c 0E94 0000 		call parseSerialMidiMessage
+ 429               	.LVL28:
+ 430 0020 9091 0000 		lds r25,utxrdy
+ 431 0024 892B      		or r24,r25
+ 432 0026 8093 0000 		sts utxrdy,r24
+ 433               	.LVL29:
+ 434               	.LBB62:
+ 435               	.LBB63:
+ 436               		.file 4 "./Board/LEDs.h"
+   1:./Board/LEDs.h **** /*
+   2:./Board/LEDs.h ****              LUFA Library
+   3:./Board/LEDs.h ****      Copyright (C) Dean Camera, 2010.
+   4:./Board/LEDs.h ****               
+   5:./Board/LEDs.h ****   dean [at] fourwalledcubicle [dot] com
+   6:./Board/LEDs.h ****       www.fourwalledcubicle.com
+   7:./Board/LEDs.h **** */
+   8:./Board/LEDs.h **** 
+   9:./Board/LEDs.h **** /*
+  10:./Board/LEDs.h ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:./Board/LEDs.h **** 
+  12:./Board/LEDs.h ****   Permission to use, copy, modify, distribute, and sell this 
+  13:./Board/LEDs.h ****   software and its documentation for any purpose is hereby granted
+  14:./Board/LEDs.h ****   without fee, provided that the above copyright notice appear in 
+  15:./Board/LEDs.h ****   all copies and that both that the copyright notice and this
+  16:./Board/LEDs.h ****   permission notice and warranty disclaimer appear in supporting 
+  17:./Board/LEDs.h ****   documentation, and that the name of the author not be used in 
+  18:./Board/LEDs.h ****   advertising or publicity pertaining to distribution of the 
+  19:./Board/LEDs.h ****   software without specific, written prior permission.
+  20:./Board/LEDs.h **** 
+  21:./Board/LEDs.h ****   The author disclaim all warranties with regard to this
+  22:./Board/LEDs.h ****   software, including all implied warranties of merchantability
+  23:./Board/LEDs.h ****   and fitness.  In no event shall the author be liable for any
+  24:./Board/LEDs.h ****   special, indirect or consequential damages or any damages
+  25:./Board/LEDs.h ****   whatsoever resulting from loss of use, data or profits, whether
+  26:./Board/LEDs.h ****   in an action of contract, negligence or other tortious action,
+  27:./Board/LEDs.h ****   arising out of or in connection with the use or performance of
+  28:./Board/LEDs.h ****   this software.
+  29:./Board/LEDs.h **** */
+  30:./Board/LEDs.h **** 
+  31:./Board/LEDs.h **** /*
+  32:./Board/LEDs.h ****    Board LEDs driver for the Benito board, from www.dorkbotpdx.org.
+  33:./Board/LEDs.h **** */
+  34:./Board/LEDs.h **** 
+  35:./Board/LEDs.h **** #ifndef __LEDS_ARDUINOUNO_H__
+  36:./Board/LEDs.h **** #define __LEDS_ARDUINOUNO_H__
+  37:./Board/LEDs.h **** 
+  38:./Board/LEDs.h **** 	/* Includes: */
+  39:./Board/LEDs.h **** 		#include <avr/io.h>
+  40:./Board/LEDs.h **** 
+  41:./Board/LEDs.h **** /* Enable C linkage for C++ Compilers: */
+  42:./Board/LEDs.h **** 		#if defined(__cplusplus)
+  43:./Board/LEDs.h **** 			extern "C" {
+  44:./Board/LEDs.h **** 		#endif
+  45:./Board/LEDs.h **** 
+  46:./Board/LEDs.h **** 	/* Preprocessor Checks: */
+  47:./Board/LEDs.h **** 		#if !defined(INCLUDE_FROM_LEDS_H)
+  48:./Board/LEDs.h **** 			#error Do not include this file directly. Include LUFA/Drivers/Board/LEDS.h instead.
+  49:./Board/LEDs.h **** 		#endif
+  50:./Board/LEDs.h **** 
+  51:./Board/LEDs.h **** 	/* Public Interface - May be used in end-application: */
+  52:./Board/LEDs.h **** 		/* Macros: */
+  53:./Board/LEDs.h **** 			/** LED mask for the first LED on the board. */
+  54:./Board/LEDs.h **** 			#define LEDS_LED1        (1 << 5)
+  55:./Board/LEDs.h **** 
+  56:./Board/LEDs.h **** 			/** LED mask for the second LED on the board. */
+  57:./Board/LEDs.h **** 			#define LEDS_LED2        (1 << 4)
+  58:./Board/LEDs.h **** 
+  59:./Board/LEDs.h **** 			/** LED mask for all the LEDs on the board. */
+  60:./Board/LEDs.h **** 			#define LEDS_ALL_LEDS    (LEDS_LED1 | LEDS_LED2)
+  61:./Board/LEDs.h **** 
+  62:./Board/LEDs.h **** 			/** LED mask for the none of the board LEDs */
+  63:./Board/LEDs.h **** 			#define LEDS_NO_LEDS     0
+  64:./Board/LEDs.h **** 
+  65:./Board/LEDs.h **** 		/* Inline Functions: */
+  66:./Board/LEDs.h **** 		#if !defined(__DOXYGEN__)
+  67:./Board/LEDs.h **** 			static inline void LEDs_Init(void)
+  68:./Board/LEDs.h **** 			{
+  69:./Board/LEDs.h **** 				DDRD  |= LEDS_ALL_LEDS;
+  70:./Board/LEDs.h **** 				PORTD |= LEDS_ALL_LEDS;
+  71:./Board/LEDs.h **** 			}
+  72:./Board/LEDs.h **** 			
+  73:./Board/LEDs.h **** 			static inline void LEDs_TurnOnLEDs(const uint8_t LEDMask)
+  74:./Board/LEDs.h **** 			{
+  75:./Board/LEDs.h **** 				PORTD &= ~LEDMask;
+ 437               		.loc 4 75 0
+ 438 002a 5D98      		cbi 0xb,5
+ 439               	.LVL30:
+ 440               	.LBE63:
+ 441               	.LBE62:
+ 442               		.loc 3 229 0
+ 443 002c 1093 0000 		sts PulseMSRemaining,r17
+ 444               	.L39:
+ 230:dualMoco.c    ****     }
+ 231:dualMoco.c    **** 
+ 232:dualMoco.c    ****     /* send packets to USB MIDI */
+ 233:dualMoco.c    ****     if( utxrdy ) {
+ 445               		.loc 3 233 0
+ 446 0030 8091 0000 		lds r24,utxrdy
+ 447 0034 8823      		tst r24
+ 448 0036 01F0      		breq .L41
+ 234:dualMoco.c    ****       MIDI_Device_SendEventPacket(&Keyboard_MIDI_Interface, (MIDI_EventPacket_t *)&utx_buf);
+ 449               		.loc 3 234 0
+ 450 0038 60E0      		ldi r22,lo8(utx_buf)
+ 451 003a 70E0      		ldi r23,hi8(utx_buf)
+ 452 003c 80E0      		ldi r24,lo8(Keyboard_MIDI_Interface)
+ 453 003e 90E0      		ldi r25,hi8(Keyboard_MIDI_Interface)
+ 454 0040 0E94 0000 		call MIDI_Device_SendEventPacket
+ 455               	.LVL31:
+ 235:dualMoco.c    ****       MIDI_Device_Flush(&Keyboard_MIDI_Interface);
+ 456               		.loc 3 235 0
+ 457 0044 80E0      		ldi r24,lo8(Keyboard_MIDI_Interface)
+ 458 0046 90E0      		ldi r25,hi8(Keyboard_MIDI_Interface)
+ 459 0048 0E94 0000 		call MIDI_Device_Flush
+ 460               	.LVL32:
+ 236:dualMoco.c    ****       utxrdy = FALSE;
+ 461               		.loc 3 236 0
+ 462 004c 1092 0000 		sts utxrdy,__zero_reg__
+ 463               	.L41:
+ 237:dualMoco.c    ****     }
+ 238:dualMoco.c    **** 
+ 239:dualMoco.c    ****     /* receive from USB MIDI */
+ 240:dualMoco.c    ****     MIDI_EventPacket_t ReceivedMIDIEvent;
+ 241:dualMoco.c    ****     while (MIDI_Device_ReceiveEventPacket(&Keyboard_MIDI_Interface, &ReceivedMIDIEvent)) {
+ 464               		.loc 3 241 0
+ 465 0050 BE01      		movw r22,r28
+ 466 0052 6F5F      		subi r22,-1
+ 467 0054 7F4F      		sbci r23,-1
+ 468 0056 80E0      		ldi r24,lo8(Keyboard_MIDI_Interface)
+ 469 0058 90E0      		ldi r25,hi8(Keyboard_MIDI_Interface)
+ 470 005a 0E94 0000 		call MIDI_Device_ReceiveEventPacket
+ 471               	.LVL33:
+ 472 005e 8823      		tst r24
+ 473 0060 01F0      		breq .L60
+ 242:dualMoco.c    ****       /* for each MIDI packet w/ 4 bytes */
+ 243:dualMoco.c    ****       parseUSBMidiMessage((uchar *)&ReceivedMIDIEvent, 4);
+ 474               		.loc 3 243 0
+ 475 0062 64E0      		ldi r22,lo8(4)
+ 476 0064 CE01      		movw r24,r28
+ 477 0066 0196      		adiw r24,1
+ 478 0068 0E94 0000 		call parseUSBMidiMessage
+ 479               	.LVL34:
+ 480               	.LBB64:
+ 481               	.LBB65:
+ 482               		.loc 4 75 0
+ 483 006c 5C98      		cbi 0xb,4
+ 484               	.LVL35:
+ 485               	.LBE65:
+ 486               	.LBE64:
+ 244:dualMoco.c    ****       LEDs_TurnOnLEDs(LEDMASK_RX);
+ 245:dualMoco.c    ****       PulseMSRemaining.RxLEDPulse = TX_RX_LED_PULSE_MS;
+ 487               		.loc 3 245 0
+ 488 006e 1093 0000 		sts PulseMSRemaining+1,r17
+ 489 0072 00C0      		rjmp .L41
+ 490               	.L60:
+ 246:dualMoco.c    ****     }
+ 247:dualMoco.c    ****       
+ 248:dualMoco.c    ****     /* send to Serial MIDI line  */
+ 249:dualMoco.c    ****     if( (UCSR1A & (1<<UDRE1)) && uwptr!=irptr ) {
+ 491               		.loc 3 249 0
+ 492 0074 8091 C800 		lds r24,200
+ 493 0078 85FF      		sbrs r24,5
+ 494 007a 00C0      		rjmp .L43
+ 495               		.loc 3 249 0 is_stmt 0 discriminator 1
+ 496 007c E091 0000 		lds r30,irptr
+ 497 0080 8091 0000 		lds r24,uwptr
+ 498 0084 8E17      		cp r24,r30
+ 499 0086 01F0      		breq .L43
+ 250:dualMoco.c    ****       UDR1 = tx_buf[irptr++];
+ 500               		.loc 3 250 0 is_stmt 1
+ 501 0088 81E0      		ldi r24,lo8(1)
+ 502 008a 8E0F      		add r24,r30
+ 503 008c 8093 0000 		sts irptr,r24
+ 504 0090 F0E0      		ldi r31,0
+ 505 0092 E050      		subi r30,lo8(-(tx_buf))
+ 506 0094 F040      		sbci r31,hi8(-(tx_buf))
+ 507 0096 8081      		ld r24,Z
+ 508 0098 8093 CE00 		sts 206,r24
+ 251:dualMoco.c    ****       irptr &= TX_MASK;
+ 509               		.loc 3 251 0
+ 510 009c 8091 0000 		lds r24,irptr
+ 511 00a0 8F71      		andi r24,lo8(31)
+ 512 00a2 8093 0000 		sts irptr,r24
+ 513               	.L43:
+ 252:dualMoco.c    ****     }
+ 253:dualMoco.c    ****     
+ 254:dualMoco.c    ****     if (TIFR0 & (1 << TOV0)) {
+ 514               		.loc 3 254 0
+ 515 00a6 A89B      		sbis 0x15,0
+ 516 00a8 00C0      		rjmp .L45
+ 255:dualMoco.c    ****       TIFR0 |= (1 << TOV0);
+ 517               		.loc 3 255 0
+ 518 00aa A89A      		sbi 0x15,0
+ 256:dualMoco.c    ****       /* Turn off TX LED(s) once the TX pulse period has elapsed */
+ 257:dualMoco.c    ****       if (PulseMSRemaining.TxLEDPulse && !(--PulseMSRemaining.TxLEDPulse))
+ 519               		.loc 3 257 0
+ 520 00ac 8091 0000 		lds r24,PulseMSRemaining
+ 521 00b0 8823      		tst r24
+ 522 00b2 01F0      		breq .L47
+ 523               		.loc 3 257 0 is_stmt 0 discriminator 1
+ 524 00b4 8091 0000 		lds r24,PulseMSRemaining
+ 525 00b8 8150      		subi r24,lo8(-(-1))
+ 526 00ba 8093 0000 		sts PulseMSRemaining,r24
+ 527 00be 8111      		cpse r24,__zero_reg__
+ 528 00c0 00C0      		rjmp .L47
+ 529               	.LVL36:
+ 530               	.LBB66:
+ 531               	.LBB67:
+  76:./Board/LEDs.h **** 			}
+  77:./Board/LEDs.h **** 
+  78:./Board/LEDs.h **** 			static inline void LEDs_TurnOffLEDs(const uint8_t LEDMask)
+  79:./Board/LEDs.h **** 			{
+  80:./Board/LEDs.h **** 				PORTD |= LEDMask;
+ 532               		.loc 4 80 0 is_stmt 1
+ 533 00c2 5D9A      		sbi 0xb,5
+ 534               	.LVL37:
+ 535               	.L47:
+ 536               	.LBE67:
+ 537               	.LBE66:
+ 258:dualMoco.c    **** 	LEDs_TurnOffLEDs(LEDMASK_TX);
+ 259:dualMoco.c    ****       
+ 260:dualMoco.c    ****       /* Turn off RX LED(s) once the RX pulse period has elapsed */
+ 261:dualMoco.c    ****       if (PulseMSRemaining.RxLEDPulse && !(--PulseMSRemaining.RxLEDPulse))
+ 538               		.loc 3 261 0
+ 539 00c4 8091 0000 		lds r24,PulseMSRemaining+1
+ 540 00c8 8823      		tst r24
+ 541 00ca 01F0      		breq .L45
+ 542               		.loc 3 261 0 is_stmt 0 discriminator 1
+ 543 00cc 8091 0000 		lds r24,PulseMSRemaining+1
+ 544 00d0 8150      		subi r24,lo8(-(-1))
+ 545 00d2 8093 0000 		sts PulseMSRemaining+1,r24
+ 546 00d6 8111      		cpse r24,__zero_reg__
+ 547 00d8 00C0      		rjmp .L45
+ 548               	.LVL38:
+ 549               	.LBB68:
+ 550               	.LBB69:
+ 551               		.loc 4 80 0 is_stmt 1
+ 552 00da 5C9A      		sbi 0xb,4
+ 553               	.LVL39:
+ 554               	.L45:
+ 555               	.LBE69:
+ 556               	.LBE68:
+ 262:dualMoco.c    **** 	LEDs_TurnOffLEDs(LEDMASK_RX);
+ 263:dualMoco.c    ****     }
+ 264:dualMoco.c    **** 
+ 265:dualMoco.c    ****     MIDI_Device_USBTask(&Keyboard_MIDI_Interface);
+ 266:dualMoco.c    ****     USB_USBTask();
+ 557               		.loc 3 266 0
+ 558 00dc 0E94 0000 		call USB_USBTask
+ 559               	.LVL40:
+ 560               	.LBE61:
+ 267:dualMoco.c    ****   }
+ 561               		.loc 3 267 0
+ 562 00e0 00C0      		rjmp .L50
+ 563               		.cfi_endproc
+ 564               	.LFE94:
+ 566               		.section	.text.processSerial,"ax",@progbits
+ 567               	.global	processSerial
+ 569               	processSerial:
+ 570               	.LFB95:
+ 268:dualMoco.c    **** }
+ 269:dualMoco.c    **** 
+ 270:dualMoco.c    **** 
+ 271:dualMoco.c    **** void processSerial(void) 
+ 272:dualMoco.c    **** {
+ 571               		.loc 3 272 0
+ 572               		.cfi_startproc
+ 573               	/* prologue: function */
+ 574               	/* frame size = 0 */
+ 575               	/* stack size = 0 */
+ 576               	.L__stack_usage = 0
+ 577               	.LVL41:
+ 578               	.LBB121:
+ 579               	.LBB122:
+  87:Lib/LightweightRingBuff.h **** 			{
+ 580               		.loc 1 87 0
+ 581 0000 2FB7      		in r18,__SREG__
+ 582               	.LVL42:
+ 583               	.LBB123:
+ 584               	.LBB124:
+  50:/usr/lib/avr/include/util/atomic.h ****     return 1;
+ 585               		.loc 2 50 0
+ 586               	/* #APP */
+ 587               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+ 588 0002 F894      		cli
+ 589               	 ;  0 "" 2
+ 590               	.LVL43:
+ 591               	/* #NOAPP */
+ 592               	.LBE124:
+ 593               	.LBE123:
+  89:Lib/LightweightRingBuff.h **** 				Buffer->Out = Buffer->Buffer;
+ 594               		.loc 1 89 0
+ 595 0004 80E0      		ldi r24,lo8(USBtoUSART_Buffer)
+ 596 0006 90E0      		ldi r25,hi8(USBtoUSART_Buffer)
+ 597 0008 9093 0000 		sts USBtoUSART_Buffer+128+1,r25
+ 598 000c 8093 0000 		sts USBtoUSART_Buffer+128,r24
+  90:Lib/LightweightRingBuff.h **** 			}
+ 599               		.loc 1 90 0
+ 600 0010 9093 0000 		sts USBtoUSART_Buffer+130+1,r25
+ 601 0014 8093 0000 		sts USBtoUSART_Buffer+130,r24
+ 602               	.LVL44:
+ 603               	.LBB125:
+ 604               	.LBB126:
+  70:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+ 605               		.loc 2 70 0
+ 606 0018 2FBF      		out __SREG__,r18
+ 607               		.loc 2 71 0
+ 608               	.LVL45:
+ 609               	.LBE126:
+ 610               	.LBE125:
+ 611               	.LBE122:
+ 612               	.LBE121:
+ 613               	.LBB127:
+ 614               	.LBB128:
+  87:Lib/LightweightRingBuff.h **** 			{
+ 615               		.loc 1 87 0
+ 616 001a 2FB7      		in r18,__SREG__
+ 617               	.LVL46:
+ 618               	.LBB129:
+ 619               	.LBB130:
+  50:/usr/lib/avr/include/util/atomic.h ****     return 1;
+ 620               		.loc 2 50 0
+ 621               	/* #APP */
+ 622               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+ 623 001c F894      		cli
+ 624               	 ;  0 "" 2
+ 625               	.LVL47:
+ 626               	/* #NOAPP */
+ 627               	.LBE130:
+ 628               	.LBE129:
+  89:Lib/LightweightRingBuff.h **** 				Buffer->Out = Buffer->Buffer;
+ 629               		.loc 1 89 0
+ 630 001e 80E0      		ldi r24,lo8(USARTtoUSB_Buffer)
+ 631 0020 90E0      		ldi r25,hi8(USARTtoUSB_Buffer)
+ 632 0022 9093 0000 		sts USARTtoUSB_Buffer+128+1,r25
+ 633 0026 8093 0000 		sts USARTtoUSB_Buffer+128,r24
+  90:Lib/LightweightRingBuff.h **** 			}
+ 634               		.loc 1 90 0
+ 635 002a 9093 0000 		sts USARTtoUSB_Buffer+130+1,r25
+ 636 002e 8093 0000 		sts USARTtoUSB_Buffer+130,r24
+ 637               	.LVL48:
+ 638               	.LBB131:
+ 639               	.LBB132:
+  70:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+ 640               		.loc 2 70 0
+ 641 0032 2FBF      		out __SREG__,r18
+ 642               		.loc 2 71 0
+ 643               	.LVL49:
+ 644               	.LBE132:
+ 645               	.LBE131:
+ 646               	.LBE128:
+ 647               	.LBE127:
+ 273:dualMoco.c    **** 	
+ 274:dualMoco.c    **** 	RingBuffer_InitBuffer(&USBtoUSART_Buffer);
+ 275:dualMoco.c    **** 	RingBuffer_InitBuffer(&USARTtoUSB_Buffer);
+ 276:dualMoco.c    **** 
+ 277:dualMoco.c    **** 	sei();
+ 648               		.loc 3 277 0
+ 649               	/* #APP */
+ 650               	 ;  277 "dualMoco.c" 1
+ 651 0034 7894      		sei
+ 652               	 ;  0 "" 2
+ 653               	/* #NOAPP */
+ 654               	.LBB133:
+ 278:dualMoco.c    **** 
+ 279:dualMoco.c    **** 	for (;;)
+ 280:dualMoco.c    **** 	{
+ 281:dualMoco.c    **** 		/* Only try to read in bytes from the CDC interface if the transmit buffer is not full */
+ 282:dualMoco.c    **** 		if (!(RingBuffer_IsFull(&USBtoUSART_Buffer)))
+ 283:dualMoco.c    **** 		{
+ 284:dualMoco.c    **** 			int16_t ReceivedByte = CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
+ 285:dualMoco.c    **** 
+ 286:dualMoco.c    **** 			/* Read bytes from the USB OUT endpoint into the USART transmit buffer */
+ 287:dualMoco.c    **** 			if (!(ReceivedByte < 0))
+ 288:dualMoco.c    **** 			  RingBuffer_Insert(&USBtoUSART_Buffer, ReceivedByte);
+ 289:dualMoco.c    **** 		}
+ 290:dualMoco.c    **** 		
+ 291:dualMoco.c    **** 		/* Check if the UART receive buffer flush timer has expired or the buffer is nearly full */
+ 292:dualMoco.c    **** 		RingBuff_Count_t BufferCount = RingBuffer_GetCount(&USARTtoUSB_Buffer);
+ 293:dualMoco.c    **** 		if ((TIFR0 & (1 << TOV0)) || (BufferCount > BUFFER_NEARLY_FULL))
+ 294:dualMoco.c    **** 		{
+ 295:dualMoco.c    **** 			TIFR0 |= (1 << TOV0);
+ 296:dualMoco.c    **** 
+ 297:dualMoco.c    **** 			if (USARTtoUSB_Buffer.Count) {
+ 298:dualMoco.c    **** 				LEDs_TurnOnLEDs(LEDMASK_TX);
+ 299:dualMoco.c    **** 				PulseMSRemaining.TxLEDPulse = TX_RX_LED_PULSE_MS;
+ 655               		.loc 3 299 0
+ 656 0036 D3E0      		ldi r29,lo8(3)
+ 657               	.LVL50:
+ 658               	.L76:
+ 659               	.LBB134:
+ 660               	.LBB135:
+ 661               	.LBB136:
+ 662               	.LBB137:
+ 111:Lib/LightweightRingBuff.h **** 			{
+ 663               		.loc 1 111 0
+ 664 0038 9FB7      		in r25,__SREG__
+ 665               	.LVL51:
+ 666               	.LBB138:
+ 667               	.LBB139:
+  50:/usr/lib/avr/include/util/atomic.h ****     return 1;
+ 668               		.loc 2 50 0
+ 669               	/* #APP */
+ 670               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+ 671 003a F894      		cli
+ 672               	 ;  0 "" 2
+ 673               	.LVL52:
+ 674               	/* #NOAPP */
+ 675               	.LBE139:
+ 676               	.LBE138:
+ 113:Lib/LightweightRingBuff.h **** 			}
+ 677               		.loc 1 113 0
+ 678 003c 8091 0000 		lds r24,USBtoUSART_Buffer+132
+ 679               	.LVL53:
+ 680               	.LBB140:
+ 681               	.LBB141:
+  70:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+ 682               		.loc 2 70 0
+ 683 0040 9FBF      		out __SREG__,r25
+ 684               		.loc 2 71 0
+ 685               	.LVL54:
+ 686               	.LBE141:
+ 687               	.LBE140:
+ 688               	.LBE137:
+ 689               	.LBE136:
+ 690               	.LBE135:
+ 691               	.LBE134:
+ 282:dualMoco.c    **** 		{
+ 692               		.loc 3 282 0
+ 693 0042 8038      		cpi r24,lo8(-128)
+ 694 0044 01F0      		breq .L63
+ 695               	.LBB142:
+ 284:dualMoco.c    **** 
+ 696               		.loc 3 284 0
+ 697 0046 80E0      		ldi r24,lo8(VirtualSerial_CDC_Interface)
+ 698 0048 90E0      		ldi r25,hi8(VirtualSerial_CDC_Interface)
+ 699 004a 0E94 0000 		call CDC_Device_ReceiveByte
+ 700               	.LVL55:
+ 287:dualMoco.c    **** 			  RingBuffer_Insert(&USBtoUSART_Buffer, ReceivedByte);
+ 701               		.loc 3 287 0
+ 702 004e 97FD      		sbrc r25,7
+ 703 0050 00C0      		rjmp .L63
+ 288:dualMoco.c    **** 		}
+ 704               		.loc 3 288 0
+ 705 0052 682F      		mov r22,r24
+ 706 0054 80E0      		ldi r24,lo8(USBtoUSART_Buffer)
+ 707 0056 90E0      		ldi r25,hi8(USBtoUSART_Buffer)
+ 708               	.LVL56:
+ 709 0058 0E94 0000 		call RingBuffer_Insert
+ 710               	.LVL57:
+ 711               	.L63:
+ 712               	.LBE142:
+ 713               	.LBB143:
+ 714               	.LBB144:
+ 715               	.LBB145:
+ 111:Lib/LightweightRingBuff.h **** 			{
+ 716               		.loc 1 111 0
+ 717 005c 8FB7      		in r24,__SREG__
+ 718               	.LVL58:
+ 719               	.LBB146:
+ 720               	.LBB147:
+  50:/usr/lib/avr/include/util/atomic.h ****     return 1;
+ 721               		.loc 2 50 0
+ 722               	/* #APP */
+ 723               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+ 724 005e F894      		cli
+ 725               	 ;  0 "" 2
+ 726               	.LVL59:
+ 727               	/* #NOAPP */
+ 728               	.LBE147:
+ 729               	.LBE146:
+ 113:Lib/LightweightRingBuff.h **** 			}
+ 730               		.loc 1 113 0
+ 731 0060 C091 0000 		lds r28,USARTtoUSB_Buffer+132
+ 732               	.LVL60:
+ 733               	.LBB148:
+ 734               	.LBB149:
+  70:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+ 735               		.loc 2 70 0
+ 736 0064 8FBF      		out __SREG__,r24
+ 737               		.loc 2 71 0
+ 738               	.LVL61:
+ 739               	.LBE149:
+ 740               	.LBE148:
+ 741               	.LBE145:
+ 742               	.LBE144:
+ 743               	.LBE143:
+ 293:dualMoco.c    **** 		{
+ 744               		.loc 3 293 0
+ 745 0066 A899      		sbic 0x15,0
+ 746 0068 00C0      		rjmp .L65
+ 293:dualMoco.c    **** 		{
+ 747               		.loc 3 293 0 is_stmt 0 discriminator 1
+ 748 006a C136      		cpi r28,lo8(97)
+ 749 006c 00F0      		brlo .L66
+ 750               	.L65:
+ 295:dualMoco.c    **** 
+ 751               		.loc 3 295 0 is_stmt 1
+ 752 006e A89A      		sbi 0x15,0
+ 297:dualMoco.c    **** 				LEDs_TurnOnLEDs(LEDMASK_TX);
+ 753               		.loc 3 297 0
+ 754 0070 8091 0000 		lds r24,USARTtoUSB_Buffer+132
+ 755 0074 8823      		tst r24
+ 756 0076 01F0      		breq .L68
+ 757               	.LVL62:
+ 758               	.LBB150:
+ 759               	.LBB151:
+  75:./Board/LEDs.h **** 			}
+ 760               		.loc 4 75 0
+ 761 0078 5D98      		cbi 0xb,5
+ 762               	.LVL63:
+ 763               	.LBE151:
+ 764               	.LBE150:
+ 765               		.loc 3 299 0
+ 766 007a D093 0000 		sts PulseMSRemaining,r29
+ 767               	.L68:
+ 768               	.LVL64:
+ 300:dualMoco.c    **** 			}
+ 301:dualMoco.c    **** 
+ 302:dualMoco.c    **** 			/* Read bytes from the USART receive buffer into the USB IN endpoint */
+ 303:dualMoco.c    **** 			while (BufferCount--)
+ 769               		.loc 3 303 0
+ 770 007e CC23      		tst r28
+ 771 0080 01F0      		breq .L88
+ 304:dualMoco.c    **** 			  CDC_Device_SendByte(&VirtualSerial_CDC_Interface, RingBuffer_Remove(&USARTtoUSB_Buffer));
+ 772               		.loc 3 304 0
+ 773 0082 80E0      		ldi r24,lo8(USARTtoUSB_Buffer)
+ 774 0084 90E0      		ldi r25,hi8(USARTtoUSB_Buffer)
+ 775 0086 0E94 0000 		call RingBuffer_Remove
+ 776               	.LVL65:
+ 777 008a 682F      		mov r22,r24
+ 778 008c 80E0      		ldi r24,lo8(VirtualSerial_CDC_Interface)
+ 779 008e 90E0      		ldi r25,hi8(VirtualSerial_CDC_Interface)
+ 780 0090 0E94 0000 		call CDC_Device_SendByte
+ 781               	.LVL66:
+ 782 0094 C150      		subi r28,lo8(-(-1))
+ 783               	.LVL67:
+ 784 0096 00C0      		rjmp .L68
+ 785               	.LVL68:
+ 786               	.L88:
+ 305:dualMoco.c    **** 			  
+ 306:dualMoco.c    **** 			/* Turn off TX LED(s) once the TX pulse period has elapsed */
+ 307:dualMoco.c    **** 			if (PulseMSRemaining.TxLEDPulse && !(--PulseMSRemaining.TxLEDPulse))
+ 787               		.loc 3 307 0
+ 788 0098 8091 0000 		lds r24,PulseMSRemaining
+ 789 009c 8823      		tst r24
+ 790 009e 01F0      		breq .L71
+ 791               		.loc 3 307 0 is_stmt 0 discriminator 1
+ 792 00a0 8091 0000 		lds r24,PulseMSRemaining
+ 793 00a4 8150      		subi r24,lo8(-(-1))
+ 794 00a6 8093 0000 		sts PulseMSRemaining,r24
+ 795 00aa 8111      		cpse r24,__zero_reg__
+ 796 00ac 00C0      		rjmp .L71
+ 797               	.LVL69:
+ 798               	.LBB152:
+ 799               	.LBB153:
+ 800               		.loc 4 80 0 is_stmt 1
+ 801 00ae 5D9A      		sbi 0xb,5
+ 802               	.LVL70:
+ 803               	.L71:
+ 804               	.LBE153:
+ 805               	.LBE152:
+ 308:dualMoco.c    **** 			  LEDs_TurnOffLEDs(LEDMASK_TX);
+ 309:dualMoco.c    **** 
+ 310:dualMoco.c    **** 			/* Turn off RX LED(s) once the RX pulse period has elapsed */
+ 311:dualMoco.c    **** 			if (PulseMSRemaining.RxLEDPulse && !(--PulseMSRemaining.RxLEDPulse))
+ 806               		.loc 3 311 0
+ 807 00b0 8091 0000 		lds r24,PulseMSRemaining+1
+ 808 00b4 8823      		tst r24
+ 809 00b6 01F0      		breq .L66
+ 810               		.loc 3 311 0 is_stmt 0 discriminator 1
+ 811 00b8 8091 0000 		lds r24,PulseMSRemaining+1
+ 812 00bc 8150      		subi r24,lo8(-(-1))
+ 813 00be 8093 0000 		sts PulseMSRemaining+1,r24
+ 814 00c2 8111      		cpse r24,__zero_reg__
+ 815 00c4 00C0      		rjmp .L66
+ 816               	.LVL71:
+ 817               	.LBB154:
+ 818               	.LBB155:
+ 819               		.loc 4 80 0 is_stmt 1
+ 820 00c6 5C9A      		sbi 0xb,4
+ 821               	.LVL72:
+ 822               	.L66:
+ 823               	.LBE155:
+ 824               	.LBE154:
+ 825               	.LBB156:
+ 826               	.LBB157:
+ 827               	.LBB158:
+ 828               	.LBB159:
+ 111:Lib/LightweightRingBuff.h **** 			{
+ 829               		.loc 1 111 0
+ 830 00c8 9FB7      		in r25,__SREG__
+ 831               	.LVL73:
+ 832               	.LBB160:
+ 833               	.LBB161:
+  50:/usr/lib/avr/include/util/atomic.h ****     return 1;
+ 834               		.loc 2 50 0
+ 835               	/* #APP */
+ 836               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+ 837 00ca F894      		cli
+ 838               	 ;  0 "" 2
+ 839               	.LVL74:
+ 840               	/* #NOAPP */
+ 841               	.LBE161:
+ 842               	.LBE160:
+ 113:Lib/LightweightRingBuff.h **** 			}
+ 843               		.loc 1 113 0
+ 844 00cc 8091 0000 		lds r24,USBtoUSART_Buffer+132
+ 845               	.LVL75:
+ 846               	.LBB162:
+ 847               	.LBB163:
+  70:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+ 848               		.loc 2 70 0
+ 849 00d0 9FBF      		out __SREG__,r25
+ 850               		.loc 2 71 0
+ 851               	.LVL76:
+ 852               	.LBE163:
+ 853               	.LBE162:
+ 854               	.LBE159:
+ 855               	.LBE158:
+ 856               	.LBE157:
+ 857               	.LBE156:
+ 312:dualMoco.c    **** 			  LEDs_TurnOffLEDs(LEDMASK_RX);
+ 313:dualMoco.c    **** 		}
+ 314:dualMoco.c    **** 		
+ 315:dualMoco.c    **** 		/* Load the next byte from the USART transmit buffer into the USART */
+ 316:dualMoco.c    **** 		if (!(RingBuffer_IsEmpty(&USBtoUSART_Buffer))) {
+ 858               		.loc 3 316 0
+ 859 00d2 8823      		tst r24
+ 860 00d4 01F0      		breq .L74
+ 317:dualMoco.c    **** 		  Serial_TxByte(RingBuffer_Remove(&USBtoUSART_Buffer));
+ 861               		.loc 3 317 0
+ 862 00d6 80E0      		ldi r24,lo8(USBtoUSART_Buffer)
+ 863 00d8 90E0      		ldi r25,hi8(USBtoUSART_Buffer)
+ 864 00da 0E94 0000 		call RingBuffer_Remove
+ 865               	.LVL77:
+ 866               	.L75:
+ 867               	.LBB164:
+ 868               	.LBB165:
+ 869               		.file 5 "../LUFA/Drivers/Peripheral/Serial.h"
+   1:../LUFA/Drivers/Peripheral/Serial.h **** /*
+   2:../LUFA/Drivers/Peripheral/Serial.h ****              LUFA Library
+   3:../LUFA/Drivers/Peripheral/Serial.h ****      Copyright (C) Dean Camera, 2010.
+   4:../LUFA/Drivers/Peripheral/Serial.h ****               
+   5:../LUFA/Drivers/Peripheral/Serial.h ****   dean [at] fourwalledcubicle [dot] com
+   6:../LUFA/Drivers/Peripheral/Serial.h ****       www.fourwalledcubicle.com
+   7:../LUFA/Drivers/Peripheral/Serial.h **** */
+   8:../LUFA/Drivers/Peripheral/Serial.h **** 
+   9:../LUFA/Drivers/Peripheral/Serial.h **** /*
+  10:../LUFA/Drivers/Peripheral/Serial.h ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:../LUFA/Drivers/Peripheral/Serial.h **** 
+  12:../LUFA/Drivers/Peripheral/Serial.h ****   Permission to use, copy, modify, distribute, and sell this 
+  13:../LUFA/Drivers/Peripheral/Serial.h ****   software and its documentation for any purpose is hereby granted
+  14:../LUFA/Drivers/Peripheral/Serial.h ****   without fee, provided that the above copyright notice appear in 
+  15:../LUFA/Drivers/Peripheral/Serial.h ****   all copies and that both that the copyright notice and this
+  16:../LUFA/Drivers/Peripheral/Serial.h ****   permission notice and warranty disclaimer appear in supporting 
+  17:../LUFA/Drivers/Peripheral/Serial.h ****   documentation, and that the name of the author not be used in 
+  18:../LUFA/Drivers/Peripheral/Serial.h ****   advertising or publicity pertaining to distribution of the 
+  19:../LUFA/Drivers/Peripheral/Serial.h ****   software without specific, written prior permission.
+  20:../LUFA/Drivers/Peripheral/Serial.h **** 
+  21:../LUFA/Drivers/Peripheral/Serial.h ****   The author disclaim all warranties with regard to this
+  22:../LUFA/Drivers/Peripheral/Serial.h ****   software, including all implied warranties of merchantability
+  23:../LUFA/Drivers/Peripheral/Serial.h ****   and fitness.  In no event shall the author be liable for any
+  24:../LUFA/Drivers/Peripheral/Serial.h ****   special, indirect or consequential damages or any damages
+  25:../LUFA/Drivers/Peripheral/Serial.h ****   whatsoever resulting from loss of use, data or profits, whether
+  26:../LUFA/Drivers/Peripheral/Serial.h ****   in an action of contract, negligence or other tortious action,
+  27:../LUFA/Drivers/Peripheral/Serial.h ****   arising out of or in connection with the use or performance of
+  28:../LUFA/Drivers/Peripheral/Serial.h ****   this software.
+  29:../LUFA/Drivers/Peripheral/Serial.h **** */
+  30:../LUFA/Drivers/Peripheral/Serial.h **** 
+  31:../LUFA/Drivers/Peripheral/Serial.h **** /** \file
+  32:../LUFA/Drivers/Peripheral/Serial.h ****  *  \brief Master include file for the USART peripheral driver.
+  33:../LUFA/Drivers/Peripheral/Serial.h ****  *
+  34:../LUFA/Drivers/Peripheral/Serial.h ****  *  Driver for the USART subsystem on supported USB AVRs.
+  35:../LUFA/Drivers/Peripheral/Serial.h ****  */
+  36:../LUFA/Drivers/Peripheral/Serial.h ****  
+  37:../LUFA/Drivers/Peripheral/Serial.h **** /** \ingroup Group_PeripheralDrivers
+  38:../LUFA/Drivers/Peripheral/Serial.h ****  *  @defgroup Group_Serial Serial USART Driver - LUFA/Drivers/Peripheral/Serial.h
+  39:../LUFA/Drivers/Peripheral/Serial.h ****  *
+  40:../LUFA/Drivers/Peripheral/Serial.h ****  *  \section Sec_Dependencies Module Source Dependencies
+  41:../LUFA/Drivers/Peripheral/Serial.h ****  *  The following files must be built with any user project that uses this module:
+  42:../LUFA/Drivers/Peripheral/Serial.h ****  *    - LUFA/Drivers/Peripheral/Serial.c <i>(Makefile source module name: LUFA_SRC_SERIAL)</i>
+  43:../LUFA/Drivers/Peripheral/Serial.h ****  *
+  44:../LUFA/Drivers/Peripheral/Serial.h ****  *  \section Module Description
+  45:../LUFA/Drivers/Peripheral/Serial.h ****  *  Hardware serial USART driver. This module provides an easy to use driver for
+  46:../LUFA/Drivers/Peripheral/Serial.h ****  *  the setup of and transfer of data over the AVR's USART port.
+  47:../LUFA/Drivers/Peripheral/Serial.h ****  *
+  48:../LUFA/Drivers/Peripheral/Serial.h ****  *  @{
+  49:../LUFA/Drivers/Peripheral/Serial.h ****  */
+  50:../LUFA/Drivers/Peripheral/Serial.h ****  
+  51:../LUFA/Drivers/Peripheral/Serial.h **** #ifndef __SERIAL_H__
+  52:../LUFA/Drivers/Peripheral/Serial.h **** #define __SERIAL_H__
+  53:../LUFA/Drivers/Peripheral/Serial.h **** 
+  54:../LUFA/Drivers/Peripheral/Serial.h **** 	/* Includes: */
+  55:../LUFA/Drivers/Peripheral/Serial.h **** 		#include <avr/io.h>
+  56:../LUFA/Drivers/Peripheral/Serial.h **** 		#include <avr/pgmspace.h>
+  57:../LUFA/Drivers/Peripheral/Serial.h **** 		#include <stdbool.h>
+  58:../LUFA/Drivers/Peripheral/Serial.h **** 		
+  59:../LUFA/Drivers/Peripheral/Serial.h **** 		#include "../../Common/Common.h"
+  60:../LUFA/Drivers/Peripheral/Serial.h **** 		#include "../Misc/TerminalCodes.h"
+  61:../LUFA/Drivers/Peripheral/Serial.h **** 
+  62:../LUFA/Drivers/Peripheral/Serial.h **** 	/* Enable C linkage for C++ Compilers: */
+  63:../LUFA/Drivers/Peripheral/Serial.h **** 		#if defined(__cplusplus)
+  64:../LUFA/Drivers/Peripheral/Serial.h **** 			extern "C" {
+  65:../LUFA/Drivers/Peripheral/Serial.h **** 		#endif
+  66:../LUFA/Drivers/Peripheral/Serial.h **** 
+  67:../LUFA/Drivers/Peripheral/Serial.h **** 	/* Public Interface - May be used in end-application: */
+  68:../LUFA/Drivers/Peripheral/Serial.h **** 		/* Macros: */
+  69:../LUFA/Drivers/Peripheral/Serial.h **** 			/** Macro for calculating the baud value from a given baud rate when the U2X (double speed) bit 
+  70:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  not set.
+  71:../LUFA/Drivers/Peripheral/Serial.h **** 			 */
+  72:../LUFA/Drivers/Peripheral/Serial.h **** 			#define SERIAL_UBBRVAL(baud)    ((((F_CPU / 16) + (baud / 2)) / (baud)) - 1)
+  73:../LUFA/Drivers/Peripheral/Serial.h **** 
+  74:../LUFA/Drivers/Peripheral/Serial.h **** 			/** Macro for calculating the baud value from a given baud rate when the U2X (double speed) bit 
+  75:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  set.
+  76:../LUFA/Drivers/Peripheral/Serial.h **** 			 */
+  77:../LUFA/Drivers/Peripheral/Serial.h **** 			#define SERIAL_2X_UBBRVAL(baud) ((((F_CPU / 8) + (baud / 2)) / (baud)) - 1)
+  78:../LUFA/Drivers/Peripheral/Serial.h **** 
+  79:../LUFA/Drivers/Peripheral/Serial.h **** 		/* Function Prototypes: */
+  80:../LUFA/Drivers/Peripheral/Serial.h **** 			/** Transmits a given string located in program space (FLASH) through the USART.
+  81:../LUFA/Drivers/Peripheral/Serial.h **** 			 *
+  82:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  \param[in] FlashStringPtr  Pointer to a string located in program space.
+  83:../LUFA/Drivers/Peripheral/Serial.h **** 			 */
+  84:../LUFA/Drivers/Peripheral/Serial.h **** 			void Serial_TxString_P(const char* FlashStringPtr) ATTR_NON_NULL_PTR_ARG(1);
+  85:../LUFA/Drivers/Peripheral/Serial.h **** 
+  86:../LUFA/Drivers/Peripheral/Serial.h **** 			/** Transmits a given string located in SRAM memory through the USART.
+  87:../LUFA/Drivers/Peripheral/Serial.h **** 			 *
+  88:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  \param[in] StringPtr  Pointer to a string located in SRAM space.
+  89:../LUFA/Drivers/Peripheral/Serial.h **** 			 */
+  90:../LUFA/Drivers/Peripheral/Serial.h **** 			void Serial_TxString(const char* StringPtr) ATTR_NON_NULL_PTR_ARG(1);
+  91:../LUFA/Drivers/Peripheral/Serial.h **** 
+  92:../LUFA/Drivers/Peripheral/Serial.h **** 		/* Inline Functions: */
+  93:../LUFA/Drivers/Peripheral/Serial.h **** 			/** Initializes the USART, ready for serial data transmission and reception. This initializes th
+  94:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  standard 8-bit, no parity, 1 stop bit settings suitable for most applications.
+  95:../LUFA/Drivers/Peripheral/Serial.h **** 			 *
+  96:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  \param[in] BaudRate     Serial baud rate, in bits per second.
+  97:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  \param[in] DoubleSpeed  Enables double speed mode when set, halving the sample time to doubl
+  98:../LUFA/Drivers/Peripheral/Serial.h **** 			 */
+  99:../LUFA/Drivers/Peripheral/Serial.h **** 			static inline void Serial_Init(const uint32_t BaudRate,
+ 100:../LUFA/Drivers/Peripheral/Serial.h **** 			                               const bool DoubleSpeed)
+ 101:../LUFA/Drivers/Peripheral/Serial.h **** 			{
+ 102:../LUFA/Drivers/Peripheral/Serial.h **** 				UBRR1  = (DoubleSpeed ? SERIAL_2X_UBBRVAL(BaudRate) : SERIAL_UBBRVAL(BaudRate));
+ 103:../LUFA/Drivers/Peripheral/Serial.h **** 
+ 104:../LUFA/Drivers/Peripheral/Serial.h **** 				UCSR1C = ((1 << UCSZ11) | (1 << UCSZ10));
+ 105:../LUFA/Drivers/Peripheral/Serial.h **** 				UCSR1A = (DoubleSpeed ? (1 << U2X1) : 0);
+ 106:../LUFA/Drivers/Peripheral/Serial.h **** 				UCSR1B = ((1 << TXEN1)  | (1 << RXEN1));
+ 107:../LUFA/Drivers/Peripheral/Serial.h **** 				
+ 108:../LUFA/Drivers/Peripheral/Serial.h **** 				DDRD  |= (1 << 3);
+ 109:../LUFA/Drivers/Peripheral/Serial.h **** 				PORTD |= (1 << 2);
+ 110:../LUFA/Drivers/Peripheral/Serial.h **** 			}
+ 111:../LUFA/Drivers/Peripheral/Serial.h **** 
+ 112:../LUFA/Drivers/Peripheral/Serial.h **** 			/** Turns off the USART driver, disabling and returning used hardware to their default configura
+ 113:../LUFA/Drivers/Peripheral/Serial.h **** 			static inline void Serial_ShutDown(void)
+ 114:../LUFA/Drivers/Peripheral/Serial.h **** 			{
+ 115:../LUFA/Drivers/Peripheral/Serial.h **** 				UCSR1B = 0;
+ 116:../LUFA/Drivers/Peripheral/Serial.h **** 				UCSR1A = 0;
+ 117:../LUFA/Drivers/Peripheral/Serial.h **** 				UCSR1C = 0;
+ 118:../LUFA/Drivers/Peripheral/Serial.h **** 
+ 119:../LUFA/Drivers/Peripheral/Serial.h **** 				UBRR1  = 0;
+ 120:../LUFA/Drivers/Peripheral/Serial.h **** 				
+ 121:../LUFA/Drivers/Peripheral/Serial.h **** 				DDRD  &= ~(1 << 3);
+ 122:../LUFA/Drivers/Peripheral/Serial.h **** 				PORTD &= ~(1 << 2);
+ 123:../LUFA/Drivers/Peripheral/Serial.h **** 			}
+ 124:../LUFA/Drivers/Peripheral/Serial.h **** 
+ 125:../LUFA/Drivers/Peripheral/Serial.h **** 			/** Indicates whether a character has been received through the USART.
+ 126:../LUFA/Drivers/Peripheral/Serial.h **** 			 *
+ 127:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  \return Boolean true if a character has been received, false otherwise.
+ 128:../LUFA/Drivers/Peripheral/Serial.h **** 			 */
+ 129:../LUFA/Drivers/Peripheral/Serial.h **** 			static inline bool Serial_IsCharReceived(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 130:../LUFA/Drivers/Peripheral/Serial.h **** 			static inline bool Serial_IsCharReceived(void)
+ 131:../LUFA/Drivers/Peripheral/Serial.h **** 			{
+ 132:../LUFA/Drivers/Peripheral/Serial.h **** 				return ((UCSR1A & (1 << RXC1)) ? true : false);
+ 133:../LUFA/Drivers/Peripheral/Serial.h **** 			}
+ 134:../LUFA/Drivers/Peripheral/Serial.h **** 			
+ 135:../LUFA/Drivers/Peripheral/Serial.h **** 			/** Transmits a given byte through the USART.
+ 136:../LUFA/Drivers/Peripheral/Serial.h **** 			 *
+ 137:../LUFA/Drivers/Peripheral/Serial.h **** 			 *  \param[in] DataByte  Byte to transmit through the USART.
+ 138:../LUFA/Drivers/Peripheral/Serial.h **** 			 */
+ 139:../LUFA/Drivers/Peripheral/Serial.h **** 			static inline void Serial_TxByte(const char DataByte) ATTR_ALWAYS_INLINE;
+ 140:../LUFA/Drivers/Peripheral/Serial.h **** 			static inline void Serial_TxByte(const char DataByte)
+ 141:../LUFA/Drivers/Peripheral/Serial.h **** 			{
+ 142:../LUFA/Drivers/Peripheral/Serial.h **** 				while (!(UCSR1A & (1 << UDRE1)));
+ 870               		.loc 5 142 0
+ 871 00de 9091 C800 		lds r25,200
+ 872 00e2 95FF      		sbrs r25,5
+ 873 00e4 00C0      		rjmp .L75
+ 143:../LUFA/Drivers/Peripheral/Serial.h **** 				UDR1 = DataByte;
+ 874               		.loc 5 143 0
+ 875 00e6 8093 CE00 		sts 206,r24
+ 876               	.LVL78:
+ 877               	.LBE165:
+ 878               	.LBE164:
+ 879               	.LBB166:
+ 880               	.LBB167:
+  75:./Board/LEDs.h **** 			}
+ 881               		.loc 4 75 0
+ 882 00ea 5C98      		cbi 0xb,4
+ 883               	.LVL79:
+ 884               	.LBE167:
+ 885               	.LBE166:
+ 318:dualMoco.c    **** 		  	
+ 319:dualMoco.c    **** 		  	LEDs_TurnOnLEDs(LEDMASK_RX);
+ 320:dualMoco.c    **** 			PulseMSRemaining.RxLEDPulse = TX_RX_LED_PULSE_MS;
+ 886               		.loc 3 320 0
+ 887 00ec D093 0000 		sts PulseMSRemaining+1,r29
+ 888               	.L74:
+ 321:dualMoco.c    **** 		}
+ 322:dualMoco.c    **** 		
+ 323:dualMoco.c    **** 		CDC_Device_USBTask(&VirtualSerial_CDC_Interface);
+ 889               		.loc 3 323 0
+ 890 00f0 80E0      		ldi r24,lo8(VirtualSerial_CDC_Interface)
+ 891 00f2 90E0      		ldi r25,hi8(VirtualSerial_CDC_Interface)
+ 892 00f4 0E94 0000 		call CDC_Device_USBTask
+ 893               	.LVL80:
+ 324:dualMoco.c    **** 		USB_USBTask();
+ 894               		.loc 3 324 0
+ 895 00f8 0E94 0000 		call USB_USBTask
+ 896               	.LVL81:
+ 897               	.LBE133:
+ 325:dualMoco.c    **** 	}
+ 898               		.loc 3 325 0
+ 899 00fc 00C0      		rjmp .L76
+ 900               		.cfi_endproc
+ 901               	.LFE95:
+ 903               		.section	.text.SetupHardware,"ax",@progbits
+ 904               	.global	SetupHardware
+ 906               	SetupHardware:
+ 907               	.LFB96:
+ 326:dualMoco.c    **** }
+ 327:dualMoco.c    **** 
+ 328:dualMoco.c    **** 
+ 329:dualMoco.c    **** /** Configures the board hardware and chip peripherals for the demo's functionality. */
+ 330:dualMoco.c    **** void SetupHardware(void)
+ 331:dualMoco.c    **** {
+ 908               		.loc 3 331 0
+ 909               		.cfi_startproc
+ 910               	/* prologue: function */
+ 911               	/* frame size = 0 */
+ 912               	/* stack size = 0 */
+ 913               	.L__stack_usage = 0
+ 332:dualMoco.c    **** 	/* Disable watchdog if enabled by bootloader/fuses */
+ 333:dualMoco.c    **** 	MCUSR &= ~(1 << WDRF);
+ 914               		.loc 3 333 0
+ 915 0000 84B7      		in r24,0x34
+ 916 0002 877F      		andi r24,lo8(-9)
+ 917 0004 84BF      		out 0x34,r24
+ 918               	.LBB174:
+ 919               	.LBB175:
+ 920               		.file 6 "/usr/lib/avr/include/avr/wdt.h"
+   1:/usr/lib/avr/include/avr/wdt.h **** /* Copyright (c) 2002, 2004 Marek Michalkiewicz
+   2:/usr/lib/avr/include/avr/wdt.h ****    Copyright (c) 2005, 2006, 2007 Eric B. Weddington
+   3:/usr/lib/avr/include/avr/wdt.h ****    All rights reserved.
+   4:/usr/lib/avr/include/avr/wdt.h **** 
+   5:/usr/lib/avr/include/avr/wdt.h ****    Redistribution and use in source and binary forms, with or without
+   6:/usr/lib/avr/include/avr/wdt.h ****    modification, are permitted provided that the following conditions are met:
+   7:/usr/lib/avr/include/avr/wdt.h **** 
+   8:/usr/lib/avr/include/avr/wdt.h ****    * Redistributions of source code must retain the above copyright
+   9:/usr/lib/avr/include/avr/wdt.h ****      notice, this list of conditions and the following disclaimer.
+  10:/usr/lib/avr/include/avr/wdt.h **** 
+  11:/usr/lib/avr/include/avr/wdt.h ****    * Redistributions in binary form must reproduce the above copyright
+  12:/usr/lib/avr/include/avr/wdt.h ****      notice, this list of conditions and the following disclaimer in
+  13:/usr/lib/avr/include/avr/wdt.h ****      the documentation and/or other materials provided with the
+  14:/usr/lib/avr/include/avr/wdt.h ****      distribution.
+  15:/usr/lib/avr/include/avr/wdt.h **** 
+  16:/usr/lib/avr/include/avr/wdt.h ****    * Neither the name of the copyright holders nor the names of
+  17:/usr/lib/avr/include/avr/wdt.h ****      contributors may be used to endorse or promote products derived
+  18:/usr/lib/avr/include/avr/wdt.h ****      from this software without specific prior written permission.
+  19:/usr/lib/avr/include/avr/wdt.h **** 
+  20:/usr/lib/avr/include/avr/wdt.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  21:/usr/lib/avr/include/avr/wdt.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  22:/usr/lib/avr/include/avr/wdt.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  23:/usr/lib/avr/include/avr/wdt.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  24:/usr/lib/avr/include/avr/wdt.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  25:/usr/lib/avr/include/avr/wdt.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  26:/usr/lib/avr/include/avr/wdt.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  27:/usr/lib/avr/include/avr/wdt.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  28:/usr/lib/avr/include/avr/wdt.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  29:/usr/lib/avr/include/avr/wdt.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  30:/usr/lib/avr/include/avr/wdt.h ****   POSSIBILITY OF SUCH DAMAGE. */
+  31:/usr/lib/avr/include/avr/wdt.h **** 
+  32:/usr/lib/avr/include/avr/wdt.h **** /* $Id$ */
+  33:/usr/lib/avr/include/avr/wdt.h **** 
+  34:/usr/lib/avr/include/avr/wdt.h **** /*
+  35:/usr/lib/avr/include/avr/wdt.h ****    avr/wdt.h - macros for AVR watchdog timer
+  36:/usr/lib/avr/include/avr/wdt.h ****  */
+  37:/usr/lib/avr/include/avr/wdt.h **** 
+  38:/usr/lib/avr/include/avr/wdt.h **** #ifndef _AVR_WDT_H_
+  39:/usr/lib/avr/include/avr/wdt.h **** #define _AVR_WDT_H_
+  40:/usr/lib/avr/include/avr/wdt.h **** 
+  41:/usr/lib/avr/include/avr/wdt.h **** #include <avr/io.h>
+  42:/usr/lib/avr/include/avr/wdt.h **** #include <stdint.h>
+  43:/usr/lib/avr/include/avr/wdt.h **** 
+  44:/usr/lib/avr/include/avr/wdt.h **** /** \file */
+  45:/usr/lib/avr/include/avr/wdt.h **** /** \defgroup avr_watchdog <avr/wdt.h>: Watchdog timer handling
+  46:/usr/lib/avr/include/avr/wdt.h ****     \code #include <avr/wdt.h> \endcode
+  47:/usr/lib/avr/include/avr/wdt.h **** 
+  48:/usr/lib/avr/include/avr/wdt.h ****     This header file declares the interface to some inline macros
+  49:/usr/lib/avr/include/avr/wdt.h ****     handling the watchdog timer present in many AVR devices.  In order
+  50:/usr/lib/avr/include/avr/wdt.h ****     to prevent the watchdog timer configuration from being
+  51:/usr/lib/avr/include/avr/wdt.h ****     accidentally altered by a crashing application, a special timed
+  52:/usr/lib/avr/include/avr/wdt.h ****     sequence is required in order to change it.  The macros within
+  53:/usr/lib/avr/include/avr/wdt.h ****     this header file handle the required sequence automatically
+  54:/usr/lib/avr/include/avr/wdt.h ****     before changing any value.  Interrupts will be disabled during
+  55:/usr/lib/avr/include/avr/wdt.h ****     the manipulation.
+  56:/usr/lib/avr/include/avr/wdt.h **** 
+  57:/usr/lib/avr/include/avr/wdt.h ****     \note Depending on the fuse configuration of the particular
+  58:/usr/lib/avr/include/avr/wdt.h ****     device, further restrictions might apply, in particular it might
+  59:/usr/lib/avr/include/avr/wdt.h ****     be disallowed to turn off the watchdog timer.
+  60:/usr/lib/avr/include/avr/wdt.h **** 
+  61:/usr/lib/avr/include/avr/wdt.h ****     Note that for newer devices (ATmega88 and newer, effectively any
+  62:/usr/lib/avr/include/avr/wdt.h ****     AVR that has the option to also generate interrupts), the watchdog
+  63:/usr/lib/avr/include/avr/wdt.h ****     timer remains active even after a system reset (except a power-on
+  64:/usr/lib/avr/include/avr/wdt.h ****     condition), using the fastest prescaler value (approximately 15
+  65:/usr/lib/avr/include/avr/wdt.h ****     ms).  It is therefore required to turn off the watchdog early
+  66:/usr/lib/avr/include/avr/wdt.h ****     during program startup, the datasheet recommends a sequence like
+  67:/usr/lib/avr/include/avr/wdt.h ****     the following:
+  68:/usr/lib/avr/include/avr/wdt.h **** 
+  69:/usr/lib/avr/include/avr/wdt.h ****     \code
+  70:/usr/lib/avr/include/avr/wdt.h ****     #include <stdint.h>
+  71:/usr/lib/avr/include/avr/wdt.h ****     #include <avr/wdt.h>
+  72:/usr/lib/avr/include/avr/wdt.h **** 
+  73:/usr/lib/avr/include/avr/wdt.h ****     uint8_t mcusr_mirror __attribute__ ((section (".noinit")));
+  74:/usr/lib/avr/include/avr/wdt.h **** 
+  75:/usr/lib/avr/include/avr/wdt.h ****     void get_mcusr(void) \
+  76:/usr/lib/avr/include/avr/wdt.h ****       __attribute__((naked)) \
+  77:/usr/lib/avr/include/avr/wdt.h ****       __attribute__((section(".init3")));
+  78:/usr/lib/avr/include/avr/wdt.h ****     void get_mcusr(void)
+  79:/usr/lib/avr/include/avr/wdt.h ****     {
+  80:/usr/lib/avr/include/avr/wdt.h ****       mcusr_mirror = MCUSR;
+  81:/usr/lib/avr/include/avr/wdt.h ****       MCUSR = 0;
+  82:/usr/lib/avr/include/avr/wdt.h ****       wdt_disable();
+  83:/usr/lib/avr/include/avr/wdt.h ****     }
+  84:/usr/lib/avr/include/avr/wdt.h ****     \endcode
+  85:/usr/lib/avr/include/avr/wdt.h **** 
+  86:/usr/lib/avr/include/avr/wdt.h ****     Saving the value of MCUSR in \c mcusr_mirror is only needed if the
+  87:/usr/lib/avr/include/avr/wdt.h ****     application later wants to examine the reset source, but in particular, 
+  88:/usr/lib/avr/include/avr/wdt.h ****     clearing the watchdog reset flag before disabling the
+  89:/usr/lib/avr/include/avr/wdt.h ****     watchdog is required, according to the datasheet.
+  90:/usr/lib/avr/include/avr/wdt.h **** */
+  91:/usr/lib/avr/include/avr/wdt.h **** 
+  92:/usr/lib/avr/include/avr/wdt.h **** /**
+  93:/usr/lib/avr/include/avr/wdt.h ****    \ingroup avr_watchdog
+  94:/usr/lib/avr/include/avr/wdt.h ****    Reset the watchdog timer.  When the watchdog timer is enabled,
+  95:/usr/lib/avr/include/avr/wdt.h ****    a call to this instruction is required before the timer expires,
+  96:/usr/lib/avr/include/avr/wdt.h ****    otherwise a watchdog-initiated device reset will occur. 
+  97:/usr/lib/avr/include/avr/wdt.h **** */
+  98:/usr/lib/avr/include/avr/wdt.h **** 
+  99:/usr/lib/avr/include/avr/wdt.h **** #define wdt_reset() __asm__ __volatile__ ("wdr")
+ 100:/usr/lib/avr/include/avr/wdt.h **** 
+ 101:/usr/lib/avr/include/avr/wdt.h **** #ifndef __DOXYGEN__
+ 102:/usr/lib/avr/include/avr/wdt.h **** 
+ 103:/usr/lib/avr/include/avr/wdt.h **** #if defined(WDP3)
+ 104:/usr/lib/avr/include/avr/wdt.h **** # define _WD_PS3_MASK       _BV(WDP3)
+ 105:/usr/lib/avr/include/avr/wdt.h **** #else
+ 106:/usr/lib/avr/include/avr/wdt.h **** # define _WD_PS3_MASK       0x00
+ 107:/usr/lib/avr/include/avr/wdt.h **** #endif
+ 108:/usr/lib/avr/include/avr/wdt.h **** 
+ 109:/usr/lib/avr/include/avr/wdt.h **** #if defined(WDTCSR)
+ 110:/usr/lib/avr/include/avr/wdt.h **** #  define _WD_CONTROL_REG     WDTCSR
+ 111:/usr/lib/avr/include/avr/wdt.h **** #elif defined(WDTCR)
+ 112:/usr/lib/avr/include/avr/wdt.h **** #  define _WD_CONTROL_REG     WDTCR
+ 113:/usr/lib/avr/include/avr/wdt.h **** #else
+ 114:/usr/lib/avr/include/avr/wdt.h **** #  define _WD_CONTROL_REG     WDT
+ 115:/usr/lib/avr/include/avr/wdt.h **** #endif
+ 116:/usr/lib/avr/include/avr/wdt.h **** 
+ 117:/usr/lib/avr/include/avr/wdt.h **** #if defined(WDTOE)
+ 118:/usr/lib/avr/include/avr/wdt.h **** #define _WD_CHANGE_BIT      WDTOE
+ 119:/usr/lib/avr/include/avr/wdt.h **** #else
+ 120:/usr/lib/avr/include/avr/wdt.h **** #define _WD_CHANGE_BIT      WDCE
+ 121:/usr/lib/avr/include/avr/wdt.h **** #endif
+ 122:/usr/lib/avr/include/avr/wdt.h **** 
+ 123:/usr/lib/avr/include/avr/wdt.h **** #endif	/* !__DOXYGEN__ */
+ 124:/usr/lib/avr/include/avr/wdt.h **** 
+ 125:/usr/lib/avr/include/avr/wdt.h **** 
+ 126:/usr/lib/avr/include/avr/wdt.h **** /**
+ 127:/usr/lib/avr/include/avr/wdt.h ****    \ingroup avr_watchdog
+ 128:/usr/lib/avr/include/avr/wdt.h ****    Enable the watchdog timer, configuring it for expiry after
+ 129:/usr/lib/avr/include/avr/wdt.h ****    \c timeout (which is a combination of the \c WDP0 through
+ 130:/usr/lib/avr/include/avr/wdt.h ****    \c WDP2 bits to write into the \c WDTCR register; For those devices 
+ 131:/usr/lib/avr/include/avr/wdt.h ****    that have a \c WDTCSR register, it uses the combination of the \c WDP0 
+ 132:/usr/lib/avr/include/avr/wdt.h ****    through \c WDP3 bits).
+ 133:/usr/lib/avr/include/avr/wdt.h **** 
+ 134:/usr/lib/avr/include/avr/wdt.h ****    See also the symbolic constants \c WDTO_15MS et al.
+ 135:/usr/lib/avr/include/avr/wdt.h **** */
+ 136:/usr/lib/avr/include/avr/wdt.h **** 
+ 137:/usr/lib/avr/include/avr/wdt.h **** 
+ 138:/usr/lib/avr/include/avr/wdt.h **** #if defined(__AVR_XMEGA__)
+ 139:/usr/lib/avr/include/avr/wdt.h **** 
+ 140:/usr/lib/avr/include/avr/wdt.h **** #if defined (WDT_CTRLA) && !defined(RAMPD)
+ 141:/usr/lib/avr/include/avr/wdt.h **** 
+ 142:/usr/lib/avr/include/avr/wdt.h **** #define wdt_enable(timeout) \
+ 143:/usr/lib/avr/include/avr/wdt.h **** do { \
+ 144:/usr/lib/avr/include/avr/wdt.h **** uint8_t temp; \
+ 145:/usr/lib/avr/include/avr/wdt.h **** __asm__ __volatile__ ( \
+ 146:/usr/lib/avr/include/avr/wdt.h **** 	"wdr"									"\n\t" \
+ 147:/usr/lib/avr/include/avr/wdt.h **** 	"out %[ccp_reg], %[ioreg_cen_mask]"		"\n\t" \
+ 148:/usr/lib/avr/include/avr/wdt.h **** 	"lds %[tmp], %[wdt_reg]"				"\n\t" \
+ 149:/usr/lib/avr/include/avr/wdt.h **** 	"sbr %[tmp], %[wdt_enable_timeout]"		"\n\t" \
+ 150:/usr/lib/avr/include/avr/wdt.h **** 	"sts %[wdt_reg], %[tmp]"				"\n\t" \
+ 151:/usr/lib/avr/include/avr/wdt.h **** 	"1:lds %[tmp], %[wdt_status_reg]"		"\n\t" \
+ 152:/usr/lib/avr/include/avr/wdt.h **** 	"sbrc %[tmp], %[wdt_syncbusy_bit]"		"\n\t" \
+ 153:/usr/lib/avr/include/avr/wdt.h **** 	"rjmp 1b"								"\n\t" \
+ 154:/usr/lib/avr/include/avr/wdt.h **** 	: [tmp]					"=r" (temp) \
+ 155:/usr/lib/avr/include/avr/wdt.h **** 	: [ccp_reg]				"I"  (_SFR_IO_ADDR(CCP)), \
+ 156:/usr/lib/avr/include/avr/wdt.h **** 	  [ioreg_cen_mask]		"r"  ((uint8_t)CCP_IOREG_gc), \
+ 157:/usr/lib/avr/include/avr/wdt.h **** 	  [wdt_reg]				"n"  (_SFR_MEM_ADDR(WDT_CTRLA)), \
+ 158:/usr/lib/avr/include/avr/wdt.h **** 	  [wdt_enable_timeout]	"M"  (timeout), \
+ 159:/usr/lib/avr/include/avr/wdt.h **** 	  [wdt_status_reg]		"n"  (_SFR_MEM_ADDR(WDT_STATUS)), \
+ 160:/usr/lib/avr/include/avr/wdt.h **** 	  [wdt_syncbusy_bit]	"I"  (WDT_SYNCBUSY_bm) \
+ 161:/usr/lib/avr/include/avr/wdt.h **** ); \
+ 162:/usr/lib/avr/include/avr/wdt.h **** } while(0)
+ 163:/usr/lib/avr/include/avr/wdt.h **** 
+ 164:/usr/lib/avr/include/avr/wdt.h **** #define wdt_disable() \
+ 165:/usr/lib/avr/include/avr/wdt.h **** do { \
+ 166:/usr/lib/avr/include/avr/wdt.h **** uint8_t temp; \
+ 167:/usr/lib/avr/include/avr/wdt.h **** __asm__ __volatile__ (  \
+ 168:/usr/lib/avr/include/avr/wdt.h **** 	"wdr"								"\n\t" \
+ 169:/usr/lib/avr/include/avr/wdt.h **** 	"out %[ccp_reg], %[ioreg_cen_mask]" "\n\t" \
+ 170:/usr/lib/avr/include/avr/wdt.h **** 	"lds %[tmp], %[wdt_reg]"			"\n\t" \
+ 171:/usr/lib/avr/include/avr/wdt.h **** 	"cbr %[tmp], %[timeout_mask]"       "\n\t" \
+ 172:/usr/lib/avr/include/avr/wdt.h **** 	"sts %[wdt_reg], %[tmp]"			"\n\t" \
+ 173:/usr/lib/avr/include/avr/wdt.h ****     : [tmp]            "=r" (temp) \
+ 174:/usr/lib/avr/include/avr/wdt.h ****     : [ccp_reg]        "I" (_SFR_IO_ADDR(CCP)),       \
+ 175:/usr/lib/avr/include/avr/wdt.h ****       [ioreg_cen_mask] "r" ((uint8_t)CCP_IOREG_gc),   \
+ 176:/usr/lib/avr/include/avr/wdt.h ****       [wdt_reg]        "n" (_SFR_MEM_ADDR(WDT_CTRLA)),\
+ 177:/usr/lib/avr/include/avr/wdt.h ****       [timeout_mask]   "I" (WDT_PERIOD_gm) \
+ 178:/usr/lib/avr/include/avr/wdt.h **** ); \
+ 179:/usr/lib/avr/include/avr/wdt.h **** } while(0)
+ 180:/usr/lib/avr/include/avr/wdt.h **** 
+ 181:/usr/lib/avr/include/avr/wdt.h **** #else // defined (WDT_CTRLA) && !defined(RAMPD)
+ 182:/usr/lib/avr/include/avr/wdt.h **** 
+ 183:/usr/lib/avr/include/avr/wdt.h **** /*
+ 184:/usr/lib/avr/include/avr/wdt.h ****    wdt_enable(timeout) for xmega devices
+ 185:/usr/lib/avr/include/avr/wdt.h **** ** write signature (CCP_IOREG_gc) that enables change of protected I/O
+ 186:/usr/lib/avr/include/avr/wdt.h ****    registers to the CCP register
+ 187:/usr/lib/avr/include/avr/wdt.h **** ** At the same time,
+ 188:/usr/lib/avr/include/avr/wdt.h ****    1) set WDT change enable (WDT_CEN_bm)
+ 189:/usr/lib/avr/include/avr/wdt.h ****    2) enable WDT (WDT_ENABLE_bm)
+ 190:/usr/lib/avr/include/avr/wdt.h ****    3) set timeout (timeout)
+ 191:/usr/lib/avr/include/avr/wdt.h **** ** Synchronization starts when ENABLE bit of WDT is set. So, wait till it
+ 192:/usr/lib/avr/include/avr/wdt.h ****    finishes (SYNCBUSY of STATUS register is automatically cleared after the
+ 193:/usr/lib/avr/include/avr/wdt.h ****    sync is finished).
+ 194:/usr/lib/avr/include/avr/wdt.h **** */
+ 195:/usr/lib/avr/include/avr/wdt.h **** #define wdt_enable(timeout) \
+ 196:/usr/lib/avr/include/avr/wdt.h **** do { \
+ 197:/usr/lib/avr/include/avr/wdt.h **** uint8_t temp; \
+ 198:/usr/lib/avr/include/avr/wdt.h **** __asm__ __volatile__ (         \
+ 199:/usr/lib/avr/include/avr/wdt.h ****     "in __tmp_reg__, %[rampd]"              "\n\t" \
+ 200:/usr/lib/avr/include/avr/wdt.h ****     "out %[rampd], __zero_reg__"            "\n\t" \
+ 201:/usr/lib/avr/include/avr/wdt.h ****     "out %[ccp_reg], %[ioreg_cen_mask]"     "\n\t" \
+ 202:/usr/lib/avr/include/avr/wdt.h ****     "sts %[wdt_reg], %[wdt_enable_timeout]" "\n\t" \
+ 203:/usr/lib/avr/include/avr/wdt.h ****     "1:lds %[tmp], %[wdt_status_reg]"       "\n\t" \
+ 204:/usr/lib/avr/include/avr/wdt.h ****     "sbrc %[tmp], %[wdt_syncbusy_bit]"      "\n\t" \
+ 205:/usr/lib/avr/include/avr/wdt.h ****     "rjmp 1b"                               "\n\t" \
+ 206:/usr/lib/avr/include/avr/wdt.h ****     "out %[rampd], __tmp_reg__"             "\n\t" \
+ 207:/usr/lib/avr/include/avr/wdt.h ****     : [tmp]                "=r" (temp) \
+ 208:/usr/lib/avr/include/avr/wdt.h ****     : [rampd]              "I" (_SFR_IO_ADDR(RAMPD)),      \
+ 209:/usr/lib/avr/include/avr/wdt.h ****       [ccp_reg]            "I" (_SFR_IO_ADDR(CCP)),        \
+ 210:/usr/lib/avr/include/avr/wdt.h ****       [ioreg_cen_mask]     "r" ((uint8_t)CCP_IOREG_gc),     \
+ 211:/usr/lib/avr/include/avr/wdt.h ****       [wdt_reg]            "n" (_SFR_MEM_ADDR(WDT_CTRL)),   \
+ 212:/usr/lib/avr/include/avr/wdt.h ****       [wdt_enable_timeout] "r" ((uint8_t)(WDT_CEN_bm | WDT_ENABLE_bm | timeout)), \
+ 213:/usr/lib/avr/include/avr/wdt.h ****       [wdt_status_reg]     "n" (_SFR_MEM_ADDR(WDT_STATUS)), \
+ 214:/usr/lib/avr/include/avr/wdt.h ****       [wdt_syncbusy_bit]   "I" (WDT_SYNCBUSY_bm)            \
+ 215:/usr/lib/avr/include/avr/wdt.h ****     : "r0" \
+ 216:/usr/lib/avr/include/avr/wdt.h **** ); \
+ 217:/usr/lib/avr/include/avr/wdt.h **** } while(0)
+ 218:/usr/lib/avr/include/avr/wdt.h **** 
+ 219:/usr/lib/avr/include/avr/wdt.h **** #define wdt_disable() \
+ 220:/usr/lib/avr/include/avr/wdt.h **** __asm__ __volatile__ (  \
+ 221:/usr/lib/avr/include/avr/wdt.h ****     "in __tmp_reg__, %[rampd]"          "\n\t" \
+ 222:/usr/lib/avr/include/avr/wdt.h ****     "out %[rampd], __zero_reg__"        "\n\t" \
+ 223:/usr/lib/avr/include/avr/wdt.h ****     "out %[ccp_reg], %[ioreg_cen_mask]" "\n\t" \
+ 224:/usr/lib/avr/include/avr/wdt.h ****     "sts %[wdt_reg], %[disable_mask]"   "\n\t" \
+ 225:/usr/lib/avr/include/avr/wdt.h ****     "out %[rampd], __tmp_reg__"         "\n\t" \
+ 226:/usr/lib/avr/include/avr/wdt.h ****     : \
+ 227:/usr/lib/avr/include/avr/wdt.h ****     : [rampd]             "I" (_SFR_IO_ADDR(RAMPD)),    \
+ 228:/usr/lib/avr/include/avr/wdt.h ****       [ccp_reg]           "I" (_SFR_IO_ADDR(CCP)),      \
+ 229:/usr/lib/avr/include/avr/wdt.h ****       [ioreg_cen_mask]    "r" ((uint8_t)CCP_IOREG_gc),   \
+ 230:/usr/lib/avr/include/avr/wdt.h ****       [wdt_reg]           "n" (_SFR_MEM_ADDR(WDT_CTRL)), \
+ 231:/usr/lib/avr/include/avr/wdt.h ****       [disable_mask]      "r" ((uint8_t)((~WDT_ENABLE_bm) | WDT_CEN_bm)) \
+ 232:/usr/lib/avr/include/avr/wdt.h ****     : "r0" \
+ 233:/usr/lib/avr/include/avr/wdt.h **** );
+ 234:/usr/lib/avr/include/avr/wdt.h **** 
+ 235:/usr/lib/avr/include/avr/wdt.h **** #endif // defined (WDT_CTRLA) && !defined(RAMPD)
+ 236:/usr/lib/avr/include/avr/wdt.h **** 
+ 237:/usr/lib/avr/include/avr/wdt.h **** #elif defined(__AVR_TINY__)
+ 238:/usr/lib/avr/include/avr/wdt.h **** 
+ 239:/usr/lib/avr/include/avr/wdt.h **** #define wdt_enable(value) \
+ 240:/usr/lib/avr/include/avr/wdt.h **** __asm__ __volatile__ ( \
+ 241:/usr/lib/avr/include/avr/wdt.h ****     "in __tmp_reg__,__SREG__" "\n\t"  \
+ 242:/usr/lib/avr/include/avr/wdt.h ****     "cli" "\n\t"  \
+ 243:/usr/lib/avr/include/avr/wdt.h ****     "wdr" "\n\t"  \
+ 244:/usr/lib/avr/include/avr/wdt.h ****     "out %[CCPADDRESS],%[SIGNATURE]" "\n\t"  \
+ 245:/usr/lib/avr/include/avr/wdt.h ****     "out %[WDTREG],%[WDVALUE]" "\n\t"  \
+ 246:/usr/lib/avr/include/avr/wdt.h ****     "out __SREG__,__tmp_reg__" "\n\t"  \
+ 247:/usr/lib/avr/include/avr/wdt.h ****     : /* no outputs */  \
+ 248:/usr/lib/avr/include/avr/wdt.h ****     : [CCPADDRESS] "I" (_SFR_IO_ADDR(CCP)),  \
+ 249:/usr/lib/avr/include/avr/wdt.h ****       [SIGNATURE] "r" ((uint8_t)0xD8), \
+ 250:/usr/lib/avr/include/avr/wdt.h ****       [WDTREG] "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)), \
+ 251:/usr/lib/avr/include/avr/wdt.h ****       [WDVALUE] "r" ((uint8_t)((value & 0x08 ? _WD_PS3_MASK : 0x00) \
+ 252:/usr/lib/avr/include/avr/wdt.h ****       | _BV(WDE) | (value & 0x07) )) \
+ 253:/usr/lib/avr/include/avr/wdt.h ****     : "r16" \
+ 254:/usr/lib/avr/include/avr/wdt.h **** )
+ 255:/usr/lib/avr/include/avr/wdt.h **** 
+ 256:/usr/lib/avr/include/avr/wdt.h **** #define wdt_disable() \
+ 257:/usr/lib/avr/include/avr/wdt.h **** do { \
+ 258:/usr/lib/avr/include/avr/wdt.h **** uint8_t temp_wd; \
+ 259:/usr/lib/avr/include/avr/wdt.h **** __asm__ __volatile__ ( \
+ 260:/usr/lib/avr/include/avr/wdt.h ****     "in __tmp_reg__,__SREG__" "\n\t"  \
+ 261:/usr/lib/avr/include/avr/wdt.h ****     "cli" "\n\t"  \
+ 262:/usr/lib/avr/include/avr/wdt.h ****     "wdr" "\n\t"  \
+ 263:/usr/lib/avr/include/avr/wdt.h ****     "out %[CCPADDRESS],%[SIGNATURE]" "\n\t"  \
+ 264:/usr/lib/avr/include/avr/wdt.h ****     "in  %[TEMP_WD],%[WDTREG]" "\n\t" \
+ 265:/usr/lib/avr/include/avr/wdt.h ****     "cbr %[TEMP_WD],%[WDVALUE]" "\n\t" \
+ 266:/usr/lib/avr/include/avr/wdt.h ****     "out %[WDTREG],%[TEMP_WD]" "\n\t" \
+ 267:/usr/lib/avr/include/avr/wdt.h ****     "out __SREG__,__tmp_reg__" "\n\t" \
+ 268:/usr/lib/avr/include/avr/wdt.h ****     : /*no output */ \
+ 269:/usr/lib/avr/include/avr/wdt.h ****     : [CCPADDRESS] "I" (_SFR_IO_ADDR(CCP)), \
+ 270:/usr/lib/avr/include/avr/wdt.h ****       [SIGNATURE] "r" ((uint8_t)0xD8), \
+ 271:/usr/lib/avr/include/avr/wdt.h ****       [WDTREG] "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)), \
+ 272:/usr/lib/avr/include/avr/wdt.h ****       [TEMP_WD] "d" (temp_wd), \
+ 273:/usr/lib/avr/include/avr/wdt.h ****       [WDVALUE] "n" (1 << WDE) \
+ 274:/usr/lib/avr/include/avr/wdt.h ****     : "r16" \
+ 275:/usr/lib/avr/include/avr/wdt.h **** ); \
+ 276:/usr/lib/avr/include/avr/wdt.h **** }while(0)
+ 277:/usr/lib/avr/include/avr/wdt.h **** 
+ 278:/usr/lib/avr/include/avr/wdt.h **** #elif defined(CCP)
+ 279:/usr/lib/avr/include/avr/wdt.h **** 
+ 280:/usr/lib/avr/include/avr/wdt.h **** static __inline__
+ 281:/usr/lib/avr/include/avr/wdt.h **** __attribute__ ((__always_inline__))
+ 282:/usr/lib/avr/include/avr/wdt.h **** void wdt_enable (const uint8_t value)
+ 283:/usr/lib/avr/include/avr/wdt.h **** {
+ 284:/usr/lib/avr/include/avr/wdt.h **** 	if (!_SFR_IO_REG_P (CCP) && !_SFR_IO_REG_P (_WD_CONTROL_REG))
+ 285:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 286:/usr/lib/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
+ 287:/usr/lib/avr/include/avr/wdt.h **** 			"in __tmp_reg__,__SREG__" "\n\t"
+ 288:/usr/lib/avr/include/avr/wdt.h **** 			"cli" "\n\t"
+ 289:/usr/lib/avr/include/avr/wdt.h **** 			"wdr" "\n\t"
+ 290:/usr/lib/avr/include/avr/wdt.h **** 			"sts %[CCPADDRESS],%[SIGNATURE]" "\n\t"
+ 291:/usr/lib/avr/include/avr/wdt.h **** 			"sts %[WDTREG],%[WDVALUE]" "\n\t"
+ 292:/usr/lib/avr/include/avr/wdt.h **** 			"out __SREG__,__tmp_reg__" "\n\t"
+ 293:/usr/lib/avr/include/avr/wdt.h **** 			: /* no outputs */
+ 294:/usr/lib/avr/include/avr/wdt.h **** 			: [CCPADDRESS] "n" (_SFR_MEM_ADDR(CCP)),
+ 295:/usr/lib/avr/include/avr/wdt.h **** 			[SIGNATURE] "r" ((uint8_t)0xD8),
+ 296:/usr/lib/avr/include/avr/wdt.h **** 			[WDTREG] "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+ 297:/usr/lib/avr/include/avr/wdt.h **** 			[WDVALUE] "r" ((uint8_t)((value & 0x08 ? _WD_PS3_MASK : 0x00)
+ 298:/usr/lib/avr/include/avr/wdt.h **** 				| _BV(WDE) | (value & 0x07) ))
+ 299:/usr/lib/avr/include/avr/wdt.h **** 			: "r0"
+ 300:/usr/lib/avr/include/avr/wdt.h **** 			);
+ 301:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 302:/usr/lib/avr/include/avr/wdt.h **** 	else if (!_SFR_IO_REG_P (CCP) && _SFR_IO_REG_P (_WD_CONTROL_REG))
+ 303:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 304:/usr/lib/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
+ 305:/usr/lib/avr/include/avr/wdt.h **** 			"in __tmp_reg__,__SREG__" "\n\t"
+ 306:/usr/lib/avr/include/avr/wdt.h **** 			"cli" "\n\t"
+ 307:/usr/lib/avr/include/avr/wdt.h **** 			"wdr" "\n\t"
+ 308:/usr/lib/avr/include/avr/wdt.h **** 			"sts %[CCPADDRESS],%[SIGNATURE]" "\n\t"
+ 309:/usr/lib/avr/include/avr/wdt.h **** 			"out %[WDTREG],%[WDVALUE]" "\n\t"
+ 310:/usr/lib/avr/include/avr/wdt.h **** 			"out __SREG__,__tmp_reg__" "\n\t"
+ 311:/usr/lib/avr/include/avr/wdt.h **** 			: /* no outputs */
+ 312:/usr/lib/avr/include/avr/wdt.h **** 			: [CCPADDRESS] "n" (_SFR_MEM_ADDR(CCP)),
+ 313:/usr/lib/avr/include/avr/wdt.h **** 			[SIGNATURE] "r" ((uint8_t)0xD8),
+ 314:/usr/lib/avr/include/avr/wdt.h **** 			[WDTREG] "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+ 315:/usr/lib/avr/include/avr/wdt.h **** 			[WDVALUE] "r" ((uint8_t)((value & 0x08 ? _WD_PS3_MASK : 0x00)
+ 316:/usr/lib/avr/include/avr/wdt.h **** 				| _BV(WDE) | (value & 0x07) ))
+ 317:/usr/lib/avr/include/avr/wdt.h **** 			: "r0"
+ 318:/usr/lib/avr/include/avr/wdt.h **** 			);
+ 319:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 320:/usr/lib/avr/include/avr/wdt.h **** 	else if (_SFR_IO_REG_P (CCP) && !_SFR_IO_REG_P (_WD_CONTROL_REG))
+ 321:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 322:/usr/lib/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
+ 323:/usr/lib/avr/include/avr/wdt.h **** 			"in __tmp_reg__,__SREG__" "\n\t"
+ 324:/usr/lib/avr/include/avr/wdt.h **** 			"cli" "\n\t"
+ 325:/usr/lib/avr/include/avr/wdt.h **** 			"wdr" "\n\t"
+ 326:/usr/lib/avr/include/avr/wdt.h **** 			"out %[CCPADDRESS],%[SIGNATURE]" "\n\t"
+ 327:/usr/lib/avr/include/avr/wdt.h **** 			"sts %[WDTREG],%[WDVALUE]" "\n\t"
+ 328:/usr/lib/avr/include/avr/wdt.h **** 			"out __SREG__,__tmp_reg__" "\n\t"
+ 329:/usr/lib/avr/include/avr/wdt.h **** 			: /* no outputs */
+ 330:/usr/lib/avr/include/avr/wdt.h **** 			: [CCPADDRESS] "I" (_SFR_IO_ADDR(CCP)),
+ 331:/usr/lib/avr/include/avr/wdt.h **** 			[SIGNATURE] "r" ((uint8_t)0xD8),
+ 332:/usr/lib/avr/include/avr/wdt.h **** 			[WDTREG] "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+ 333:/usr/lib/avr/include/avr/wdt.h **** 			[WDVALUE] "r" ((uint8_t)((value & 0x08 ? _WD_PS3_MASK : 0x00)
+ 334:/usr/lib/avr/include/avr/wdt.h **** 				| _BV(WDE) | (value & 0x07) ))
+ 335:/usr/lib/avr/include/avr/wdt.h **** 			: "r0"
+ 336:/usr/lib/avr/include/avr/wdt.h **** 			);
+ 337:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 338:/usr/lib/avr/include/avr/wdt.h **** 	else
+ 339:/usr/lib/avr/include/avr/wdt.h ****  	{
+ 340:/usr/lib/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
+ 341:/usr/lib/avr/include/avr/wdt.h **** 			"in __tmp_reg__,__SREG__" "\n\t"
+ 342:/usr/lib/avr/include/avr/wdt.h **** 			"cli" "\n\t"
+ 343:/usr/lib/avr/include/avr/wdt.h **** 			"wdr" "\n\t"
+ 344:/usr/lib/avr/include/avr/wdt.h **** 			"out %[CCPADDRESS],%[SIGNATURE]" "\n\t"
+ 345:/usr/lib/avr/include/avr/wdt.h **** 			"out %[WDTREG],%[WDVALUE]" "\n\t"
+ 346:/usr/lib/avr/include/avr/wdt.h **** 			"out __SREG__,__tmp_reg__" "\n\t"
+ 347:/usr/lib/avr/include/avr/wdt.h **** 			: /* no outputs */
+ 348:/usr/lib/avr/include/avr/wdt.h **** 			: [CCPADDRESS] "I" (_SFR_IO_ADDR(CCP)),
+ 349:/usr/lib/avr/include/avr/wdt.h **** 			[SIGNATURE] "r" ((uint8_t)0xD8),
+ 350:/usr/lib/avr/include/avr/wdt.h **** 			[WDTREG] "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+ 351:/usr/lib/avr/include/avr/wdt.h **** 			[WDVALUE] "r" ((uint8_t)((value & 0x08 ? _WD_PS3_MASK : 0x00)
+ 352:/usr/lib/avr/include/avr/wdt.h **** 				| _BV(WDE) | (value & 0x07) ))
+ 353:/usr/lib/avr/include/avr/wdt.h **** 			: "r0"
+ 354:/usr/lib/avr/include/avr/wdt.h **** 			);
+ 355:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 356:/usr/lib/avr/include/avr/wdt.h **** }
+ 357:/usr/lib/avr/include/avr/wdt.h **** 
+ 358:/usr/lib/avr/include/avr/wdt.h **** static __inline__
+ 359:/usr/lib/avr/include/avr/wdt.h **** __attribute__ ((__always_inline__))
+ 360:/usr/lib/avr/include/avr/wdt.h **** void wdt_disable (void)
+ 361:/usr/lib/avr/include/avr/wdt.h **** {
+ 362:/usr/lib/avr/include/avr/wdt.h **** 	if (!_SFR_IO_REG_P (CCP) && !_SFR_IO_REG_P(_WD_CONTROL_REG))
+ 363:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 364:/usr/lib/avr/include/avr/wdt.h ****         uint8_t temp_wd;
+ 365:/usr/lib/avr/include/avr/wdt.h ****         __asm__ __volatile__ (
+ 366:/usr/lib/avr/include/avr/wdt.h **** 				"in __tmp_reg__,__SREG__" "\n\t"
+ 367:/usr/lib/avr/include/avr/wdt.h **** 				"cli" "\n\t"
+ 368:/usr/lib/avr/include/avr/wdt.h **** 				"wdr" "\n\t"
+ 369:/usr/lib/avr/include/avr/wdt.h **** 				"sts %[CCPADDRESS],%[SIGNATURE]" "\n\t"
+ 370:/usr/lib/avr/include/avr/wdt.h **** 				"lds %[TEMP_WD],%[WDTREG]" "\n\t"
+ 371:/usr/lib/avr/include/avr/wdt.h **** 				"cbr %[TEMP_WD],%[WDVALUE]" "\n\t"
+ 372:/usr/lib/avr/include/avr/wdt.h **** 				"sts %[WDTREG],%[TEMP_WD]" "\n\t"
+ 373:/usr/lib/avr/include/avr/wdt.h **** 				"out __SREG__,__tmp_reg__" "\n\t"
+ 374:/usr/lib/avr/include/avr/wdt.h **** 				: /*no output */
+ 375:/usr/lib/avr/include/avr/wdt.h **** 				: [CCPADDRESS] "n" (_SFR_MEM_ADDR(CCP)),
+ 376:/usr/lib/avr/include/avr/wdt.h **** 				[SIGNATURE] "r" ((uint8_t)0xD8),
+ 377:/usr/lib/avr/include/avr/wdt.h **** 				[WDTREG] "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+ 378:/usr/lib/avr/include/avr/wdt.h **** 				[TEMP_WD] "d" (temp_wd),
+ 379:/usr/lib/avr/include/avr/wdt.h **** 				[WDVALUE] "n" (1 << WDE)
+ 380:/usr/lib/avr/include/avr/wdt.h **** 				: "r0"
+ 381:/usr/lib/avr/include/avr/wdt.h **** 				);
+ 382:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 383:/usr/lib/avr/include/avr/wdt.h **** 	else if (!_SFR_IO_REG_P (CCP) && _SFR_IO_REG_P(_WD_CONTROL_REG))
+ 384:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 385:/usr/lib/avr/include/avr/wdt.h ****         uint8_t temp_wd;
+ 386:/usr/lib/avr/include/avr/wdt.h ****         __asm__ __volatile__ (
+ 387:/usr/lib/avr/include/avr/wdt.h **** 				"in __tmp_reg__,__SREG__" "\n\t"
+ 388:/usr/lib/avr/include/avr/wdt.h **** 				"cli" "\n\t"
+ 389:/usr/lib/avr/include/avr/wdt.h **** 				"wdr" "\n\t"
+ 390:/usr/lib/avr/include/avr/wdt.h **** 				"sts %[CCPADDRESS],%[SIGNATURE]" "\n\t"
+ 391:/usr/lib/avr/include/avr/wdt.h **** 				"in %[TEMP_WD],%[WDTREG]" "\n\t"
+ 392:/usr/lib/avr/include/avr/wdt.h **** 				"cbr %[TEMP_WD],%[WDVALUE]" "\n\t"
+ 393:/usr/lib/avr/include/avr/wdt.h **** 				"out %[WDTREG],%[TEMP_WD]" "\n\t"
+ 394:/usr/lib/avr/include/avr/wdt.h **** 				"out __SREG__,__tmp_reg__" "\n\t"
+ 395:/usr/lib/avr/include/avr/wdt.h **** 				: /*no output */
+ 396:/usr/lib/avr/include/avr/wdt.h **** 				: [CCPADDRESS] "n" (_SFR_MEM_ADDR(CCP)),
+ 397:/usr/lib/avr/include/avr/wdt.h **** 				[SIGNATURE] "r" ((uint8_t)0xD8),
+ 398:/usr/lib/avr/include/avr/wdt.h **** 				[WDTREG] "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+ 399:/usr/lib/avr/include/avr/wdt.h **** 				[TEMP_WD] "d" (temp_wd),
+ 400:/usr/lib/avr/include/avr/wdt.h **** 				[WDVALUE] "n" (1 << WDE)
+ 401:/usr/lib/avr/include/avr/wdt.h **** 				: "r0"
+ 402:/usr/lib/avr/include/avr/wdt.h **** 				);
+ 403:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 404:/usr/lib/avr/include/avr/wdt.h **** 	else if (_SFR_IO_REG_P (CCP) && !_SFR_IO_REG_P(_WD_CONTROL_REG))
+ 405:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 406:/usr/lib/avr/include/avr/wdt.h ****         uint8_t temp_wd;
+ 407:/usr/lib/avr/include/avr/wdt.h ****         __asm__ __volatile__ (
+ 408:/usr/lib/avr/include/avr/wdt.h **** 				"in __tmp_reg__,__SREG__" "\n\t"
+ 409:/usr/lib/avr/include/avr/wdt.h **** 				"cli" "\n\t"
+ 410:/usr/lib/avr/include/avr/wdt.h **** 				"wdr" "\n\t"
+ 411:/usr/lib/avr/include/avr/wdt.h **** 				"out %[CCPADDRESS],%[SIGNATURE]" "\n\t"
+ 412:/usr/lib/avr/include/avr/wdt.h **** 				"lds %[TEMP_WD],%[WDTREG]" "\n\t"
+ 413:/usr/lib/avr/include/avr/wdt.h **** 				"cbr %[TEMP_WD],%[WDVALUE]" "\n\t"
+ 414:/usr/lib/avr/include/avr/wdt.h **** 				"sts %[WDTREG],%[TEMP_WD]" "\n\t"
+ 415:/usr/lib/avr/include/avr/wdt.h **** 				"out __SREG__,__tmp_reg__" "\n\t"
+ 416:/usr/lib/avr/include/avr/wdt.h **** 				: /*no output */
+ 417:/usr/lib/avr/include/avr/wdt.h **** 				: [CCPADDRESS] "I" (_SFR_IO_ADDR(CCP)),
+ 418:/usr/lib/avr/include/avr/wdt.h **** 				[SIGNATURE] "r" ((uint8_t)0xD8),
+ 419:/usr/lib/avr/include/avr/wdt.h **** 				[WDTREG] "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+ 420:/usr/lib/avr/include/avr/wdt.h **** 				[TEMP_WD] "d" (temp_wd),
+ 421:/usr/lib/avr/include/avr/wdt.h **** 				[WDVALUE] "n" (1 << WDE)
+ 422:/usr/lib/avr/include/avr/wdt.h **** 				: "r0"
+ 423:/usr/lib/avr/include/avr/wdt.h **** 				);
+ 424:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 425:/usr/lib/avr/include/avr/wdt.h **** 	else
+ 426:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 427:/usr/lib/avr/include/avr/wdt.h ****         uint8_t temp_wd;
+ 428:/usr/lib/avr/include/avr/wdt.h ****         __asm__ __volatile__ (
+ 429:/usr/lib/avr/include/avr/wdt.h **** 				"in __tmp_reg__,__SREG__" "\n\t"
+ 430:/usr/lib/avr/include/avr/wdt.h **** 				"cli" "\n\t"
+ 431:/usr/lib/avr/include/avr/wdt.h **** 				"wdr" "\n\t"
+ 432:/usr/lib/avr/include/avr/wdt.h **** 				"out %[CCPADDRESS],%[SIGNATURE]" "\n\t"
+ 433:/usr/lib/avr/include/avr/wdt.h **** 				"in %[TEMP_WD],%[WDTREG]" "\n\t"
+ 434:/usr/lib/avr/include/avr/wdt.h **** 				"cbr %[TEMP_WD],%[WDVALUE]" "\n\t"
+ 435:/usr/lib/avr/include/avr/wdt.h **** 				"out %[WDTREG],%[TEMP_WD]" "\n\t"
+ 436:/usr/lib/avr/include/avr/wdt.h **** 				"out __SREG__,__tmp_reg__" "\n\t"
+ 437:/usr/lib/avr/include/avr/wdt.h **** 				: /*no output */
+ 438:/usr/lib/avr/include/avr/wdt.h **** 				: [CCPADDRESS] "I" (_SFR_IO_ADDR(CCP)),
+ 439:/usr/lib/avr/include/avr/wdt.h **** 				[SIGNATURE] "r" ((uint8_t)0xD8),
+ 440:/usr/lib/avr/include/avr/wdt.h **** 				[WDTREG] "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+ 441:/usr/lib/avr/include/avr/wdt.h **** 				[TEMP_WD] "d" (temp_wd),
+ 442:/usr/lib/avr/include/avr/wdt.h **** 				[WDVALUE] "n" (1 << WDE)
+ 443:/usr/lib/avr/include/avr/wdt.h **** 				: "r0"
+ 444:/usr/lib/avr/include/avr/wdt.h **** 				);
+ 445:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 446:/usr/lib/avr/include/avr/wdt.h **** }
+ 447:/usr/lib/avr/include/avr/wdt.h **** 
+ 448:/usr/lib/avr/include/avr/wdt.h **** #else
+ 449:/usr/lib/avr/include/avr/wdt.h **** 
+ 450:/usr/lib/avr/include/avr/wdt.h **** static __inline__
+ 451:/usr/lib/avr/include/avr/wdt.h **** __attribute__ ((__always_inline__))
+ 452:/usr/lib/avr/include/avr/wdt.h **** void wdt_enable (const uint8_t value)
+ 453:/usr/lib/avr/include/avr/wdt.h **** {
+ 454:/usr/lib/avr/include/avr/wdt.h **** 	if (_SFR_IO_REG_P (_WD_CONTROL_REG))
+ 455:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 456:/usr/lib/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
+ 457:/usr/lib/avr/include/avr/wdt.h **** 				"in __tmp_reg__,__SREG__" "\n\t"
+ 458:/usr/lib/avr/include/avr/wdt.h **** 				"cli" "\n\t"
+ 459:/usr/lib/avr/include/avr/wdt.h **** 				"wdr" "\n\t"
+ 460:/usr/lib/avr/include/avr/wdt.h **** 				"out %0, %1" "\n\t"
+ 461:/usr/lib/avr/include/avr/wdt.h **** 				"out __SREG__,__tmp_reg__" "\n\t"
+ 462:/usr/lib/avr/include/avr/wdt.h **** 				"out %0, %2" "\n \t"
+ 463:/usr/lib/avr/include/avr/wdt.h **** 				: /* no outputs */
+ 464:/usr/lib/avr/include/avr/wdt.h **** 				: "I" (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+ 465:/usr/lib/avr/include/avr/wdt.h **** 				"r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+ 466:/usr/lib/avr/include/avr/wdt.h **** 				"r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+ 467:/usr/lib/avr/include/avr/wdt.h **** 						_BV(WDE) | (value & 0x07)) )
+ 468:/usr/lib/avr/include/avr/wdt.h **** 				: "r0"
+ 469:/usr/lib/avr/include/avr/wdt.h **** 		);
+ 470:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 471:/usr/lib/avr/include/avr/wdt.h **** 	else
+ 472:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 473:/usr/lib/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
+ 474:/usr/lib/avr/include/avr/wdt.h **** 				"in __tmp_reg__,__SREG__" "\n\t"
+ 475:/usr/lib/avr/include/avr/wdt.h **** 				"cli" "\n\t"
+ 476:/usr/lib/avr/include/avr/wdt.h **** 				"wdr" "\n\t"
+ 477:/usr/lib/avr/include/avr/wdt.h **** 				"sts %0, %1" "\n\t"
+ 478:/usr/lib/avr/include/avr/wdt.h **** 				"out __SREG__,__tmp_reg__" "\n\t"
+ 479:/usr/lib/avr/include/avr/wdt.h **** 				"sts %0, %2" "\n \t"
+ 480:/usr/lib/avr/include/avr/wdt.h **** 				: /* no outputs */
+ 481:/usr/lib/avr/include/avr/wdt.h **** 				: "n" (_SFR_MEM_ADDR(_WD_CONTROL_REG)),
+ 482:/usr/lib/avr/include/avr/wdt.h **** 				"r" ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE))),
+ 483:/usr/lib/avr/include/avr/wdt.h **** 				"r" ((uint8_t) ((value & 0x08 ? _WD_PS3_MASK : 0x00) |
+ 484:/usr/lib/avr/include/avr/wdt.h **** 						_BV(WDE) | (value & 0x07)) )
+ 485:/usr/lib/avr/include/avr/wdt.h **** 				: "r0"
+ 486:/usr/lib/avr/include/avr/wdt.h **** 		);
+ 487:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 488:/usr/lib/avr/include/avr/wdt.h **** }
+ 489:/usr/lib/avr/include/avr/wdt.h **** 
+ 490:/usr/lib/avr/include/avr/wdt.h **** static __inline__
+ 491:/usr/lib/avr/include/avr/wdt.h **** __attribute__ ((__always_inline__))
+ 492:/usr/lib/avr/include/avr/wdt.h **** void wdt_disable (void)
+ 493:/usr/lib/avr/include/avr/wdt.h **** {
+ 494:/usr/lib/avr/include/avr/wdt.h **** 	if (_SFR_IO_REG_P (_WD_CONTROL_REG))
+ 495:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 496:/usr/lib/avr/include/avr/wdt.h ****         uint8_t register temp_reg;
+ 497:/usr/lib/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
+ 498:/usr/lib/avr/include/avr/wdt.h **** 				"in __tmp_reg__,__SREG__"    "\n\t"
+ 499:/usr/lib/avr/include/avr/wdt.h **** 				"cli"                        "\n\t"
+ 500:/usr/lib/avr/include/avr/wdt.h **** 				"wdr"                        "\n\t"
+ 501:/usr/lib/avr/include/avr/wdt.h **** 				"in  %[TEMPREG],%[WDTREG]"   "\n\t"
+ 502:/usr/lib/avr/include/avr/wdt.h **** 				"ori %[TEMPREG],%[WDCE_WDE]" "\n\t"
+ 503:/usr/lib/avr/include/avr/wdt.h **** 				"out %[WDTREG],%[TEMPREG]"   "\n\t"
+ 504:/usr/lib/avr/include/avr/wdt.h **** 				"out %[WDTREG],__zero_reg__" "\n\t"
+ 505:/usr/lib/avr/include/avr/wdt.h **** 				"out __SREG__,__tmp_reg__"   "\n\t"
+ 506:/usr/lib/avr/include/avr/wdt.h **** 				: [TEMPREG] "=d" (temp_reg)
+ 507:/usr/lib/avr/include/avr/wdt.h **** 				: [WDTREG]  "I"  (_SFR_IO_ADDR(_WD_CONTROL_REG)),
+ 508:/usr/lib/avr/include/avr/wdt.h **** 				[WDCE_WDE]  "n"  ((uint8_t)(_BV(_WD_CHANGE_BIT) | _BV(WDE)))
+ 509:/usr/lib/avr/include/avr/wdt.h **** 				: "r0"
+ 510:/usr/lib/avr/include/avr/wdt.h **** 		);
+ 511:/usr/lib/avr/include/avr/wdt.h **** 	}
+ 512:/usr/lib/avr/include/avr/wdt.h **** 	else
+ 513:/usr/lib/avr/include/avr/wdt.h **** 	{
+ 514:/usr/lib/avr/include/avr/wdt.h ****         uint8_t register temp_reg;
+ 515:/usr/lib/avr/include/avr/wdt.h **** 		__asm__ __volatile__ (
+ 921               		.loc 6 515 0
+ 922               	/* #APP */
+ 923               	 ;  515 "/usr/lib/avr/include/avr/wdt.h" 1
+ 924 0006 0FB6      		in __tmp_reg__,__SREG__
+ 925 0008 F894      		cli
+ 926 000a A895      		wdr
+ 927 000c 8091 6000 		lds r24,96
+ 928 0010 8861      		ori r24,24
+ 929 0012 8093 6000 		sts 96,r24
+ 930 0016 1092 6000 		sts 96,__zero_reg__
+ 931 001a 0FBE      		out __SREG__,__tmp_reg__
+ 932               		
+ 933               	 ;  0 "" 2
+ 934               	/* #NOAPP */
+ 935               	.LBE175:
+ 936               	.LBE174:
+ 334:dualMoco.c    **** 	wdt_disable();
+ 335:dualMoco.c    **** 
+ 336:dualMoco.c    **** 	DDRB = 0x00;
+ 937               		.loc 3 336 0
+ 938 001c 14B8      		out 0x4,__zero_reg__
+ 337:dualMoco.c    **** 	PORTB = 0x04;		/* PULL-UP PB2 */
+ 939               		.loc 3 337 0
+ 940 001e 84E0      		ldi r24,lo8(4)
+ 941 0020 85B9      		out 0x5,r24
+ 338:dualMoco.c    **** 
+ 339:dualMoco.c    **** 	if ((PINB & 0x04) == 0) { /* JUMPER BTW PB2-GND */
+ 942               		.loc 3 339 0
+ 943 0022 1A99      		sbic 0x3,2
+ 944 0024 00C0      		rjmp .L90
+ 340:dualMoco.c    **** 	  mocoMode = 1;
+ 945               		.loc 3 340 0
+ 946 0026 81E0      		ldi r24,lo8(1)
+ 947 0028 8093 0000 		sts mocoMode,r24
+ 948               	.L90:
+ 341:dualMoco.c    **** 	}
+ 342:dualMoco.c    **** 
+ 343:dualMoco.c    **** 	/* Hardware Initialization */
+ 344:dualMoco.c    **** 	if (mocoMode == 1) {
+ 949               		.loc 3 344 0
+ 950 002c 8091 0000 		lds r24,mocoMode
+ 951 0030 8130      		cpi r24,lo8(1)
+ 952 0032 01F4      		brne .L91
+ 345:dualMoco.c    **** 	  /* set baud rate */
+ 346:dualMoco.c    **** 	  UBRR1L = 31;			/* 312500Hz at 16MHz clock */
+ 953               		.loc 3 346 0
+ 954 0034 8FE1      		ldi r24,lo8(31)
+ 955 0036 8093 CC00 		sts 204,r24
+ 347:dualMoco.c    **** 	  /*  */
+ 348:dualMoco.c    **** 	  UCSR1B = (1<<RXEN1) | (1<<TXEN1);
+ 956               		.loc 3 348 0
+ 957 003a 88E1      		ldi r24,lo8(24)
+ 958 003c 8093 C900 		sts 201,r24
+ 959 0040 00C0      		rjmp .L92
+ 960               	.L91:
+ 961               	.LVL82:
+ 962               	.LBB176:
+ 963               	.LBB177:
+ 102:../LUFA/Drivers/Peripheral/Serial.h **** 
+ 964               		.loc 5 102 0
+ 965 0042 87E6      		ldi r24,lo8(103)
+ 966 0044 90E0      		ldi r25,0
+ 967 0046 9093 CD00 		sts 204+1,r25
+ 968 004a 8093 CC00 		sts 204,r24
+ 104:../LUFA/Drivers/Peripheral/Serial.h **** 				UCSR1A = (DoubleSpeed ? (1 << U2X1) : 0);
+ 969               		.loc 5 104 0
+ 970 004e 86E0      		ldi r24,lo8(6)
+ 971 0050 8093 CA00 		sts 202,r24
+ 105:../LUFA/Drivers/Peripheral/Serial.h **** 				UCSR1B = ((1 << TXEN1)  | (1 << RXEN1));
+ 972               		.loc 5 105 0
+ 973 0054 1092 C800 		sts 200,__zero_reg__
+ 106:../LUFA/Drivers/Peripheral/Serial.h **** 				
+ 974               		.loc 5 106 0
+ 975 0058 88E1      		ldi r24,lo8(24)
+ 976 005a 8093 C900 		sts 201,r24
+ 108:../LUFA/Drivers/Peripheral/Serial.h **** 				PORTD |= (1 << 2);
+ 977               		.loc 5 108 0
+ 978 005e 539A      		sbi 0xa,3
+ 109:../LUFA/Drivers/Peripheral/Serial.h **** 			}
+ 979               		.loc 5 109 0
+ 980 0060 5A9A      		sbi 0xb,2
+ 981               	.LVL83:
+ 982               	.L92:
+ 983               	.LBE177:
+ 984               	.LBE176:
+ 349:dualMoco.c    **** 	} else {
+ 350:dualMoco.c    **** 	  Serial_Init(9600, false);
+ 351:dualMoco.c    **** 	}
+ 352:dualMoco.c    **** 
+ 353:dualMoco.c    **** 	USB_Init();
+ 985               		.loc 3 353 0
+ 986 0062 0E94 0000 		call USB_Init
+ 987               	.LVL84:
+ 988               	.LBB178:
+ 989               	.LBB179:
+  69:./Board/LEDs.h **** 				PORTD |= LEDS_ALL_LEDS;
+ 990               		.loc 4 69 0
+ 991 0066 8AB1      		in r24,0xa
+ 992 0068 8063      		ori r24,lo8(48)
+ 993 006a 8AB9      		out 0xa,r24
+  70:./Board/LEDs.h **** 			}
+ 994               		.loc 4 70 0
+ 995 006c 8BB1      		in r24,0xb
+ 996 006e 8063      		ori r24,lo8(48)
+ 997 0070 8BB9      		out 0xb,r24
+ 998               	.LBE179:
+ 999               	.LBE178:
+ 354:dualMoco.c    **** 	LEDs_Init();
+ 355:dualMoco.c    **** 
+ 356:dualMoco.c    **** 	/* Start the flush timer so that overflows occur rapidly to push received bytes to the USB interfa
+ 357:dualMoco.c    **** 	TCCR0B = (1 << CS02);
+ 1000               		.loc 3 357 0
+ 1001 0072 84E0      		ldi r24,lo8(4)
+ 1002 0074 85BD      		out 0x25,r24
+ 358:dualMoco.c    **** 	
+ 359:dualMoco.c    **** 	if (mocoMode == 0) {
+ 1003               		.loc 3 359 0
+ 1004 0076 8091 0000 		lds r24,mocoMode
+ 1005 007a 8111      		cpse r24,__zero_reg__
+ 1006 007c 00C0      		rjmp .L89
+ 360:dualMoco.c    **** 	  /* Pull target /RESET line high */
+ 361:dualMoco.c    **** 	  AVR_RESET_LINE_PORT |= AVR_RESET_LINE_MASK;
+ 1007               		.loc 3 361 0
+ 1008 007e 5F9A      		sbi 0xb,7
+ 362:dualMoco.c    **** 	  AVR_RESET_LINE_DDR  |= AVR_RESET_LINE_MASK;
+ 1009               		.loc 3 362 0
+ 1010 0080 579A      		sbi 0xa,7
+ 1011               	.L89:
+ 1012 0082 0895      		ret
+ 1013               		.cfi_endproc
+ 1014               	.LFE96:
+ 1016               		.section	.text.startup.main,"ax",@progbits
+ 1017               	.global	main
+ 1019               	main:
+ 1020               	.LFB93:
+ 210:dualMoco.c    ****   SetupHardware();
+ 1021               		.loc 3 210 0
+ 1022               		.cfi_startproc
+ 1023               	/* prologue: function */
+ 1024               	/* frame size = 0 */
+ 1025               	/* stack size = 0 */
+ 1026               	.L__stack_usage = 0
+ 211:dualMoco.c    **** 
+ 1027               		.loc 3 211 0
+ 1028 0000 0E94 0000 		call SetupHardware
+ 1029               	.LVL85:
+ 213:dualMoco.c    ****     processMIDI();
+ 1030               		.loc 3 213 0
+ 1031 0004 8091 0000 		lds r24,mocoMode
+ 1032 0008 8130      		cpi r24,lo8(1)
+ 1033 000a 01F4      		brne .L95
+ 214:dualMoco.c    ****   } else {
+ 1034               		.loc 3 214 0
+ 1035 000c 0E94 0000 		call processMIDI
+ 1036               	.LVL86:
+ 1037               	.L95:
+ 216:dualMoco.c    ****   }
+ 1038               		.loc 3 216 0
+ 1039 0010 0E94 0000 		call processSerial
+ 1040               	.LVL87:
+ 1041               		.cfi_endproc
+ 1042               	.LFE93:
+ 1044               		.section	.text.EVENT_USB_Device_Connect,"ax",@progbits
+ 1045               	.global	EVENT_USB_Device_Connect
+ 1047               	EVENT_USB_Device_Connect:
+ 1048               	.LFB110:
+ 1049               		.cfi_startproc
+ 1050               	/* prologue: function */
+ 1051               	/* frame size = 0 */
+ 1052               	/* stack size = 0 */
+ 1053               	.L__stack_usage = 0
+ 1054 0000 0895      		ret
+ 1055               		.cfi_endproc
+ 1056               	.LFE110:
+ 1058               		.section	.text.EVENT_USB_Device_Disconnect,"ax",@progbits
+ 1059               	.global	EVENT_USB_Device_Disconnect
+ 1061               	EVENT_USB_Device_Disconnect:
+ 1062               	.LFB108:
+ 1063               		.cfi_startproc
+ 1064               	/* prologue: function */
+ 1065               	/* frame size = 0 */
+ 1066               	/* stack size = 0 */
+ 1067               	.L__stack_usage = 0
+ 1068 0000 0895      		ret
+ 1069               		.cfi_endproc
+ 1070               	.LFE108:
+ 1072               		.section	.text.EVENT_USB_Device_ConfigurationChanged,"ax",@progbits
+ 1073               	.global	EVENT_USB_Device_ConfigurationChanged
+ 1075               	EVENT_USB_Device_ConfigurationChanged:
+ 1076               	.LFB99:
+ 363:dualMoco.c    **** 	}
+ 364:dualMoco.c    **** }
+ 365:dualMoco.c    **** 
+ 366:dualMoco.c    **** /** Event handler for the library USB Connection event. */
+ 367:dualMoco.c    **** void EVENT_USB_Device_Connect(void) 
+ 368:dualMoco.c    **** {
+ 369:dualMoco.c    **** }
+ 370:dualMoco.c    **** 
+ 371:dualMoco.c    **** /** Event handler for the library USB Disconnection event. */
+ 372:dualMoco.c    **** void EVENT_USB_Device_Disconnect(void) 
+ 373:dualMoco.c    **** {
+ 374:dualMoco.c    **** }
+ 375:dualMoco.c    **** 
+ 376:dualMoco.c    **** /** Event handler for the library USB Configuration Changed event. */
+ 377:dualMoco.c    **** void EVENT_USB_Device_ConfigurationChanged(void)
+ 378:dualMoco.c    **** {
+ 1077               		.loc 3 378 0
+ 1078               		.cfi_startproc
+ 1079               	/* prologue: function */
+ 1080               	/* frame size = 0 */
+ 1081               	/* stack size = 0 */
+ 1082               	.L__stack_usage = 0
+ 379:dualMoco.c    ****   if (mocoMode == 1) {
+ 1083               		.loc 3 379 0
+ 1084 0000 8091 0000 		lds r24,mocoMode
+ 1085 0004 8130      		cpi r24,lo8(1)
+ 1086 0006 01F4      		brne .L99
+ 1087               	.LVL88:
+ 1088               	.LBB180:
+ 380:dualMoco.c    **** 	bool ConfigSuccess = true;
+ 381:dualMoco.c    **** 	ConfigSuccess &= MIDI_Device_ConfigureEndpoints(&Keyboard_MIDI_Interface);
+ 1089               		.loc 3 381 0
+ 1090 0008 80E0      		ldi r24,lo8(Keyboard_MIDI_Interface)
+ 1091 000a 90E0      		ldi r25,hi8(Keyboard_MIDI_Interface)
+ 1092 000c 0C94 0000 		jmp MIDI_Device_ConfigureEndpoints
+ 1093               	.LVL89:
+ 1094               	.L99:
+ 1095               	.LBE180:
+ 382:dualMoco.c    ****   } else {
+ 383:dualMoco.c    **** 	CDC_Device_ConfigureEndpoints(&VirtualSerial_CDC_Interface);
+ 1096               		.loc 3 383 0
+ 1097 0010 80E0      		ldi r24,lo8(VirtualSerial_CDC_Interface)
+ 1098 0012 90E0      		ldi r25,hi8(VirtualSerial_CDC_Interface)
+ 1099 0014 0C94 0000 		jmp CDC_Device_ConfigureEndpoints
+ 1100               	.LVL90:
+ 1101               		.cfi_endproc
+ 1102               	.LFE99:
+ 1104               		.section	.text.EVENT_USB_Device_ControlRequest,"ax",@progbits
+ 1105               	.global	EVENT_USB_Device_ControlRequest
+ 1107               	EVENT_USB_Device_ControlRequest:
+ 1108               	.LFB100:
+ 384:dualMoco.c    ****   }
+ 385:dualMoco.c    **** }
+ 386:dualMoco.c    **** 
+ 387:dualMoco.c    **** /** Event handler for the library USB Control Request reception event. */
+ 388:dualMoco.c    **** void EVENT_USB_Device_ControlRequest(void) 
+ 389:dualMoco.c    **** {
+ 1109               		.loc 3 389 0
+ 1110               		.cfi_startproc
+ 1111               	/* prologue: function */
+ 1112               	/* frame size = 0 */
+ 1113               	/* stack size = 0 */
+ 1114               	.L__stack_usage = 0
+ 1115 0000 0895      		ret
+ 1116               		.cfi_endproc
+ 1117               	.LFE100:
+ 1119               		.section	.text.EVENT_USB_Device_UnhandledControlRequest,"ax",@progbits
+ 1120               	.global	EVENT_USB_Device_UnhandledControlRequest
+ 1122               	EVENT_USB_Device_UnhandledControlRequest:
+ 1123               	.LFB101:
+ 390:dualMoco.c    ****   if (mocoMode == 1) {
+ 391:dualMoco.c    ****     	MIDI_Device_ProcessControlRequest(&Keyboard_MIDI_Interface);
+ 392:dualMoco.c    ****   }
+ 393:dualMoco.c    **** }
+ 394:dualMoco.c    **** 
+ 395:dualMoco.c    **** /** Event handler for the library USB Unhandled Control Request event. */
+ 396:dualMoco.c    **** void EVENT_USB_Device_UnhandledControlRequest(void)
+ 397:dualMoco.c    **** {
+ 1124               		.loc 3 397 0
+ 1125               		.cfi_startproc
+ 1126               	/* prologue: function */
+ 1127               	/* frame size = 0 */
+ 1128               	/* stack size = 0 */
+ 1129               	.L__stack_usage = 0
+ 398:dualMoco.c    ****   if (mocoMode == 0) {
+ 1130               		.loc 3 398 0
+ 1131 0000 8091 0000 		lds r24,mocoMode
+ 1132 0004 8111      		cpse r24,__zero_reg__
+ 1133 0006 00C0      		rjmp .L101
+ 399:dualMoco.c    **** 	CDC_Device_ProcessControlRequest(&VirtualSerial_CDC_Interface);
+ 1134               		.loc 3 399 0
+ 1135 0008 80E0      		ldi r24,lo8(VirtualSerial_CDC_Interface)
+ 1136 000a 90E0      		ldi r25,hi8(VirtualSerial_CDC_Interface)
+ 1137 000c 0C94 0000 		jmp CDC_Device_ProcessControlRequest
+ 1138               	.LVL91:
+ 1139               	.L101:
+ 1140 0010 0895      		ret
+ 1141               		.cfi_endproc
+ 1142               	.LFE101:
+ 1144               		.section	.text.EVENT_CDC_Device_LineEncodingChanged,"ax",@progbits
+ 1145               	.global	EVENT_CDC_Device_LineEncodingChanged
+ 1147               	EVENT_CDC_Device_LineEncodingChanged:
+ 1148               	.LFB102:
+ 400:dualMoco.c    ****   } else {
+ 401:dualMoco.c    ****     	MIDI_Device_ProcessControlRequest(&Keyboard_MIDI_Interface);
+ 402:dualMoco.c    ****   }
+ 403:dualMoco.c    **** }
+ 404:dualMoco.c    **** 
+ 405:dualMoco.c    **** /** Event handler for the CDC Class driver Line Encoding Changed event.
+ 406:dualMoco.c    ****  *
+ 407:dualMoco.c    ****  *  \param[in] CDCInterfaceInfo  Pointer to the CDC class interface configuration structure being r
+ 408:dualMoco.c    ****  */
+ 409:dualMoco.c    **** void EVENT_CDC_Device_LineEncodingChanged(USB_ClassInfo_CDC_Device_t* const CDCInterfaceInfo)
+ 410:dualMoco.c    **** {
+ 1149               		.loc 3 410 0
+ 1150               		.cfi_startproc
+ 1151               	.LVL92:
+ 1152 0000 0F93      		push r16
+ 1153               	.LCFI6:
+ 1154               		.cfi_def_cfa_offset 3
+ 1155               		.cfi_offset 16, -2
+ 1156 0002 1F93      		push r17
+ 1157               	.LCFI7:
+ 1158               		.cfi_def_cfa_offset 4
+ 1159               		.cfi_offset 17, -3
+ 1160 0004 CF93      		push r28
+ 1161               	.LCFI8:
+ 1162               		.cfi_def_cfa_offset 5
+ 1163               		.cfi_offset 28, -4
+ 1164               	/* prologue: function */
+ 1165               	/* frame size = 0 */
+ 1166               	/* stack size = 3 */
+ 1167               	.L__stack_usage = 3
+ 1168 0006 8C01      		movw r16,r24
+ 1169               	.LVL93:
+ 411:dualMoco.c    **** 	uint8_t ConfigMask = 0;
+ 412:dualMoco.c    **** 
+ 413:dualMoco.c    **** 	switch (CDCInterfaceInfo->State.LineEncoding.ParityType)
+ 1170               		.loc 3 413 0
+ 1171 0008 FC01      		movw r30,r24
+ 1172 000a 8489      		ldd r24,Z+20
+ 1173               	.LVL94:
+ 1174 000c 8130      		cpi r24,lo8(1)
+ 1175 000e 01F0      		breq .L105
+ 1176 0010 8230      		cpi r24,lo8(2)
+ 1177 0012 01F4      		brne .L118
+ 1178               	.LVL95:
+ 414:dualMoco.c    **** 	{
+ 415:dualMoco.c    **** 		case CDC_PARITY_Odd:
+ 416:dualMoco.c    **** 			ConfigMask = ((1 << UPM11) | (1 << UPM10));		
+ 417:dualMoco.c    **** 			break;
+ 418:dualMoco.c    **** 		case CDC_PARITY_Even:
+ 419:dualMoco.c    **** 			ConfigMask = (1 << UPM11);		
+ 1179               		.loc 3 419 0
+ 1180 0014 C0E2      		ldi r28,lo8(32)
+ 420:dualMoco.c    **** 			break;
+ 1181               		.loc 3 420 0
+ 1182 0016 00C0      		rjmp .L104
+ 1183               	.LVL96:
+ 1184               	.L105:
+ 416:dualMoco.c    **** 			break;
+ 1185               		.loc 3 416 0
+ 1186 0018 C0E3      		ldi r28,lo8(48)
+ 1187 001a 00C0      		rjmp .L104
+ 1188               	.L118:
+ 411:dualMoco.c    **** 
+ 1189               		.loc 3 411 0
+ 1190 001c C0E0      		ldi r28,0
+ 1191               	.LVL97:
+ 1192               	.L104:
+ 421:dualMoco.c    **** 	}
+ 422:dualMoco.c    **** 
+ 423:dualMoco.c    **** 	if (CDCInterfaceInfo->State.LineEncoding.CharFormat == CDC_LINEENCODING_TwoStopBits)
+ 1193               		.loc 3 423 0
+ 1194 001e F801      		movw r30,r16
+ 1195 0020 8389      		ldd r24,Z+19
+ 1196 0022 8230      		cpi r24,lo8(2)
+ 1197 0024 01F4      		brne .L107
+ 424:dualMoco.c    **** 	  ConfigMask |= (1 << USBS1);
+ 1198               		.loc 3 424 0
+ 1199 0026 C860      		ori r28,lo8(8)
+ 1200               	.LVL98:
+ 1201               	.L107:
+ 425:dualMoco.c    **** 
+ 426:dualMoco.c    **** 	switch (CDCInterfaceInfo->State.LineEncoding.DataBits)
+ 1202               		.loc 3 426 0
+ 1203 0028 F801      		movw r30,r16
+ 1204 002a 8589      		ldd r24,Z+21
+ 1205 002c 8730      		cpi r24,lo8(7)
+ 1206 002e 01F0      		breq .L109
+ 1207 0030 8830      		cpi r24,lo8(8)
+ 1208 0032 01F0      		breq .L110
+ 1209 0034 8630      		cpi r24,lo8(6)
+ 1210 0036 01F4      		brne .L108
+ 427:dualMoco.c    **** 	{
+ 428:dualMoco.c    **** 		case 6:
+ 429:dualMoco.c    **** 			ConfigMask |= (1 << UCSZ10);
+ 1211               		.loc 3 429 0
+ 1212 0038 C260      		ori r28,lo8(2)
+ 1213               	.LVL99:
+ 430:dualMoco.c    **** 			break;
+ 1214               		.loc 3 430 0
+ 1215 003a 00C0      		rjmp .L108
+ 1216               	.L109:
+ 431:dualMoco.c    **** 		case 7:
+ 432:dualMoco.c    **** 			ConfigMask |= (1 << UCSZ11);
+ 1217               		.loc 3 432 0
+ 1218 003c C460      		ori r28,lo8(4)
+ 1219               	.LVL100:
+ 433:dualMoco.c    **** 			break;
+ 1220               		.loc 3 433 0
+ 1221 003e 00C0      		rjmp .L108
+ 1222               	.L110:
+ 434:dualMoco.c    **** 		case 8:
+ 435:dualMoco.c    **** 			ConfigMask |= ((1 << UCSZ11) | (1 << UCSZ10));
+ 1223               		.loc 3 435 0
+ 1224 0040 C660      		ori r28,lo8(6)
+ 1225               	.LVL101:
+ 1226               	.L108:
+ 436:dualMoco.c    **** 			break;
+ 437:dualMoco.c    **** 	}
+ 438:dualMoco.c    **** 
+ 439:dualMoco.c    **** 	/* Must turn off USART before reconfiguring it, otherwise incorrect operation may occur */
+ 440:dualMoco.c    **** 	UCSR1B = 0;
+ 1227               		.loc 3 440 0
+ 1228 0042 1092 C900 		sts 201,__zero_reg__
+ 441:dualMoco.c    **** 	UCSR1A = 0;
+ 1229               		.loc 3 441 0
+ 1230 0046 1092 C800 		sts 200,__zero_reg__
+ 442:dualMoco.c    **** 	UCSR1C = 0;
+ 1231               		.loc 3 442 0
+ 1232 004a 1092 CA00 		sts 202,__zero_reg__
+ 443:dualMoco.c    **** 
+ 444:dualMoco.c    **** 	/* Special case 57600 baud for compatibility with the ATmega328 bootloader. */	
+ 445:dualMoco.c    **** 	UBRR1  = (CDCInterfaceInfo->State.LineEncoding.BaudRateBPS == 57600)
+ 1233               		.loc 3 445 0
+ 1234 004e F801      		movw r30,r16
+ 1235 0050 2785      		ldd r18,Z+15
+ 1236 0052 3089      		ldd r19,Z+16
+ 1237 0054 4189      		ldd r20,Z+17
+ 1238 0056 5289      		ldd r21,Z+18
+ 1239 0058 2115      		cp r18,__zero_reg__
+ 1240 005a F1EE      		ldi r31,-31
+ 1241 005c 3F07      		cpc r19,r31
+ 1242 005e 4105      		cpc r20,__zero_reg__
+ 1243 0060 5105      		cpc r21,__zero_reg__
+ 1244 0062 01F0      		breq .L115
+ 1245               		.loc 3 445 0 is_stmt 0 discriminator 2
+ 1246 0064 DA01      		movw r26,r20
+ 1247 0066 C901      		movw r24,r18
+ 1248 0068 B695      		lsr r27
+ 1249 006a A795      		ror r26
+ 1250 006c 9795      		ror r25
+ 1251 006e 8795      		ror r24
+ 1252 0070 BC01      		movw r22,r24
+ 1253 0072 CD01      		movw r24,r26
+ 1254 0074 6058      		subi r22,-128
+ 1255 0076 7B47      		sbci r23,123
+ 1256 0078 814E      		sbci r24,-31
+ 1257 007a 9F4F      		sbci r25,-1
+ 1258 007c 0E94 0000 		call __udivmodsi4
+ 1259 0080 2150      		subi r18,1
+ 1260 0082 3109      		sbc r19,__zero_reg__
+ 1261 0084 00C0      		rjmp .L112
+ 1262               	.L115:
+ 1263               		.loc 3 445 0
+ 1264 0086 20E1      		ldi r18,lo8(16)
+ 1265 0088 30E0      		ldi r19,0
+ 1266               	.L112:
+ 1267               		.loc 3 445 0 discriminator 4
+ 1268 008a 3093 CD00 		sts 204+1,r19
+ 1269 008e 2093 CC00 		sts 204,r18
+ 446:dualMoco.c    **** 			 ? SERIAL_UBBRVAL(CDCInterfaceInfo->State.LineEncoding.BaudRateBPS)
+ 447:dualMoco.c    **** 			 : SERIAL_2X_UBBRVAL(CDCInterfaceInfo->State.LineEncoding.BaudRateBPS);	
+ 448:dualMoco.c    **** 
+ 449:dualMoco.c    **** 	UCSR1C = ConfigMask;
+ 1270               		.loc 3 449 0 is_stmt 1 discriminator 4
+ 1271 0092 C093 CA00 		sts 202,r28
+ 450:dualMoco.c    **** 	UCSR1A = (CDCInterfaceInfo->State.LineEncoding.BaudRateBPS == 57600) ? 0 : (1 << U2X1);
+ 1272               		.loc 3 450 0 discriminator 4
+ 1273 0096 F801      		movw r30,r16
+ 1274 0098 8785      		ldd r24,Z+15
+ 1275 009a 9089      		ldd r25,Z+16
+ 1276 009c A189      		ldd r26,Z+17
+ 1277 009e B289      		ldd r27,Z+18
+ 1278 00a0 8115      		cp r24,__zero_reg__
+ 1279 00a2 914E      		sbci r25,-31
+ 1280 00a4 A105      		cpc r26,__zero_reg__
+ 1281 00a6 B105      		cpc r27,__zero_reg__
+ 1282 00a8 01F0      		breq .L116
+ 1283               		.loc 3 450 0 is_stmt 0
+ 1284 00aa 82E0      		ldi r24,lo8(2)
+ 1285 00ac 00C0      		rjmp .L113
+ 1286               	.L116:
+ 1287 00ae 80E0      		ldi r24,0
+ 1288               	.L113:
+ 1289               		.loc 3 450 0 discriminator 4
+ 1290 00b0 8093 C800 		sts 200,r24
+ 451:dualMoco.c    **** 	UCSR1B = ((1 << RXCIE1) | (1 << TXEN1) | (1 << RXEN1));
+ 1291               		.loc 3 451 0 is_stmt 1 discriminator 4
+ 1292 00b4 88E9      		ldi r24,lo8(-104)
+ 1293 00b6 8093 C900 		sts 201,r24
+ 1294               	/* epilogue start */
+ 452:dualMoco.c    **** }
+ 1295               		.loc 3 452 0 discriminator 4
+ 1296 00ba CF91      		pop r28
+ 1297               	.LVL102:
+ 1298 00bc 1F91      		pop r17
+ 1299 00be 0F91      		pop r16
+ 1300               	.LVL103:
+ 1301 00c0 0895      		ret
+ 1302               		.cfi_endproc
+ 1303               	.LFE102:
+ 1305               		.section	.text.__vector_23,"ax",@progbits
+ 1306               	.global	__vector_23
+ 1308               	__vector_23:
+ 1309               	.LFB103:
+ 453:dualMoco.c    **** 
+ 454:dualMoco.c    **** /** ISR to manage the reception of data from the serial port, placing received bytes into a circula
+ 455:dualMoco.c    ****  *  for later transmission to the host.
+ 456:dualMoco.c    ****  */
+ 457:dualMoco.c    **** ISR(USART1_RX_vect, ISR_BLOCK)
+ 458:dualMoco.c    **** {
+ 1310               		.loc 3 458 0
+ 1311               		.cfi_startproc
+ 1312 0000 1F92      		push r1
+ 1313               	.LCFI9:
+ 1314               		.cfi_def_cfa_offset 3
+ 1315               		.cfi_offset 1, -2
+ 1316 0002 0F92      		push r0
+ 1317               	.LCFI10:
+ 1318               		.cfi_def_cfa_offset 4
+ 1319               		.cfi_offset 0, -3
+ 1320 0004 0FB6      		in r0,__SREG__
+ 1321 0006 0F92      		push r0
+ 1322 0008 1124      		clr __zero_reg__
+ 1323 000a 2F93      		push r18
+ 1324               	.LCFI11:
+ 1325               		.cfi_def_cfa_offset 5
+ 1326               		.cfi_offset 18, -4
+ 1327 000c 3F93      		push r19
+ 1328               	.LCFI12:
+ 1329               		.cfi_def_cfa_offset 6
+ 1330               		.cfi_offset 19, -5
+ 1331 000e 4F93      		push r20
+ 1332               	.LCFI13:
+ 1333               		.cfi_def_cfa_offset 7
+ 1334               		.cfi_offset 20, -6
+ 1335 0010 5F93      		push r21
+ 1336               	.LCFI14:
+ 1337               		.cfi_def_cfa_offset 8
+ 1338               		.cfi_offset 21, -7
+ 1339 0012 6F93      		push r22
+ 1340               	.LCFI15:
+ 1341               		.cfi_def_cfa_offset 9
+ 1342               		.cfi_offset 22, -8
+ 1343 0014 7F93      		push r23
+ 1344               	.LCFI16:
+ 1345               		.cfi_def_cfa_offset 10
+ 1346               		.cfi_offset 23, -9
+ 1347 0016 8F93      		push r24
+ 1348               	.LCFI17:
+ 1349               		.cfi_def_cfa_offset 11
+ 1350               		.cfi_offset 24, -10
+ 1351 0018 9F93      		push r25
+ 1352               	.LCFI18:
+ 1353               		.cfi_def_cfa_offset 12
+ 1354               		.cfi_offset 25, -11
+ 1355 001a AF93      		push r26
+ 1356               	.LCFI19:
+ 1357               		.cfi_def_cfa_offset 13
+ 1358               		.cfi_offset 26, -12
+ 1359 001c BF93      		push r27
+ 1360               	.LCFI20:
+ 1361               		.cfi_def_cfa_offset 14
+ 1362               		.cfi_offset 27, -13
+ 1363 001e EF93      		push r30
+ 1364               	.LCFI21:
+ 1365               		.cfi_def_cfa_offset 15
+ 1366               		.cfi_offset 30, -14
+ 1367 0020 FF93      		push r31
+ 1368               	.LCFI22:
+ 1369               		.cfi_def_cfa_offset 16
+ 1370               		.cfi_offset 31, -15
+ 1371               	/* prologue: Signal */
+ 1372               	/* frame size = 0 */
+ 1373               	/* stack size = 15 */
+ 1374               	.L__stack_usage = 15
+ 459:dualMoco.c    ****   if (mocoMode == 0) {
+ 1375               		.loc 3 459 0
+ 1376 0022 8091 0000 		lds r24,mocoMode
+ 1377 0026 8111      		cpse r24,__zero_reg__
+ 1378 0028 00C0      		rjmp .L119
+ 1379               	.LBB181:
+ 460:dualMoco.c    **** 	uint8_t ReceivedByte = UDR1;
+ 1380               		.loc 3 460 0
+ 1381 002a 6091 CE00 		lds r22,206
+ 1382               	.LVL104:
+ 461:dualMoco.c    **** 
+ 462:dualMoco.c    **** 	if (USB_DeviceState == DEVICE_STATE_Configured)
+ 1383               		.loc 3 462 0
+ 1384 002e 8EB3      		in r24,0x1e
+ 1385 0030 8430      		cpi r24,lo8(4)
+ 1386 0032 01F4      		brne .L119
+ 463:dualMoco.c    **** 	  RingBuffer_Insert(&USARTtoUSB_Buffer, ReceivedByte);
+ 1387               		.loc 3 463 0
+ 1388 0034 80E0      		ldi r24,lo8(USARTtoUSB_Buffer)
+ 1389 0036 90E0      		ldi r25,hi8(USARTtoUSB_Buffer)
+ 1390 0038 0E94 0000 		call RingBuffer_Insert
+ 1391               	.LVL105:
+ 1392               	.L119:
+ 1393               	/* epilogue start */
+ 1394               	.LBE181:
+ 464:dualMoco.c    ****   }
+ 465:dualMoco.c    **** }
+ 1395               		.loc 3 465 0
+ 1396 003c FF91      		pop r31
+ 1397 003e EF91      		pop r30
+ 1398 0040 BF91      		pop r27
+ 1399 0042 AF91      		pop r26
+ 1400 0044 9F91      		pop r25
+ 1401 0046 8F91      		pop r24
+ 1402 0048 7F91      		pop r23
+ 1403 004a 6F91      		pop r22
+ 1404 004c 5F91      		pop r21
+ 1405 004e 4F91      		pop r20
+ 1406 0050 3F91      		pop r19
+ 1407 0052 2F91      		pop r18
+ 1408 0054 0F90      		pop r0
+ 1409 0056 0FBE      		out __SREG__,r0
+ 1410 0058 0F90      		pop r0
+ 1411 005a 1F90      		pop r1
+ 1412 005c 1895      		reti
+ 1413               		.cfi_endproc
+ 1414               	.LFE103:
+ 1416               		.section	.text.EVENT_CDC_Device_ControLineStateChanged,"ax",@progbits
+ 1417               	.global	EVENT_CDC_Device_ControLineStateChanged
+ 1419               	EVENT_CDC_Device_ControLineStateChanged:
+ 1420               	.LFB104:
+ 466:dualMoco.c    **** 
+ 467:dualMoco.c    **** /** Event handler for the CDC Class driver Host-to-Device Line Encoding Changed event.
+ 468:dualMoco.c    ****  *
+ 469:dualMoco.c    ****  *  \param[in] CDCInterfaceInfo  Pointer to the CDC class interface configuration structure being r
+ 470:dualMoco.c    ****  */
+ 471:dualMoco.c    **** void EVENT_CDC_Device_ControLineStateChanged(USB_ClassInfo_CDC_Device_t* const CDCInterfaceInfo)
+ 472:dualMoco.c    **** {
+ 1421               		.loc 3 472 0
+ 1422               		.cfi_startproc
+ 1423               	.LVL106:
+ 1424               	/* prologue: function */
+ 1425               	/* frame size = 0 */
+ 1426               	/* stack size = 0 */
+ 1427               	.L__stack_usage = 0
+ 473:dualMoco.c    **** 	bool CurrentDTRState = (CDCInterfaceInfo->State.ControlLineStates.HostToDevice & CDC_CONTROL_LINE_
+ 474:dualMoco.c    **** 
+ 475:dualMoco.c    **** 	if (CurrentDTRState)
+ 1428               		.loc 3 475 0
+ 1429 0000 FC01      		movw r30,r24
+ 1430 0002 8585      		ldd r24,Z+13
+ 1431               	.LVL107:
+ 1432 0004 80FF      		sbrs r24,0
+ 1433 0006 00C0      		rjmp .L122
+ 476:dualMoco.c    **** 	  AVR_RESET_LINE_PORT &= ~AVR_RESET_LINE_MASK;
+ 1434               		.loc 3 476 0
+ 1435 0008 5F98      		cbi 0xb,7
+ 1436 000a 0895      		ret
+ 1437               	.L122:
+ 477:dualMoco.c    **** 	else
+ 478:dualMoco.c    **** 	  AVR_RESET_LINE_PORT |= AVR_RESET_LINE_MASK;
+ 1438               		.loc 3 478 0
+ 1439 000c 5F9A      		sbi 0xb,7
+ 1440 000e 0895      		ret
+ 1441               		.cfi_endproc
+ 1442               	.LFE104:
+ 1444               		.section	.rodata
+ 1447               	stateTransTable.3321:
+ 1448 0000 00        		.byte	0
+ 1449 0001 00        		.byte	0
+ 1450 0002 03        		.byte	3
+ 1451 0003 82        		.byte	-126
+ 1452 0004 05        		.byte	5
+ 1453 0005 84        		.byte	-124
+ 1454 0006 07        		.byte	7
+ 1455 0007 86        		.byte	-122
+ 1456 0008 09        		.byte	9
+ 1457 0009 88        		.byte	-120
+ 1458 000a 8A        		.byte	-118
+ 1459 000b 00        		.byte	0
+ 1460 000c 8C        		.byte	-116
+ 1461 000d 00        		.byte	0
+ 1462 000e 0F        		.byte	15
+ 1463 000f 8E        		.byte	-114
+ 1464               		.local	PC.3319
+ 1465               		.comm	PC.3319,1,1
+ 1466               		.local	SysEx.3320
+ 1467               		.comm	SysEx.3320,1,1
+ 1468               	.global	Keyboard_MIDI_Interface
+ 1469               		.data
+ 1472               	Keyboard_MIDI_Interface:
+ 1473 0000 01        		.byte	1
+ 1474 0001 02        		.byte	2
+ 1475 0002 4000      		.word	64
+ 1476 0004 00        		.byte	0
+ 1477 0005 01        		.byte	1
+ 1478 0006 4000      		.word	64
+ 1479 0008 00        		.byte	0
+ 1480               	.global	VirtualSerial_CDC_Interface
+ 1483               	VirtualSerial_CDC_Interface:
+ 1484 0009 00        		.byte	0
+ 1485 000a 03        		.byte	3
+ 1486 000b 4000      		.word	64
+ 1487 000d 00        		.byte	0
+ 1488 000e 04        		.byte	4
+ 1489 000f 4000      		.word	64
+ 1490 0011 00        		.byte	0
+ 1491 0012 02        		.byte	2
+ 1492 0013 0800      		.word	8
+ 1493 0015 00        		.byte	0
+ 1494 0016 0000 0000 		.zero	9
+ 1494      0000 0000 
+ 1494      00
+ 1495               		.local	tx_buf
+ 1496               		.comm	tx_buf,32,1
+ 1497               		.local	irptr
+ 1498               		.comm	irptr,1,1
+ 1499               		.local	uwptr
+ 1500               		.comm	uwptr,1,1
+ 1501               		.local	utx_buf
+ 1502               		.comm	utx_buf,8,1
+ 1503               		.local	rx_buf
+ 1504               		.comm	rx_buf,8,1
+ 1505               		.local	utxrdy
+ 1506               		.comm	utxrdy,1,1
+ 1507               		.comm	PulseMSRemaining,3,1
+ 1508               		.comm	USARTtoUSB_Buffer,133,1
+ 1509               		.comm	USBtoUSART_Buffer,133,1
+ 1510               	.global	mocoMode
+ 1511               		.section .bss
+ 1514               	mocoMode:
+ 1515 0000 00        		.zero	1
+ 1516               		.text
+ 1517               	.Letext0:
+ 1518               		.file 7 "/usr/lib/avr/include/stdint.h"
+ 1519               		.file 8 "../LUFA/Drivers/USB/HighLevel/../LowLevel/Device.h"
+ 1520               		.file 9 "../LUFA/Drivers/USB/Class/Device/../Common/CDC.h"
+ 1521               		.file 10 "../LUFA/Drivers/USB/Class/Device/CDC.h"
+ 1522               		.file 11 "../LUFA/Drivers/USB/Class/Device/../Common/MIDI.h"
+ 1523               		.file 12 "../LUFA/Drivers/USB/Class/Device/MIDI.h"
+ 1524               		.file 13 "dualMoco.h"
+ 1525               		.file 14 "../LUFA/Drivers/USB/HighLevel/USBTask.h"
+ 1526               		.file 15 "../LUFA/Drivers/USB/HighLevel/../LowLevel/USBController.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 dualMoco.c
+     /tmp/ccWEveaz.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccWEveaz.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccWEveaz.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccWEveaz.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccWEveaz.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccWEveaz.s:12     .text.RingBuffer_Insert:0000000000000000 RingBuffer_Insert
+     /tmp/ccWEveaz.s:86     .text.RingBuffer_Remove:0000000000000000 RingBuffer_Remove
+     /tmp/ccWEveaz.s:160    .text.parseUSBMidiMessage:0000000000000000 parseUSBMidiMessage
+     /tmp/ccWEveaz.s:1498   .bss:0000000000000024 uwptr
+     /tmp/ccWEveaz.s:1467   .bss:0000000000000003 tx_buf
+     /tmp/ccWEveaz.s:264    .text.parseSerialMidiMessage:0000000000000000 parseSerialMidiMessage
+     /tmp/ccWEveaz.s:1465   .bss:0000000000000002 SysEx.3320
+     /tmp/ccWEveaz.s:1500   .bss:0000000000000025 utx_buf
+                             .bss:0000000000000001 PC.3319
+     /tmp/ccWEveaz.s:1502   .bss:000000000000002d rx_buf
+     /tmp/ccWEveaz.s:1447   .rodata:0000000000000000 stateTransTable.3321
+     /tmp/ccWEveaz.s:388    .text.processMIDI:0000000000000000 processMIDI
+     /tmp/ccWEveaz.s:1504   .bss:0000000000000035 utxrdy
+                            *COM*:0000000000000003 PulseMSRemaining
+     /tmp/ccWEveaz.s:1472   .data:0000000000000000 Keyboard_MIDI_Interface
+     /tmp/ccWEveaz.s:1496   .bss:0000000000000023 irptr
+     /tmp/ccWEveaz.s:569    .text.processSerial:0000000000000000 processSerial
+                            *COM*:0000000000000085 USBtoUSART_Buffer
+                            *COM*:0000000000000085 USARTtoUSB_Buffer
+     /tmp/ccWEveaz.s:1483   .data:0000000000000009 VirtualSerial_CDC_Interface
+     /tmp/ccWEveaz.s:906    .text.SetupHardware:0000000000000000 SetupHardware
+     /tmp/ccWEveaz.s:1514   .bss:0000000000000000 mocoMode
+     /tmp/ccWEveaz.s:1019   .text.startup.main:0000000000000000 main
+     /tmp/ccWEveaz.s:1047   .text.EVENT_USB_Device_Connect:0000000000000000 EVENT_USB_Device_Connect
+     /tmp/ccWEveaz.s:1061   .text.EVENT_USB_Device_Disconnect:0000000000000000 EVENT_USB_Device_Disconnect
+     /tmp/ccWEveaz.s:1075   .text.EVENT_USB_Device_ConfigurationChanged:0000000000000000 EVENT_USB_Device_ConfigurationChanged
+     /tmp/ccWEveaz.s:1107   .text.EVENT_USB_Device_ControlRequest:0000000000000000 EVENT_USB_Device_ControlRequest
+     /tmp/ccWEveaz.s:1122   .text.EVENT_USB_Device_UnhandledControlRequest:0000000000000000 EVENT_USB_Device_UnhandledControlRequest
+     /tmp/ccWEveaz.s:1147   .text.EVENT_CDC_Device_LineEncodingChanged:0000000000000000 EVENT_CDC_Device_LineEncodingChanged
+     /tmp/ccWEveaz.s:1308   .text.__vector_23:0000000000000000 __vector_23
+     /tmp/ccWEveaz.s:1419   .text.EVENT_CDC_Device_ControLineStateChanged:0000000000000000 EVENT_CDC_Device_ControLineStateChanged
+
+UNDEFINED SYMBOLS
+MIDI_Device_SendEventPacket
+MIDI_Device_Flush
+MIDI_Device_ReceiveEventPacket
+USB_USBTask
+CDC_Device_ReceiveByte
+CDC_Device_SendByte
+CDC_Device_USBTask
+USB_Init
+MIDI_Device_ConfigureEndpoints
+CDC_Device_ConfigureEndpoints
+CDC_Device_ProcessControlRequest
+__udivmodsi4
+__do_copy_data
+__do_clear_bss

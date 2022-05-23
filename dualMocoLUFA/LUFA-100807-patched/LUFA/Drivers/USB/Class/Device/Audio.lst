@@ -1,0 +1,1631 @@
+   1               		.file	"Audio.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.Audio_Device_ProcessControlRequest,"ax",@progbits
+  11               	.global	Audio_Device_ProcessControlRequest
+  13               	Audio_Device_ProcessControlRequest:
+  14               	.LFB74:
+  15               		.file 1 "../LUFA/Drivers/USB/Class/Device/Audio.c"
+   1:../LUFA/Drivers/USB/Class/Device/Audio.c **** /*
+   2:../LUFA/Drivers/USB/Class/Device/Audio.c ****              LUFA Library
+   3:../LUFA/Drivers/USB/Class/Device/Audio.c ****      Copyright (C) Dean Camera, 2010.
+   4:../LUFA/Drivers/USB/Class/Device/Audio.c ****               
+   5:../LUFA/Drivers/USB/Class/Device/Audio.c ****   dean [at] fourwalledcubicle [dot] com
+   6:../LUFA/Drivers/USB/Class/Device/Audio.c ****       www.fourwalledcubicle.com
+   7:../LUFA/Drivers/USB/Class/Device/Audio.c **** */
+   8:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+   9:../LUFA/Drivers/USB/Class/Device/Audio.c **** /*
+  10:../LUFA/Drivers/USB/Class/Device/Audio.c ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  12:../LUFA/Drivers/USB/Class/Device/Audio.c ****   Permission to use, copy, modify, distribute, and sell this 
+  13:../LUFA/Drivers/USB/Class/Device/Audio.c ****   software and its documentation for any purpose is hereby granted
+  14:../LUFA/Drivers/USB/Class/Device/Audio.c ****   without fee, provided that the above copyright notice appear in 
+  15:../LUFA/Drivers/USB/Class/Device/Audio.c ****   all copies and that both that the copyright notice and this
+  16:../LUFA/Drivers/USB/Class/Device/Audio.c ****   permission notice and warranty disclaimer appear in supporting 
+  17:../LUFA/Drivers/USB/Class/Device/Audio.c ****   documentation, and that the name of the author not be used in 
+  18:../LUFA/Drivers/USB/Class/Device/Audio.c ****   advertising or publicity pertaining to distribution of the 
+  19:../LUFA/Drivers/USB/Class/Device/Audio.c ****   software without specific, written prior permission.
+  20:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  21:../LUFA/Drivers/USB/Class/Device/Audio.c ****   The author disclaim all warranties with regard to this
+  22:../LUFA/Drivers/USB/Class/Device/Audio.c ****   software, including all implied warranties of merchantability
+  23:../LUFA/Drivers/USB/Class/Device/Audio.c ****   and fitness.  In no event shall the author be liable for any
+  24:../LUFA/Drivers/USB/Class/Device/Audio.c ****   special, indirect or consequential damages or any damages
+  25:../LUFA/Drivers/USB/Class/Device/Audio.c ****   whatsoever resulting from loss of use, data or profits, whether
+  26:../LUFA/Drivers/USB/Class/Device/Audio.c ****   in an action of contract, negligence or other tortious action,
+  27:../LUFA/Drivers/USB/Class/Device/Audio.c ****   arising out of or in connection with the use or performance of
+  28:../LUFA/Drivers/USB/Class/Device/Audio.c ****   this software.
+  29:../LUFA/Drivers/USB/Class/Device/Audio.c **** */
+  30:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  31:../LUFA/Drivers/USB/Class/Device/Audio.c **** #define  __INCLUDE_FROM_USB_DRIVER
+  32:../LUFA/Drivers/USB/Class/Device/Audio.c **** #include "../../HighLevel/USBMode.h"
+  33:../LUFA/Drivers/USB/Class/Device/Audio.c **** #if defined(USB_CAN_BE_DEVICE)
+  34:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  35:../LUFA/Drivers/USB/Class/Device/Audio.c **** #define  __INCLUDE_FROM_AUDIO_DRIVER
+  36:../LUFA/Drivers/USB/Class/Device/Audio.c **** #include "Audio.h"
+  37:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  38:../LUFA/Drivers/USB/Class/Device/Audio.c **** void Audio_Device_ProcessControlRequest(USB_ClassInfo_Audio_Device_t* const AudioInterfaceInfo)
+  39:../LUFA/Drivers/USB/Class/Device/Audio.c **** {
+  16               		.loc 1 39 0
+  17               		.cfi_startproc
+  18               	.LVL0:
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+  23 0000 FC01      		movw r30,r24
+  24               	.LBB10:
+  25               	.LBB11:
+  26               		.file 2 "../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h"
+   1:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** /*
+   2:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****              LUFA Library
+   3:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****      Copyright (C) Dean Camera, 2010.
+   4:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****               
+   5:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   dean [at] fourwalledcubicle [dot] com
+   6:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****       www.fourwalledcubicle.com
+   7:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** */
+   8:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+   9:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** /*
+  10:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  12:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   Permission to use, copy, modify, distribute, and sell this 
+  13:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   software and its documentation for any purpose is hereby granted
+  14:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   without fee, provided that the above copyright notice appear in 
+  15:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   all copies and that both that the copyright notice and this
+  16:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   permission notice and warranty disclaimer appear in supporting 
+  17:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   documentation, and that the name of the author not be used in 
+  18:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   advertising or publicity pertaining to distribution of the 
+  19:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   software without specific, written prior permission.
+  20:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  21:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   The author disclaim all warranties with regard to this
+  22:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   software, including all implied warranties of merchantability
+  23:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   and fitness.  In no event shall the author be liable for any
+  24:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   special, indirect or consequential damages or any damages
+  25:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   whatsoever resulting from loss of use, data or profits, whether
+  26:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   in an action of contract, negligence or other tortious action,
+  27:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   arising out of or in connection with the use or performance of
+  28:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****   this software.
+  29:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** */
+  30:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  31:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** /** \file
+  32:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  \brief USB device endpoint management definitions.
+  33:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *
+  34:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  This file contains structures, function prototypes and macros related to the management of the 
+  35:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  data endpoints when the library is initialized in USB device mode.
+  36:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *
+  37:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  \note This file should not be included directly. It is automatically included as needed by the 
+  38:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *        dispatch header located in LUFA/Drivers/USB/USB.h.
+  39:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  */
+  40:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  41:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** /** \ingroup Group_USB
+  42:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  @defgroup Group_EndpointManagement Endpoint Management
+  43:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *
+  44:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  Functions, macros and enums related to endpoint management when in USB Device mode. This
+  45:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  module contains the endpoint management macros, as well as endpoint interrupt and data
+  46:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  send/receive functions for various data types.
+  47:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *
+  48:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  @{
+  49:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  */
+  50:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  51:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** /** @defgroup Group_EndpointRW Endpoint Data Reading and Writing
+  52:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *
+  53:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  Functions, macros, variables, enums and types related to data reading and writing from and to e
+  54:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  */
+  55:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  
+  56:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** /** \ingroup Group_EndpointRW  
+  57:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  @defgroup Group_EndpointPrimitiveRW Read/Write of Primitive Data Types
+  58:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *
+  59:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  Functions, macros, variables, enums and types related to data reading and writing of primitive 
+  60:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  from and to endpoints.
+  61:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  */ 
+  62:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  63:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** /** \ingroup Group_EndpointRW  
+  64:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  @defgroup Group_EndpointStreamRW Read/Write of Multi-Byte Streams
+  65:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *
+  66:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  Functions, macros, variables, enums and types related to data reading and writing of data strea
+  67:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  and to endpoints.
+  68:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  */ 
+  69:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  70:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** /** @defgroup Group_EndpointPacketManagement Endpoint Packet Management
+  71:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *
+  72:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  *  Functions, macros, variables, enums and types related to packet management of endpoints.
+  73:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h ****  */
+  74:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  75:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** #ifndef __ENDPOINT_H__
+  76:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** #define __ENDPOINT_H__
+  77:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  78:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 	/* Includes: */
+  79:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#include <avr/io.h>
+  80:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#include <avr/pgmspace.h>
+  81:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#include <avr/eeprom.h>
+  82:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#include <stdbool.h>
+  83:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  84:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#include "../../../Common/Common.h"
+  85:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#include "../HighLevel/USBTask.h"
+  86:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#include "USBInterrupt.h"
+  87:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  88:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#if !defined(NO_STREAM_CALLBACKS) || defined(__DOXYGEN__)
+  89:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#include "../HighLevel/StreamCallbacks.h"
+  90:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#endif
+  91:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		
+  92:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 	/* Enable C linkage for C++ Compilers: */
+  93:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#if defined(__cplusplus)
+  94:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			extern "C" {
+  95:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#endif
+  96:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+  97:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 	/* Preprocessor Checks: */
+  98:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#if !defined(__INCLUDE_FROM_USB_DRIVER)
+  99:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#error Do not include this file directly. Include LUFA/Drivers/USB/USB.h instead.
+ 100:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		#endif
+ 101:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		
+ 102:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 	/* Public Interface - May be used in end-application: */
+ 103:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		/* Macros: */
+ 104:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Endpoint data direction mask for \ref Endpoint_ConfigureEndpoint(). This indicates that the 
+ 105:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  should be initialized in the OUT direction - i.e. data flows from host to device.
+ 106:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 107:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_DIR_OUT                      (0 << EPDIR)
+ 108:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 109:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Endpoint data direction mask for \ref Endpoint_ConfigureEndpoint(). This indicates that the 
+ 110:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  should be initialized in the IN direction - i.e. data flows from device to host.
+ 111:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 112:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_DIR_IN                       (1 << EPDIR)
+ 113:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 114:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Mask for the bank mode selection for the \ref Endpoint_ConfigureEndpoint() macro. This indic
+ 115:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  that the endpoint should have one single bank, which requires less USB FIFO memory but resul
+ 116:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  in slower transfers as only one USB device (the AVR or the host) can access the endpoint's
+ 117:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  bank at the one time.
+ 118:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 119:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_BANK_SINGLE                  (0 << EPBK0)
+ 120:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 121:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Mask for the bank mode selection for the \ref Endpoint_ConfigureEndpoint() macro. This indic
+ 122:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  that the endpoint should have two banks, which requires more USB FIFO memory but results
+ 123:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  in faster transfers as one USB device (the AVR or the host) can access one bank while the ot
+ 124:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  accesses the second bank.
+ 125:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 126:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_BANK_DOUBLE                  (1 << EPBK0)
+ 127:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 128:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Endpoint address for the default control endpoint, which always resides in address 0. This i
+ 129:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  defined for convenience to give more readable code when used with the endpoint macros.
+ 130:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 131:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_CONTROLEP                    0
+ 132:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 133:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#if (!defined(FIXED_CONTROL_ENDPOINT_SIZE) || defined(__DOXYGEN__))
+ 134:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				/** Default size of the default control endpoint's bank, until altered by the control endpoint 
+ 135:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				 *  value in the device descriptor. Not available if the FIXED_CONTROL_ENDPOINT_SIZE token is d
+ 136:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				 */
+ 137:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_CONTROLEP_DEFAULT_SIZE   8
+ 138:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#endif
+ 139:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 140:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Endpoint number mask, for masking against endpoint addresses to retrieve the endpoint's
+ 141:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  numerical address in the device.
+ 142:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 143:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_EPNUM_MASK                   0x07
+ 144:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 145:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Endpoint direction mask, for masking against endpoint addresses to retrieve the endpoint's
+ 146:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction for comparing with the ENDPOINT_DESCRIPTOR_DIR_* masks.
+ 147:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 148:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_EPDIR_MASK                   0x80
+ 149:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 150:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Endpoint bank size mask, for masking against endpoint addresses to retrieve the endpoint's
+ 151:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  bank size in the device.
+ 152:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 153:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_EPSIZE_MASK                  0x7F
+ 154:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 155:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Maximum size in bytes of a given endpoint.
+ 156:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 157:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] n  Endpoint number, a value between 0 and (ENDPOINT_TOTAL_ENDPOINTS - 1)
+ 158:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */				
+ 159:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_MAX_SIZE(n)                  _ENDPOINT_GET_MAXSIZE(n)
+ 160:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 161:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Indicates if the given endpoint supports double banking.
+ 162:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 163:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] n  Endpoint number, a value between 0 and (ENDPOINT_TOTAL_ENDPOINTS - 1)
+ 164:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */				
+ 165:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define ENDPOINT_DOUBLEBANK_SUPPORTED(n)      _ENDPOINT_GET_DOUBLEBANK(n)
+ 166:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 167:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#if !defined(CONTROL_ONLY_DEVICE)
+ 168:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#if defined(USB_SERIES_4_AVR) || defined(USB_SERIES_6_AVR) || defined(USB_SERIES_7_AVR) || defi
+ 169:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					/** Total number of endpoints (including the default control endpoint at address 0) which may
+ 170:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					 *  be used in the device. Different USB AVR models support different amounts of endpoints,
+ 171:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					 *  this value reflects the maximum number of endpoints for the currently selected AVR model.
+ 172:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					 */
+ 173:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					#define ENDPOINT_TOTAL_ENDPOINTS      7
+ 174:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#else
+ 175:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					#define ENDPOINT_TOTAL_ENDPOINTS      5
+ 176:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#endif
+ 177:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#else
+ 178:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_TOTAL_ENDPOINTS          1
+ 179:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#endif
+ 180:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 181:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		/* Enums: */
+ 182:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Enum for the possible error return codes of the \ref Endpoint_WaitUntilReady() function.
+ 183:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 184:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointRW
+ 185:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 186:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			enum Endpoint_WaitUntilReady_ErrorCodes_t
+ 187:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 188:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_READYWAIT_NoError                 = 0, /**< Endpoint is ready for next packet, no erro
+ 189:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_READYWAIT_EndpointStalled         = 1, /**< The endpoint was stalled during the stream
+ 190:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 *   transfer by the host or device.
+ 191:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 */
+ 192:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_READYWAIT_DeviceDisconnected      = 2,	/**< Device was disconnected from the host whil
+ 193:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 *   waiting for the endpoint to become ready.
+ 194:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 */
+ 195:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_READYWAIT_BusSuspended            = 3, /**< The USB bus has been suspended by the host
+ 196:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 *   no USB endpoint traffic can occur until th
+ 197:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 *   has resumed.
+ 198:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 */
+ 199:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_READYWAIT_Timeout                 = 4, /**< The host failed to accept or send the next
+ 200:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 *   within the software timeout period set by 
+ 201:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 *   \ref USB_STREAM_TIMEOUT_MS macro.
+ 202:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                                 */
+ 203:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			};
+ 204:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		
+ 205:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Enum for the possible error return codes of the Endpoint_*_Stream_* functions.
+ 206:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 207:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 208:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 209:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			enum Endpoint_Stream_RW_ErrorCodes_t
+ 210:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 211:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWSTREAM_NoError            = 0, /**< Command completed successfully, no error. */
+ 212:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWSTREAM_EndpointStalled    = 1, /**< The endpoint was stalled during the stream
+ 213:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           *   transfer by the host or device.
+ 214:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           */
+ 215:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWSTREAM_DeviceDisconnected = 2, /**< Device was disconnected from the host during
+ 216:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           *   the transfer.
+ 217:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           */
+ 218:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWSTREAM_BusSuspended       = 3, /**< The USB bus has been suspended by the host and
+ 219:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           *   no USB endpoint traffic can occur until the bus
+ 220:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           *   has resumed.
+ 221:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           */
+ 222:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWSTREAM_Timeout            = 4, /**< The host failed to accept or send the next packe
+ 223:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           *   within the software timeout period set by the
+ 224:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           *   \ref USB_STREAM_TIMEOUT_MS macro.
+ 225:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           */
+ 226:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWSTREAM_CallbackAborted    = 5, /**< Indicates that the stream's callback function
+ 227:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                               *   aborted the transfer early.
+ 228:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                           */
+ 229:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			};
+ 230:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 231:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Enum for the possible error return codes of the Endpoint_*_Control_Stream_* functions..
+ 232:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 233:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 234:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 235:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			enum Endpoint_ControlStream_RW_ErrorCodes_t
+ 236:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 237:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWCSTREAM_NoError            = 0, /**< Command completed successfully, no error. */
+ 238:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWCSTREAM_HostAborted        = 1, /**< The aborted the transfer prematurely. */
+ 239:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWCSTREAM_DeviceDisconnected = 2, /**< Device was disconnected from the host during
+ 240:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                            *   the transfer.
+ 241:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                            */
+ 242:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				ENDPOINT_RWCSTREAM_BusSuspended       = 3, /**< The USB bus has been suspended by the host and
+ 243:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                            *   no USB endpoint traffic can occur until the bus
+ 244:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                            *   has resumed.
+ 245:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                            */
+ 246:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			};
+ 247:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 248:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		/* Inline Functions: */
+ 249:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Indicates the number of bytes currently stored in the current endpoint's selected bank.
+ 250:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 251:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note The return width of this function may differ, depending on the maximum endpoint bank s
+ 252:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        of the selected AVR model.
+ 253:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 254:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointRW
+ 255:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 256:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Total number of bytes in the currently selected Endpoint's FIFO buffer.
+ 257:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 258:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint16_t Endpoint_BytesInEndpoint(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE
+ 259:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint16_t Endpoint_BytesInEndpoint(void)
+ 260:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 261:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#if defined(USB_SERIES_6_AVR) || defined(USB_SERIES_7_AVR)
+ 262:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					return UEBCX;
+ 263:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#elif defined(USB_SERIES_4_AVR)
+ 264:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					return (((uint16_t)UEBCHX << 8) | UEBCLX);
+ 265:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#elif defined(USB_SERIES_2_AVR)
+ 266:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					return UEBCLX;
+ 267:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#endif
+ 268:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 269:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		
+ 270:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Get the endpoint address of the currently selected endpoint. This is typically used to save
+ 271:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  the currently selected endpoint number so that it can be restored after another endpoint has
+ 272:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  been manipulated.
+ 273:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 274:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Index of the currently selected endpoint.
+ 275:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 276:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_GetCurrentEndpoint(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLI
+ 277:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_GetCurrentEndpoint(void)
+ 278:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 279:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#if !defined(CONTROL_ONLY_DEVICE)
+ 280:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					return (UENUM & ENDPOINT_EPNUM_MASK);
+ 281:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#else
+ 282:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					return ENDPOINT_CONTROLEP;
+ 283:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#endif
+ 284:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 285:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 286:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Selects the given endpoint number. If the address from the device descriptors is used, the
+ 287:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  value should be masked with the \ref ENDPOINT_EPNUM_MASK constant to extract only the endpoi
+ 288:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  number (and discarding the endpoint direction bit).
+ 289:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 290:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  Any endpoint operations which do not require the endpoint number to be indicated will operat
+ 291:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  the currently selected endpoint.
+ 292:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 293:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] EndpointNumber Endpoint number to select.
+ 294:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 295:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_SelectEndpoint(const uint8_t EndpointNumber) ATTR_ALWAYS_INLINE;
+ 296:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_SelectEndpoint(const uint8_t EndpointNumber)
+ 297:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 298:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#if !defined(CONTROL_ONLY_DEVICE)
+ 299:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					UENUM = EndpointNumber;
+ 300:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#endif			
+ 301:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 302:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 303:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Resets the endpoint bank FIFO. This clears all the endpoint banks and resets the USB control
+ 304:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  In and Out pointers to the bank's contents.
+ 305:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 306:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] EndpointNumber Endpoint number whose FIFO buffers are to be reset.
+ 307:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 308:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ResetFIFO(const uint8_t EndpointNumber) ATTR_ALWAYS_INLINE;
+ 309:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ResetFIFO(const uint8_t EndpointNumber)
+ 310:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 311:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UERST = (1 << EndpointNumber);
+ 312:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UERST = 0;
+ 313:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 314:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 315:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Enables the currently selected endpoint so that data can be sent and received through it to
+ 316:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  and from a host.
+ 317:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 318:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note Endpoints must first be configured properly via \ref Endpoint_ConfigureEndpoint().
+ 319:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 320:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_EnableEndpoint(void) ATTR_ALWAYS_INLINE;
+ 321:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_EnableEndpoint(void)
+ 322:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 323:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UECONX |= (1 << EPEN);
+ 324:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 325:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 326:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Disables the currently selected endpoint so that data cannot be sent and received through it
+ 327:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  to and from a host.
+ 328:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 329:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_DisableEndpoint(void) ATTR_ALWAYS_INLINE;
+ 330:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_DisableEndpoint(void)
+ 331:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 332:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UECONX &= ~(1 << EPEN);
+ 333:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 334:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 335:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines if the currently selected endpoint is enabled, but not necessarily configured.
+ 336:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 337:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 * \return Boolean True if the currently selected endpoint is enabled, false otherwise.
+ 338:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 339:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsEnabled(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 340:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsEnabled(void)
+ 341:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 342:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return ((UECONX & (1 << EPEN)) ? true : false);
+ 343:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 344:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 345:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines if the currently selected endpoint may be read from (if data is waiting in the en
+ 346:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  bank and the endpoint is an OUT direction, or if the bank is not yet full if the endpoint is
+ 347:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction). This function will return false if an error has occurred in the endpoint, if the
+ 348:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  is an OUT direction and no packet (or an empty packet) has been received, or if the endpoint
+ 349:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction and the endpoint bank is full.
+ 350:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 351:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 352:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 353:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Boolean true if the currently selected endpoint may be read from or written to, depe
+ 354:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 355:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsReadWriteAllowed(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 356:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsReadWriteAllowed(void)
+ 357:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 358:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return ((UEINTX & (1 << RWAL)) ? true : false);
+ 359:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 360:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 361:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines if the currently selected endpoint is configured.
+ 362:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 363:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Boolean true if the currently selected endpoint has been configured, false otherwise
+ 364:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 365:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsConfigured(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 366:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsConfigured(void)
+ 367:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 368:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return ((UESTA0X & (1 << CFGOK)) ? true : false);
+ 369:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 370:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 371:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Returns a mask indicating which INTERRUPT type endpoints have interrupted - i.e. their
+ 372:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  interrupt duration has elapsed. Which endpoints have interrupted can be determined by
+ 373:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  masking the return value against (1 << {Endpoint Number}).
+ 374:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 375:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Mask whose bits indicate which endpoints have interrupted.
+ 376:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 377:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_GetEndpointInterrupts(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_I
+ 378:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_GetEndpointInterrupts(void)
+ 379:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 380:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return UEINT;
+ 381:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 382:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 383:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines if the specified endpoint number has interrupted (valid only for INTERRUPT type
+ 384:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  endpoints).
+ 385:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 386:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] EndpointNumber  Index of the endpoint whose interrupt flag should be tested.
+ 387:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 388:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Boolean true if the specified endpoint has interrupted, false otherwise.
+ 389:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 390:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_HasEndpointInterrupted(const uint8_t EndpointNumber) ATTR_WARN_UNUSE
+ 391:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_HasEndpointInterrupted(const uint8_t EndpointNumber)
+ 392:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 393:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return ((UEINT & (1 << EndpointNumber)) ? true : false);
+ 394:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 395:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 396:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines if the selected IN endpoint is ready for a new packet.
+ 397:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 398:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 399:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 400:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Boolean true if the current endpoint is ready for an IN packet, false otherwise.
+ 401:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 402:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsINReady(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 403:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsINReady(void)
+ 404:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 405:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return ((UEINTX & (1 << TXINI))  ? true : false);
+ 406:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 407:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 408:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines if the selected OUT endpoint has received new packet.
+ 409:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 410:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 411:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 412:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Boolean true if current endpoint is has received an OUT packet, false otherwise.
+ 413:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 414:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsOUTReceived(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 415:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsOUTReceived(void)
+ 416:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 417:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return ((UEINTX & (1 << RXOUTI)) ? true : false);
+ 418:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 419:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 420:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines if the current CONTROL type endpoint has received a SETUP packet.
+ 421:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 422:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 423:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 424:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Boolean true if the selected endpoint has received a SETUP packet, false otherwise.
+ 425:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 426:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsSETUPReceived(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 427:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsSETUPReceived(void)
+ 428:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 429:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return ((UEINTX & (1 << RXSTPI)) ? true : false);
+  27               		.loc 2 429 0
+  28 0002 8091 E800 		lds r24,232
+  29               	.LVL1:
+  30               	.LBE11:
+  31               	.LBE10:
+  40:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	if (!(Endpoint_IsSETUPReceived()))
+  32               		.loc 1 40 0
+  33 0006 83FF      		sbrs r24,3
+  34 0008 00C0      		rjmp .L1
+  41:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	  return;
+  42:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	  
+  43:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	if (USB_ControlRequest.wIndex != AudioInterfaceInfo->Config.StreamingInterfaceNumber)
+  35               		.loc 1 43 0
+  36 000a 2081      		ld r18,Z
+  37 000c 30E0      		ldi r19,0
+  38 000e 8091 0000 		lds r24,USB_ControlRequest+4
+  39 0012 9091 0000 		lds r25,USB_ControlRequest+4+1
+  40 0016 8217      		cp r24,r18
+  41 0018 9307      		cpc r25,r19
+  42 001a 01F4      		brne .L1
+  44:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	  return;
+  45:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  46:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	switch (USB_ControlRequest.bRequest)
+  43               		.loc 1 46 0
+  44 001c 8091 0000 		lds r24,USB_ControlRequest+1
+  45 0020 8B30      		cpi r24,lo8(11)
+  46 0022 01F4      		brne .L1
+  47:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	{
+  48:../LUFA/Drivers/USB/Class/Device/Audio.c **** 		case REQ_SetInterface:
+  49:../LUFA/Drivers/USB/Class/Device/Audio.c **** 			if (USB_ControlRequest.bmRequestType == (REQDIR_HOSTTODEVICE | REQTYPE_STANDARD | REQREC_INTERFA
+  47               		.loc 1 49 0
+  48 0024 8091 0000 		lds r24,USB_ControlRequest
+  49 0028 8130      		cpi r24,lo8(1)
+  50 002a 01F4      		brne .L1
+  51               	.LBB12:
+  52               	.LBB13:
+ 430:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 431:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 432:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Clears a received SETUP packet on the currently selected CONTROL type endpoint, freeing up t
+ 433:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  endpoint for the next packet.
+ 434:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 435:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 436:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 437:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This is not applicable for non CONTROL type endpoints. 
+ 438:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 439:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ClearSETUP(void) ATTR_ALWAYS_INLINE;
+ 440:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ClearSETUP(void)
+ 441:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 442:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEINTX &= ~(1 << RXSTPI);
+  53               		.loc 2 442 0
+  54 002c 9091 E800 		lds r25,232
+  55 0030 977F      		andi r25,lo8(-9)
+  56 0032 9093 E800 		sts 232,r25
+  57               	.LBE13:
+  58               	.LBE12:
+  50:../LUFA/Drivers/USB/Class/Device/Audio.c **** 			{
+  51:../LUFA/Drivers/USB/Class/Device/Audio.c **** 				Endpoint_ClearSETUP();
+  52:../LUFA/Drivers/USB/Class/Device/Audio.c **** 				
+  53:../LUFA/Drivers/USB/Class/Device/Audio.c **** 				AudioInterfaceInfo->State.InterfaceEnabled = ((USB_ControlRequest.wValue & 0xFF) != 0);
+  59               		.loc 1 53 0
+  60 0036 9091 0000 		lds r25,USB_ControlRequest+2
+  61 003a 9111      		cpse r25,__zero_reg__
+  62 003c 00C0      		rjmp .L4
+  63 003e 80E0      		ldi r24,0
+  64               	.L4:
+  65 0040 8783      		std Z+7,r24
+  54:../LUFA/Drivers/USB/Class/Device/Audio.c **** 				  
+  55:../LUFA/Drivers/USB/Class/Device/Audio.c **** 				Endpoint_ClearStatusStage();
+  66               		.loc 1 55 0
+  67 0042 0C94 0000 		jmp Endpoint_ClearStatusStage
+  68               	.LVL2:
+  69               	.L1:
+  70 0046 0895      		ret
+  71               		.cfi_endproc
+  72               	.LFE74:
+  74               		.section	.text.Audio_Device_ConfigureEndpoints,"ax",@progbits
+  75               	.global	Audio_Device_ConfigureEndpoints
+  77               	Audio_Device_ConfigureEndpoints:
+  78               	.LFB75:
+  56:../LUFA/Drivers/USB/Class/Device/Audio.c **** 			}
+  57:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  58:../LUFA/Drivers/USB/Class/Device/Audio.c **** 			break;
+  59:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	}
+  60:../LUFA/Drivers/USB/Class/Device/Audio.c **** }
+  61:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  62:../LUFA/Drivers/USB/Class/Device/Audio.c **** bool Audio_Device_ConfigureEndpoints(USB_ClassInfo_Audio_Device_t* const AudioInterfaceInfo)
+  63:../LUFA/Drivers/USB/Class/Device/Audio.c **** {
+  79               		.loc 1 63 0
+  80               		.cfi_startproc
+  81               	.LVL3:
+  82 0000 1F93      		push r17
+  83               	.LCFI0:
+  84               		.cfi_def_cfa_offset 3
+  85               		.cfi_offset 17, -2
+  86 0002 CF93      		push r28
+  87               	.LCFI1:
+  88               		.cfi_def_cfa_offset 4
+  89               		.cfi_offset 28, -3
+  90 0004 DF93      		push r29
+  91               	.LCFI2:
+  92               		.cfi_def_cfa_offset 5
+  93               		.cfi_offset 29, -4
+  94               	/* prologue: function */
+  95               	/* frame size = 0 */
+  96               	/* stack size = 3 */
+  97               	.L__stack_usage = 3
+  98 0006 EC01      		movw r28,r24
+  64:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	memset(&AudioInterfaceInfo->State, 0x00, sizeof(AudioInterfaceInfo->State));
+  99               		.loc 1 64 0
+ 100 0008 1F82      		std Y+7,__zero_reg__
+  65:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  66:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	if (AudioInterfaceInfo->Config.DataINEndpointNumber)
+ 101               		.loc 1 66 0
+ 102 000a 1981      		ldd r17,Y+1
+ 103 000c 1111      		cpse r17,__zero_reg__
+ 104 000e 00C0      		rjmp .L10
+ 105               	.LVL4:
+ 106               	.L13:
+  67:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	{
+  68:../LUFA/Drivers/USB/Class/Device/Audio.c **** 		if (!(Endpoint_ConfigureEndpoint(AudioInterfaceInfo->Config.DataINEndpointNumber, EP_TYPE_ISOCHRO
+  69:../LUFA/Drivers/USB/Class/Device/Audio.c **** 										 ENDPOINT_DIR_IN, AudioInterfaceInfo->Config.DataINEndpointSize,
+  70:../LUFA/Drivers/USB/Class/Device/Audio.c **** 										 ENDPOINT_BANK_DOUBLE)))
+  71:../LUFA/Drivers/USB/Class/Device/Audio.c **** 		{
+  72:../LUFA/Drivers/USB/Class/Device/Audio.c **** 			return false;
+  73:../LUFA/Drivers/USB/Class/Device/Audio.c **** 		}
+  74:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	}
+  75:../LUFA/Drivers/USB/Class/Device/Audio.c **** 
+  76:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	if (AudioInterfaceInfo->Config.DataOUTEndpointNumber)
+ 107               		.loc 1 76 0
+ 108 0010 1C81      		ldd r17,Y+4
+ 109 0012 1111      		cpse r17,__zero_reg__
+ 110 0014 00C0      		rjmp .L11
+  77:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	{
+  78:../LUFA/Drivers/USB/Class/Device/Audio.c **** 		if (!(Endpoint_ConfigureEndpoint(AudioInterfaceInfo->Config.DataOUTEndpointNumber, EP_TYPE_ISOCHR
+  79:../LUFA/Drivers/USB/Class/Device/Audio.c **** 										 ENDPOINT_DIR_OUT, AudioInterfaceInfo->Config.DataOUTEndpointSize,
+  80:../LUFA/Drivers/USB/Class/Device/Audio.c **** 										 ENDPOINT_BANK_DOUBLE)))
+  81:../LUFA/Drivers/USB/Class/Device/Audio.c **** 		{
+  82:../LUFA/Drivers/USB/Class/Device/Audio.c **** 			return false;
+  83:../LUFA/Drivers/USB/Class/Device/Audio.c **** 		}
+  84:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	}
+  85:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	
+  86:../LUFA/Drivers/USB/Class/Device/Audio.c **** 	return true;
+ 111               		.loc 1 86 0
+ 112 0016 81E0      		ldi r24,lo8(1)
+ 113 0018 00C0      		rjmp .L12
+ 114               	.LVL5:
+ 115               	.L10:
+ 116               	.LBB26:
+ 117               	.LBB27:
+ 443:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 444:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 445:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Sends an IN packet to the host on the currently selected endpoint, freeing up the endpoint f
+ 446:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  next packet and switching to the alternative endpoint bank if double banked.
+ 447:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 448:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 449:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 450:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ClearIN(void) ATTR_ALWAYS_INLINE;
+ 451:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ClearIN(void)
+ 452:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 453:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#if !defined(CONTROL_ONLY_DEVICE)
+ 454:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					UEINTX &= ~((1 << TXINI) | (1 << FIFOCON));
+ 455:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#else
+ 456:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					UEINTX &= ~(1 << TXINI);
+ 457:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#endif
+ 458:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 459:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 460:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Acknowledges an OUT packet to the host on the currently selected endpoint, freeing up the en
+ 461:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  for the next packet and switching to the alternative endpoint bank if double banked.
+ 462:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 463:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 464:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 465:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ClearOUT(void) ATTR_ALWAYS_INLINE;
+ 466:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ClearOUT(void)
+ 467:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 468:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#if !defined(CONTROL_ONLY_DEVICE)
+ 469:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					UEINTX &= ~((1 << RXOUTI) | (1 << FIFOCON));
+ 470:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#else
+ 471:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					UEINTX &= ~(1 << RXOUTI);	
+ 472:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#endif
+ 473:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 474:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 475:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Stalls the current endpoint, indicating to the host that a logical problem occurred with the
+ 476:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  indicated endpoint and that the current transfer sequence should be aborted. This provides a
+ 477:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  way for devices to indicate invalid commands to the host so that the current transfer can be
+ 478:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  aborted and the host can begin its own recovery sequence.
+ 479:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 480:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  The currently selected endpoint remains stalled until either the \ref Endpoint_ClearStall() 
+ 481:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  is called, or the host issues a CLEAR FEATURE request to the device for the currently select
+ 482:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  endpoint.
+ 483:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 484:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 485:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 486:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_StallTransaction(void) ATTR_ALWAYS_INLINE;
+ 487:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_StallTransaction(void)
+ 488:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 489:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UECONX |= (1 << STALLRQ);
+ 490:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 491:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 492:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Clears the STALL condition on the currently selected endpoint.
+ 493:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 494:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 495:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 496:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ClearStall(void) ATTR_ALWAYS_INLINE;
+ 497:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ClearStall(void)
+ 498:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 499:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UECONX |= (1 << STALLRQC);
+ 500:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 501:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 502:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines if the currently selected endpoint is stalled, false otherwise.
+ 503:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 504:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPacketManagement
+ 505:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 506:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Boolean true if the currently selected endpoint is stalled, false otherwise.
+ 507:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 508:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsStalled(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 509:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_IsStalled(void)
+ 510:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 511:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return ((UECONX & (1 << STALLRQ)) ? true : false);
+ 512:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 513:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 514:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Resets the data toggle of the currently selected endpoint. */
+ 515:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ResetDataToggle(void) ATTR_ALWAYS_INLINE;
+ 516:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_ResetDataToggle(void)
+ 517:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 518:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UECONX |= (1 << RSTDT);
+ 519:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 520:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 521:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Determines the currently selected endpoint's direction.
+ 522:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 523:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return The currently selected endpoint's direction, as a ENDPOINT_DIR_* mask.
+ 524:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 525:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_GetEndpointDirection(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_IN
+ 526:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_GetEndpointDirection(void)
+ 527:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 528:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return (UECFG0X & ENDPOINT_DIR_IN);
+ 529:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 530:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 531:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Sets the direction of the currently selected endpoint.
+ 532:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 533:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] DirectionMask  New endpoint direction, as a ENDPOINT_DIR_* mask.
+ 534:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 535:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_SetEndpointDirection(const uint8_t DirectionMask) ATTR_ALWAYS_INLINE
+ 536:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_SetEndpointDirection(const uint8_t DirectionMask)
+ 537:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 538:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UECFG0X = ((UECFG0X & ~ENDPOINT_DIR_IN) | DirectionMask);
+ 539:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 540:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 541:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads one byte from the currently selected endpoint's bank, for OUT direction endpoints.
+ 542:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 543:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 544:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 545:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Next byte in the currently selected endpoint's FIFO buffer.
+ 546:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 547:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_Read_Byte(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 548:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_Read_Byte(void)
+ 549:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 550:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return UEDATX;
+ 551:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 552:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 553:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes one byte from the currently selected endpoint's bank, for IN direction endpoints.
+ 554:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 555:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 556:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 557:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Byte  Next byte to write into the the currently selected endpoint's FIFO buffer.
+ 558:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 559:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_Byte(const uint8_t Byte) ATTR_ALWAYS_INLINE;
+ 560:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_Byte(const uint8_t Byte)
+ 561:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 562:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = Byte;
+ 563:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 564:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 565:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Discards one byte from the currently selected endpoint's bank, for OUT direction endpoints.
+ 566:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 567:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 568:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 569:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Discard_Byte(void) ATTR_ALWAYS_INLINE;
+ 570:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Discard_Byte(void)
+ 571:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 572:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				uint8_t Dummy;
+ 573:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+ 574:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Dummy = UEDATX;
+ 575:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 576:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 577:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads two bytes from the currently selected endpoint's bank in little endian format, for OUT
+ 578:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction endpoints.
+ 579:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 580:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 581:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 582:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Next word in the currently selected endpoint's FIFO buffer.
+ 583:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 584:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint16_t Endpoint_Read_Word_LE(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 585:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint16_t Endpoint_Read_Word_LE(void)
+ 586:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 587:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				union
+ 588:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				{
+ 589:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					uint16_t Word;
+ 590:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					uint8_t  Bytes[2];
+ 591:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				} Data;
+ 592:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+ 593:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[0] = UEDATX;
+ 594:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[1] = UEDATX;
+ 595:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 596:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return Data.Word;
+ 597:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 598:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 599:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads two bytes from the currently selected endpoint's bank in big endian format, for OUT
+ 600:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction endpoints.
+ 601:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 602:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 603:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 604:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Next word in the currently selected endpoint's FIFO buffer.
+ 605:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 606:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint16_t Endpoint_Read_Word_BE(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 607:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint16_t Endpoint_Read_Word_BE(void)
+ 608:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 609:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				union
+ 610:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				{
+ 611:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					uint16_t Word;
+ 612:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					uint8_t  Bytes[2];
+ 613:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				} Data;
+ 614:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+ 615:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[1] = UEDATX;
+ 616:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[0] = UEDATX;
+ 617:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 618:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return Data.Word;
+ 619:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 620:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 621:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes two bytes to the currently selected endpoint's bank in little endian format, for IN
+ 622:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction endpoints.
+ 623:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 624:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 625:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 626:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Word  Next word to write to the currently selected endpoint's FIFO buffer.
+ 627:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 628:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_Word_LE(const uint16_t Word) ATTR_ALWAYS_INLINE;
+ 629:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_Word_LE(const uint16_t Word)
+ 630:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 631:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (Word & 0xFF);
+ 632:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (Word >> 8);
+ 633:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 634:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 635:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes two bytes to the currently selected endpoint's bank in big endian format, for IN
+ 636:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction endpoints.
+ 637:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 638:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 639:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 640:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Word  Next word to write to the currently selected endpoint's FIFO buffer.
+ 641:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 642:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_Word_BE(const uint16_t Word) ATTR_ALWAYS_INLINE;
+ 643:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_Word_BE(const uint16_t Word)
+ 644:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 645:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (Word >> 8);
+ 646:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (Word & 0xFF);
+ 647:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 648:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 649:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Discards two bytes from the currently selected endpoint's bank, for OUT direction endpoints.
+ 650:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 651:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 652:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 653:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Discard_Word(void) ATTR_ALWAYS_INLINE;
+ 654:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Discard_Word(void)
+ 655:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 656:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				uint8_t Dummy;
+ 657:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+ 658:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Dummy = UEDATX;
+ 659:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Dummy = UEDATX;
+ 660:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 661:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 662:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads four bytes from the currently selected endpoint's bank in little endian format, for OU
+ 663:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction endpoints.
+ 664:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 665:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 666:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 667:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Next double word in the currently selected endpoint's FIFO buffer.
+ 668:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 669:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint32_t Endpoint_Read_DWord_LE(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 670:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint32_t Endpoint_Read_DWord_LE(void)
+ 671:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 672:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				union
+ 673:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				{
+ 674:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					uint32_t DWord;
+ 675:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					uint8_t  Bytes[4];
+ 676:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				} Data;
+ 677:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+ 678:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[0] = UEDATX;
+ 679:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[1] = UEDATX;
+ 680:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[2] = UEDATX;
+ 681:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[3] = UEDATX;
+ 682:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 683:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return Data.DWord;
+ 684:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 685:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 686:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads four bytes from the currently selected endpoint's bank in big endian format, for OUT
+ 687:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction endpoints.
+ 688:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 689:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 690:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 691:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Next double word in the currently selected endpoint's FIFO buffer.
+ 692:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 693:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint32_t Endpoint_Read_DWord_BE(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 694:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint32_t Endpoint_Read_DWord_BE(void)
+ 695:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 696:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				union
+ 697:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				{
+ 698:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					uint32_t DWord;
+ 699:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					uint8_t  Bytes[4];
+ 700:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				} Data;
+ 701:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+ 702:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[3] = UEDATX;
+ 703:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[2] = UEDATX;
+ 704:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[1] = UEDATX;
+ 705:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Data.Bytes[0] = UEDATX;
+ 706:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 707:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return Data.DWord;
+ 708:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 709:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 710:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes four bytes to the currently selected endpoint's bank in little endian format, for IN
+ 711:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction endpoints.
+ 712:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 713:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 714:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 715:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] DWord  Next double word to write to the currently selected endpoint's FIFO buffer
+ 716:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 717:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_DWord_LE(const uint32_t DWord) ATTR_ALWAYS_INLINE;
+ 718:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_DWord_LE(const uint32_t DWord)
+ 719:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 720:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (DWord &  0xFF);
+ 721:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (DWord >> 8);
+ 722:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (DWord >> 16);
+ 723:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (DWord >> 24);
+ 724:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 725:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 726:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes four bytes to the currently selected endpoint's bank in big endian format, for IN
+ 727:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  direction endpoints.
+ 728:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 729:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 730:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 731:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] DWord  Next double word to write to the currently selected endpoint's FIFO buffer
+ 732:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 733:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_DWord_BE(const uint32_t DWord) ATTR_ALWAYS_INLINE;
+ 734:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Write_DWord_BE(const uint32_t DWord)
+ 735:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 736:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (DWord >> 24);
+ 737:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (DWord >> 16);
+ 738:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (DWord >> 8);
+ 739:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				UEDATX = (DWord &  0xFF);
+ 740:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 741:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 742:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Discards four bytes from the currently selected endpoint's bank, for OUT direction endpoints
+ 743:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 744:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointPrimitiveRW
+ 745:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 746:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Discard_DWord(void) ATTR_ALWAYS_INLINE;
+ 747:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline void Endpoint_Discard_DWord(void)
+ 748:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+ 749:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				uint8_t Dummy;
+ 750:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+ 751:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Dummy = UEDATX;
+ 752:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Dummy = UEDATX;
+ 753:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Dummy = UEDATX;
+ 754:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				Dummy = UEDATX;
+ 755:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+ 756:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 757:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		/* External Variables: */
+ 758:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Global indicating the maximum packet size of the default control endpoint located at address
+ 759:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  0 in the device. This value is set to the value indicated in the device descriptor in the us
+ 760:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  project once the USB interface is initialized into device mode.
+ 761:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 762:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  If space is an issue, it is possible to fix this to a static value by defining the control
+ 763:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  endpoint size in the FIXED_CONTROL_ENDPOINT_SIZE token passed to the compiler in the makefil
+ 764:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  via the -D switch. When a fixed control endpoint size is used, the size is no longer dynamic
+ 765:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  read from the descriptors at runtime and instead fixed to the given value. When used, it is
+ 766:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  important that the descriptor control endpoint size value matches the size given as the
+ 767:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  FIXED_CONTROL_ENDPOINT_SIZE token - it is recommended that the FIXED_CONTROL_ENDPOINT_SIZE t
+ 768:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  be used in the descriptors to ensure this.
+ 769:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 770:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This variable should be treated as read-only in the user application, and never manual
+ 771:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        changed in value.
+ 772:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 773:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#if (!defined(FIXED_CONTROL_ENDPOINT_SIZE) || defined(__DOXYGEN__))
+ 774:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				extern uint8_t USB_ControlEndpointSize;
+ 775:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#else
+ 776:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define USB_ControlEndpointSize FIXED_CONTROL_ENDPOINT_SIZE
+ 777:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#endif
+ 778:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 779:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		/* Function Prototypes: */
+ 780:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#if !defined(NO_STREAM_CALLBACKS) || defined(__DOXYGEN__)
+ 781:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define __CALLBACK_PARAM     , StreamCallbackPtr_t Callback
+ 782:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#else
+ 783:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define __CALLBACK_PARAM
+ 784:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#endif
+ 785:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		
+ 786:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Configures the specified endpoint number with the given endpoint type, direction, bank size
+ 787:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  and banking mode. Endpoints should be allocated in ascending order by their address in the
+ 788:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  device (i.e. endpoint 1 should be configured before endpoint 2 and so on) to prevent fragmen
+ 789:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  of the USB FIFO memory.
+ 790:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 791:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  The endpoint type may be one of the EP_TYPE_* macros listed in LowLevel.h and the direction
+ 792:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  may be either \ref ENDPOINT_DIR_OUT or \ref ENDPOINT_DIR_IN.
+ 793:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 794:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  The bank size must indicate the maximum packet size that the endpoint can handle. Different
+ 795:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  endpoint numbers can handle different maximum packet sizes - refer to the chosen USB AVR's
+ 796:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  datasheet to determine the maximum bank size for each endpoint.
+ 797:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 798:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  The banking mode may be either \ref ENDPOINT_BANK_SINGLE or \ref ENDPOINT_BANK_DOUBLE.
+ 799:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 800:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note The default control endpoint should not be manually configured by the user application
+ 801:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        it is automatically configured by the library internally.
+ 802:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+ 803:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 804:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine will select the specified endpoint, and the endpoint will remain selected
+ 805:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        once the routine completes regardless of if the endpoint configuration succeeds.
+ 806:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 807:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return Boolean true if the configuration succeeded, false otherwise.
+ 808:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 809:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			bool Endpoint_ConfigureEndpoint(const uint8_t  Number,
+ 810:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                const uint8_t Type,
+ 811:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                const uint8_t Direction,
+ 812:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                const uint16_t Size,
+ 813:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                const uint8_t Banks);
+ 814:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 815:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Spin-loops until the currently selected non-control endpoint is ready for the next packet of
+ 816:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  to be read or written to it.
+ 817:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 818:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should not be called on CONTROL type endpoints.
+ 819:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 820:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointRW
+ 821:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 822:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_WaitUntilReady_ErrorCodes_t enum.
+ 823:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 824:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_WaitUntilReady(void);
+ 825:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+ 826:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Completes the status stage of a control transfer on a CONTROL type endpoint automatically,
+ 827:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  with respect to the data direction. This is a convenience function which can be used to
+ 828:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  simplify user control request handling.
+ 829:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 830:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			void Endpoint_ClearStatusStage(void);
+ 831:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 832:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads and discards the given number of bytes from the endpoint from the given buffer,
+ 833:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarding fully read packets from the host as needed. The last packet is not automatically
+ 834:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarded once the remaining bytes has been read; the user is responsible for manually
+ 835:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarding the last packet from the host via the \ref Endpoint_ClearOUT() macro. Between
+ 836:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  each USB packet, the given stream callback function is executed repeatedly until the next
+ 837:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  packet is ready, allowing for early aborts of stream transfers.
+ 838:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 839:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *	The callback routine should be created according to the information in \ref Group_StreamCallb
+ 840:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  If the token NO_STREAM_CALLBACKS is passed via the -D option to the compiler, stream callbac
+ 841:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  disabled and this function has the Callback parameter omitted.
+ 842:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 843:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should not be used on CONTROL type endpoints.
+ 844:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 845:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 846:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 847:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length    Number of bytes to send via the currently selected endpoint.
+ 848:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Callback  Name of a callback routine to call between successive USB packet transf
+ 849:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 850:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 851:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 852:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Discard_Stream(uint16_t Length
+ 853:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                __CALLBACK_PARAM);
+ 854:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 855:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes the given number of bytes to the endpoint from the given buffer in little endian,
+ 856:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  sending full packets to the host as needed. The last packet filled is not automatically sent
+ 857:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  the user is responsible for manually sending the last written packet to the host via the
+ 858:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ref Endpoint_ClearIN() macro. Between each USB packet, the given stream callback function
+ 859:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  is executed repeatedly until the endpoint is ready to accept the next packet, allowing for e
+ 860:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  aborts of stream transfers.
+ 861:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 862:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *	The callback routine should be created according to the information in \ref Group_StreamCallb
+ 863:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  If the token NO_STREAM_CALLBACKS is passed via the -D option to the compiler, stream callbac
+ 864:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  disabled and this function has the Callback parameter omitted.
+ 865:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 866:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should not be used on CONTROL type endpoints.
+ 867:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 868:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 869:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 870:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer    Pointer to the source data buffer to read from.
+ 871:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length    Number of bytes to read for the currently selected endpoint into the bu
+ 872:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Callback  Name of a callback routine to call between successive USB packet transf
+ 873:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 874:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 875:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 876:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_Stream_LE(const void* Buffer,
+ 877:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                 uint16_t Length
+ 878:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                 __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+ 879:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 880:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** EEPROM buffer source version of \ref Endpoint_Write_Stream_LE().
+ 881:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 882:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 883:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 884:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer    Pointer to the source data buffer to read from.
+ 885:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length    Number of bytes to read for the currently selected endpoint into the bu
+ 886:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Callback  Name of a callback routine to call between successive USB packet transf
+ 887:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 888:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 889:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 890:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_EStream_LE(const void* Buffer,
+ 891:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                  uint16_t Length
+ 892:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                  __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+ 893:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 894:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** FLASH buffer source version of \ref Endpoint_Write_Stream_LE().
+ 895:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 896:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \pre The FLASH data must be located in the first 64KB of FLASH for this function to work cor
+ 897:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 898:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 899:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 900:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer    Pointer to the source data buffer to read from.
+ 901:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length    Number of bytes to read for the currently selected endpoint into the bu
+ 902:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Callback  Name of a callback routine to call between successive USB packet transf
+ 903:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 904:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 905:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 906:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_PStream_LE(const void* Buffer,
+ 907:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                  uint16_t Length
+ 908:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                  __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+ 909:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 910:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes the given number of bytes to the endpoint from the given buffer in big endian,
+ 911:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  sending full packets to the host as needed. The last packet filled is not automatically sent
+ 912:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  the user is responsible for manually sending the last written packet to the host via the
+ 913:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ref Endpoint_ClearIN() macro. Between each USB packet, the given stream callback function
+ 914:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  is executed repeatedly until the endpoint is ready to accept the next packet, allowing for e
+ 915:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  aborts of stream transfers.
+ 916:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 917:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *	The callback routine should be created according to the information in \ref Group_StreamCallb
+ 918:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  If the token NO_STREAM_CALLBACKS is passed via the -D option to the compiler, stream callbac
+ 919:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  disabled and this function has the Callback parameter omitted.
+ 920:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 921:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should not be used on CONTROL type endpoints.
+ 922:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 923:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 924:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 925:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer    Pointer to the source data buffer to read from.
+ 926:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length    Number of bytes to read for the currently selected endpoint into the bu
+ 927:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Callback  Name of a callback routine to call between successive USB packet transf
+ 928:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 929:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 930:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 931:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_Stream_BE(const void* Buffer,
+ 932:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                 uint16_t Length
+ 933:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                 __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+ 934:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 935:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** EEPROM buffer source version of \ref Endpoint_Write_Stream_BE().
+ 936:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 937:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 938:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 939:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer    Pointer to the source data buffer to read from.
+ 940:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length    Number of bytes to read for the currently selected endpoint into the bu
+ 941:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Callback  Name of a callback routine to call between successive USB packet transf
+ 942:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 943:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 944:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 945:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_EStream_BE(const void* Buffer,
+ 946:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                  uint16_t Length
+ 947:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                  __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+ 948:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 949:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** FLASH buffer source version of \ref Endpoint_Write_Stream_BE().
+ 950:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 951:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \pre The FLASH data must be located in the first 64KB of FLASH for this function to work cor
+ 952:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 953:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 954:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 955:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer    Pointer to the source data buffer to read from.
+ 956:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length    Number of bytes to read for the currently selected endpoint into the bu
+ 957:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Callback  Name of a callback routine to call between successive USB packet transf
+ 958:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 959:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 960:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 961:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_PStream_BE(const void* Buffer,
+ 962:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                  uint16_t Length
+ 963:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                  __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+ 964:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 965:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads the given number of bytes from the endpoint from the given buffer in little endian,
+ 966:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarding fully read packets from the host as needed. The last packet is not automatically
+ 967:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarded once the remaining bytes has been read; the user is responsible for manually
+ 968:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarding the last packet from the host via the \ref Endpoint_ClearOUT() macro. Between
+ 969:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  each USB packet, the given stream callback function is executed repeatedly until the endpoin
+ 970:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  is ready to accept the next packet, allowing for early aborts of stream transfers.
+ 971:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 972:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *	The callback routine should be created according to the information in \ref Group_StreamCallb
+ 973:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  If the token NO_STREAM_CALLBACKS is passed via the -D option to the compiler, stream callbac
+ 974:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  disabled and this function has the Callback parameter omitted.
+ 975:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 976:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should not be used on CONTROL type endpoints.
+ 977:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 978:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 979:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 980:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[out] Buffer    Pointer to the destination data buffer to write to.
+ 981:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Length    Number of bytes to send via the currently selected endpoint.
+ 982:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Callback  Name of a callback routine to call between successive USB packet trans
+ 983:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 984:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 985:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+ 986:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Read_Stream_LE(void* Buffer,
+ 987:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                uint16_t Length
+ 988:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+ 989:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+ 990:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** EEPROM buffer source version of \ref Endpoint_Read_Stream_LE().
+ 991:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 992:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+ 993:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 994:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[out] Buffer    Pointer to the destination data buffer to write to, located in EEPROM 
+ 995:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Length    Number of bytes to send via the currently selected endpoint.
+ 996:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Callback  Name of a callback routine to call between successive USB packet trans
+ 997:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+ 998:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+ 999:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1000:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Read_EStream_LE(void* Buffer,
+1001:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                 uint16_t Length
+1002:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                 __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+1003:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+1004:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads the given number of bytes from the endpoint from the given buffer in big endian,
+1005:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarding fully read packets from the host as needed. The last packet is not automatically
+1006:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarded once the remaining bytes has been read; the user is responsible for manually
+1007:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarding the last packet from the host via the \ref Endpoint_ClearOUT() macro. Between
+1008:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  each USB packet, the given stream callback function is executed repeatedly until the endpoin
+1009:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  is ready to accept the next packet, allowing for early aborts of stream transfers.
+1010:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1011:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *	The callback routine should be created according to the information in \ref Group_StreamCallb
+1012:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  If the token NO_STREAM_CALLBACKS is passed via the -D option to the compiler, stream callbac
+1013:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  disabled and this function has the Callback parameter omitted.
+1014:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1015:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should not be used on CONTROL type endpoints.
+1016:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1017:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1018:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1019:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[out] Buffer    Pointer to the destination data buffer to write to.
+1020:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Length    Number of bytes to send via the currently selected endpoint.
+1021:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Callback  Name of a callback routine to call between successive USB packet trans
+1022:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1023:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+1024:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1025:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Read_Stream_BE(void* Buffer,
+1026:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                uint16_t Length
+1027:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+1028:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1029:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** EEPROM buffer source version of \ref Endpoint_Read_Stream_BE().
+1030:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1031:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1032:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1033:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[out] Buffer    Pointer to the destination data buffer to write to, located in EEPROM 
+1034:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Length    Number of bytes to send via the currently selected endpoint.
+1035:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Callback  Name of a callback routine to call between successive USB packet trans
+1036:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1037:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_Stream_RW_ErrorCodes_t enum.
+1038:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1039:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Read_EStream_BE(void* Buffer,
+1040:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                 uint16_t Length
+1041:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                 __CALLBACK_PARAM) ATTR_NON_NULL_PTR_ARG(1);
+1042:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1043:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes the given number of bytes to the CONTROL type endpoint from the given buffer in littl
+1044:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  sending full packets to the host as needed. The host OUT acknowledgement is not automaticall
+1045:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  in both failure and success states; the user is responsible for manually clearing the setup 
+1046:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  finalize the transfer via the \ref Endpoint_ClearOUT() macro.
+1047:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1048:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1049:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1050:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1051:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1052:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1053:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1054:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1055:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1056:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1057:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1058:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1059:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer  Pointer to the source data buffer to read from.
+1060:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length  Number of bytes to read for the currently selected endpoint into the buff
+1061:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1062:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1063:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1064:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_Control_Stream_LE(const void* Buffer,
+1065:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                         uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1066:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1067:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** EEPROM buffer source version of Endpoint_Write_Control_Stream_LE.
+1068:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1069:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1070:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1071:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1072:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1073:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1074:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1075:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1076:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1077:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1078:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1079:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1080:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer  Pointer to the source data buffer to read from.
+1081:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length  Number of bytes to read for the currently selected endpoint into the buff
+1082:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1083:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1084:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1085:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_Control_EStream_LE(const void* Buffer,
+1086:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                          uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1087:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1088:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** FLASH buffer source version of \ref Endpoint_Write_Control_Stream_LE().
+1089:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1090:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \pre The FLASH data must be located in the first 64KB of FLASH for this function to work cor
+1091:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1092:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1093:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1094:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1095:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1096:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1097:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1098:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1099:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1100:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1101:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1102:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1103:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer  Pointer to the source data buffer to read from.
+1104:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length  Number of bytes to read for the currently selected endpoint into the buff
+1105:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1106:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1107:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1108:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_Control_PStream_LE(const void* Buffer,
+1109:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                          uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1110:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1111:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Writes the given number of bytes to the CONTROL type endpoint from the given buffer in big e
+1112:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  sending full packets to the host as needed. The host OUT acknowledgement is not automaticall
+1113:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  in both failure and success states; the user is responsible for manually clearing the setup 
+1114:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  finalize the transfer via the \ref Endpoint_ClearOUT() macro.
+1115:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1116:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1117:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1118:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1119:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1120:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1121:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1122:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1123:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1124:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1125:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1126:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1127:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer  Pointer to the source data buffer to read from.
+1128:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length  Number of bytes to read for the currently selected endpoint into the buff
+1129:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1130:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1131:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1132:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_Control_Stream_BE(const void* Buffer,
+1133:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                         uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1134:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1135:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** EEPROM buffer source version of \ref Endpoint_Write_Control_Stream_BE().
+1136:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1137:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1138:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1139:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1140:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1141:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1142:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1143:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1144:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1145:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1146:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1147:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1148:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer  Pointer to the source data buffer to read from.
+1149:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length  Number of bytes to read for the currently selected endpoint into the buff
+1150:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1151:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1152:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1153:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_Control_EStream_BE(const void* Buffer,
+1154:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                          uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1155:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1156:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** FLASH buffer source version of \ref Endpoint_Write_Control_Stream_BE().
+1157:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1158:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \pre The FLASH data must be located in the first 64KB of FLASH for this function to work cor
+1159:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1160:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1161:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1162:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1163:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1164:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1165:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1166:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1167:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1168:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1169:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1170:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1171:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Buffer  Pointer to the source data buffer to read from.
+1172:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in] Length  Number of bytes to read for the currently selected endpoint into the buff
+1173:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1174:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1175:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1176:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Write_Control_PStream_BE(const void* Buffer,
+1177:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                          uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1178:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1179:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads the given number of bytes from the CONTROL endpoint from the given buffer in little en
+1180:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarding fully read packets from the host as needed. The device IN acknowledgement is not
+1181:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  automatically sent after success or failure states; the user is responsible for manually sen
+1182:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  setup IN to finalize the transfer via the \ref Endpoint_ClearIN() macro.
+1183:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1184:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1185:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1186:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1187:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1188:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1189:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1190:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1191:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1192:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1193:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1194:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1195:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[out] Buffer  Pointer to the destination data buffer to write to.
+1196:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Length  Number of bytes to send via the currently selected endpoint.
+1197:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1198:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1199:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1200:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Read_Control_Stream_LE(void* Buffer,
+1201:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                        uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1202:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1203:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** EEPROM buffer source version of \ref Endpoint_Read_Control_Stream_LE().
+1204:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1205:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1206:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1207:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1208:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1209:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1210:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1211:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1212:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1213:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1214:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1215:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1216:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[out] Buffer  Pointer to the destination data buffer to write to.
+1217:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Length  Number of bytes to send via the currently selected endpoint.
+1218:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1219:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1220:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1221:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Read_Control_EStream_LE(void* Buffer,
+1222:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                         uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1223:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1224:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** Reads the given number of bytes from the CONTROL endpoint from the given buffer in big endia
+1225:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  discarding fully read packets from the host as needed. The device IN acknowledgement is not
+1226:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  automatically sent after success or failure states; the user is responsible for manually sen
+1227:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  setup IN to finalize the transfer via the \ref Endpoint_ClearIN() macro.
+1228:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1229:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1230:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1231:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1232:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1233:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1234:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1235:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1236:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1237:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1238:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1239:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1240:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[out] Buffer  Pointer to the destination data buffer to write to.
+1241:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Length  Number of bytes to send via the currently selected endpoint.
+1242:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1243:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1244:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1245:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Read_Control_Stream_BE(void* Buffer,
+1246:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                        uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1247:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+1248:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			/** EEPROM buffer source version of \ref Endpoint_Read_Control_Stream_BE().
+1249:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1250:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This function automatically clears the control transfer's status stage. Do not manuall
+1251:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        to clear the status stage when using this routine in a control transaction.
+1252:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *        \n\n
+1253:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1254:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \note This routine should only be used on CONTROL type endpoints.
+1255:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1256:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \warning Unlike the standard stream read/write commands, the control stream commands cannot 
+1257:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *           together; i.e. the entire stream data must be read or written at the one time.
+1258:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1259:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \ingroup Group_EndpointStreamRW
+1260:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1261:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[out] Buffer  Pointer to the destination data buffer to write to.
+1262:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \param[in]  Length  Number of bytes to send via the currently selected endpoint.
+1263:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *
+1264:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 *  \return A value from the \ref Endpoint_ControlStream_RW_ErrorCodes_t enum.
+1265:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			 */
+1266:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_Read_Control_EStream_BE(void* Buffer,
+1267:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                         uint16_t Length) ATTR_NON_NULL_PTR_ARG(1);
+1268:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1269:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 	/* Private Interface - For use in library only: */
+1270:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 	#if !defined(__DOXYGEN__)
+1271:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		/* Macros: */
+1272:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define _ENDPOINT_GET_MAXSIZE(n)               _ENDPOINT_GET_MAXSIZE2(ENDPOINT_DETAILS_EP ## n)
+1273:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define _ENDPOINT_GET_MAXSIZE2(details)        _ENDPOINT_GET_MAXSIZE3(details)
+1274:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define _ENDPOINT_GET_MAXSIZE3(maxsize, db)    maxsize
+1275:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1276:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define _ENDPOINT_GET_DOUBLEBANK(n)            _ENDPOINT_GET_DOUBLEBANK2(ENDPOINT_DETAILS_EP ## 
+1277:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define _ENDPOINT_GET_DOUBLEBANK2(details)     _ENDPOINT_GET_DOUBLEBANK3(details)
+1278:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define _ENDPOINT_GET_DOUBLEBANK3(maxsize, db) db
+1279:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+1280:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#if defined(USB_SERIES_4_AVR) || defined(USB_SERIES_6_AVR) || defined(USB_SERIES_7_AVR)
+1281:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP0               64,  true
+1282:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP1               256, true
+1283:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP2               64,  true
+1284:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP3               64,  true
+1285:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP4               64,  true
+1286:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP5               64,  true
+1287:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP6               64,  true
+1288:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#else
+1289:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP0               64,  true
+1290:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP1               64,  false
+1291:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP2               64,  false
+1292:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP3               64,  true
+1293:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				#define ENDPOINT_DETAILS_EP4               64,  true			
+1294:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#endif
+1295:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1296:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			#define Endpoint_ConfigureEndpoint(Number, Type, Direction, Size, Banks)                        
+1297:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                     (__builtin_constant_p(Size) ? Endpoint_ConfigureEndpointStatic((Number),   
+1298:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                                                    (Type),     
+1299:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                                                    (Direction),
+1300:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                                                    Size, Banks)
+1301:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                   Endpoint_ConfigureEndpointDynamic((Number),  
+1302:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                                                     (Type),    
+1303:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                                                     (Direction)
+1304:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                                                     Size, Banks
+1305:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1306:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		/* Function Prototypes: */
+1307:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			void    Endpoint_ClearEndpoints(void);
+1308:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			uint8_t Endpoint_BytesToEPSizeMaskDynamic(const uint16_t Size);
+1309:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			bool    Endpoint_ConfigureEndpoint_Prv(const uint8_t Number,
+1310:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                       const uint8_t UECFG0XData,
+1311:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                       const uint8_t UECFG1XData);			
+1312:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1313:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 		/* Inline Functions: */
+1314:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_BytesToEPSizeMask(const uint16_t Bytes) ATTR_WARN_UNUSED_RESULT A
+1315:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline uint8_t Endpoint_BytesToEPSizeMask(const uint16_t Bytes)
+1316:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+1317:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				uint8_t  MaskVal    = 0;
+1318:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				uint16_t CheckBytes = 8;
+1319:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+1320:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				while (CheckBytes < Bytes)
+1321:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				{
+1322:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					MaskVal++;
+1323:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 					CheckBytes <<= 1;
+1324:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				}
+1325:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				
+1326:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return (MaskVal << EPSIZE0);
+1327:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+1328:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			
+1329:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_ConfigureEndpointStatic(const uint8_t Number,
+1330:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                    const uint8_t Type,
+1331:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                    const uint8_t Direction,
+1332:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                    const uint16_t Size,
+1333:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                    const uint8_t Banks)
+1334:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+1335:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return Endpoint_ConfigureEndpoint_Prv(Number, (((Type) << EPTYPE0) | (Direction)),
+1336:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                      ((1 << ALLOC) | Banks | Endpoint_BytesToEPSizeMask(Size))
+1337:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			}
+1338:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 
+1339:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			static inline bool Endpoint_ConfigureEndpointDynamic(const uint8_t Number,
+1340:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                     const uint8_t Type,
+1341:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                     const uint8_t Direction,
+1342:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                     const uint16_t Size,
+1343:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			                                                     const uint8_t Banks)
+1344:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 			{
+1345:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				return Endpoint_ConfigureEndpoint_Prv(Number, (((Type) << EPTYPE0) | (Direction)),
+1346:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                      ((1 << ALLOC) | Banks | Endpoint_BytesToEPSizeMaskDynamic
+ 118               		.loc 2 1346 0
+ 119 001a 8A81      		ldd r24,Y+2
+ 120 001c 9B81      		ldd r25,Y+3
+ 121               	.LVL6:
+ 122 001e 0E94 0000 		call Endpoint_BytesToEPSizeMaskDynamic
+ 123               	.LVL7:
+1345:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                      ((1 << ALLOC) | Banks | Endpoint_BytesToEPSizeMaskDynamic
+ 124               		.loc 2 1345 0
+ 125 0022 482F      		mov r20,r24
+ 126 0024 4660      		ori r20,lo8(6)
+ 127 0026 61E4      		ldi r22,lo8(65)
+ 128 0028 812F      		mov r24,r17
+ 129 002a 0E94 0000 		call Endpoint_ConfigureEndpoint_Prv
+ 130               	.LVL8:
+ 131               	.LBE27:
+ 132               	.LBE26:
+  68:../LUFA/Drivers/USB/Class/Device/Audio.c **** 										 ENDPOINT_DIR_IN, AudioInterfaceInfo->Config.DataINEndpointSize,
+ 133               		.loc 1 68 0
+ 134 002e 8111      		cpse r24,__zero_reg__
+ 135 0030 00C0      		rjmp .L13
+ 136 0032 00C0      		rjmp .L12
+ 137               	.L11:
+ 138               	.LVL9:
+ 139               	.LBB28:
+ 140               	.LBB29:
+ 141               		.loc 2 1346 0
+ 142 0034 8D81      		ldd r24,Y+5
+ 143 0036 9E81      		ldd r25,Y+6
+ 144 0038 0E94 0000 		call Endpoint_BytesToEPSizeMaskDynamic
+ 145               	.LVL10:
+1345:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                      ((1 << ALLOC) | Banks | Endpoint_BytesToEPSizeMaskDynamic
+ 146               		.loc 2 1345 0
+ 147 003c 482F      		mov r20,r24
+ 148 003e 4660      		ori r20,lo8(6)
+ 149 0040 60E4      		ldi r22,lo8(64)
+ 150 0042 812F      		mov r24,r17
+ 151               	/* epilogue start */
+ 152               	.LBE29:
+ 153               	.LBE28:
+  87:../LUFA/Drivers/USB/Class/Device/Audio.c **** }
+ 154               		.loc 1 87 0
+ 155 0044 DF91      		pop r29
+ 156 0046 CF91      		pop r28
+ 157               	.LVL11:
+ 158 0048 1F91      		pop r17
+ 159               	.LVL12:
+ 160               	.LBB31:
+ 161               	.LBB30:
+1345:../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/Endpoint.h **** 				                                      ((1 << ALLOC) | Banks | Endpoint_BytesToEPSizeMaskDynamic
+ 162               		.loc 2 1345 0
+ 163 004a 0C94 0000 		jmp Endpoint_ConfigureEndpoint_Prv
+ 164               	.LVL13:
+ 165               	.L12:
+ 166               	/* epilogue start */
+ 167               	.LBE30:
+ 168               	.LBE31:
+ 169               		.loc 1 87 0
+ 170 004e DF91      		pop r29
+ 171 0050 CF91      		pop r28
+ 172               	.LVL14:
+ 173 0052 1F91      		pop r17
+ 174 0054 0895      		ret
+ 175               		.cfi_endproc
+ 176               	.LFE75:
+ 178               		.text
+ 179               	.Letext0:
+ 180               		.file 3 "/usr/lib/avr/include/stdint.h"
+ 181               		.file 4 "../LUFA/Drivers/USB/Class/Device/../../HighLevel/../LowLevel/../HighLevel/StdRequestType.
+ 182               		.file 5 "../LUFA/Drivers/USB/Class/Device/Audio.h"
+ 183               		.file 6 "../LUFA/Drivers/USB/Class/Device/../../HighLevel/USBTask.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 Audio.c
+     /tmp/cctH40rX.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/cctH40rX.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/cctH40rX.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/cctH40rX.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cctH40rX.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cctH40rX.s:13     .text.Audio_Device_ProcessControlRequest:0000000000000000 Audio_Device_ProcessControlRequest
+     /tmp/cctH40rX.s:77     .text.Audio_Device_ConfigureEndpoints:0000000000000000 Audio_Device_ConfigureEndpoints
+
+UNDEFINED SYMBOLS
+USB_ControlRequest
+Endpoint_ClearStatusStage
+Endpoint_BytesToEPSizeMaskDynamic
+Endpoint_ConfigureEndpoint_Prv
