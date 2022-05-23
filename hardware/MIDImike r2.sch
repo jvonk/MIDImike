@@ -7673,13 +7673,6 @@ Source: www.kingbright.com</description>
 <pinref part="PCB2" gate=".IO" pin="D4"/>
 </segment>
 </net>
-<net name="N$3" class="0">
-<segment>
-<pinref part="PCB2" gate=".IO" pin="MOSI2"/>
-<pinref part="JP1" gate="1" pin="3"/>
-<wire x1="55.88" y1="81.28" x2="43.18" y2="81.28" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="N$8" class="0">
 <segment>
 <pinref part="LED1" gate="G$1" pin="C"/>
@@ -7741,6 +7734,14 @@ Source: www.kingbright.com</description>
 <pinref part="PCB2" gate=".IO" pin="D3"/>
 <pinref part="SW2" gate="G$1" pin="2"/>
 <wire x1="83.82" y1="111.76" x2="99.06" y2="111.76" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$3" class="0">
+<segment>
+<pinref part="JP1" gate="1" pin="3"/>
+<wire x1="43.18" y1="81.28" x2="43.18" y2="78.74" width="0.1524" layer="91"/>
+<pinref part="PCB2" gate=".IO" pin="MISO2"/>
+<wire x1="43.18" y1="78.74" x2="55.88" y2="78.74" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
