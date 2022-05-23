@@ -41,7 +41,7 @@ Patch to specify the IDs, microcontroller and reverse the pin logic.
 From Linux (e.g. Window Subsystem for Linux)
 
 ```
-sudo apt-get install binutils gcc-avr avr-libc uisp avrdude flex byacc bison
+sudo apt-get install binutils make gcc-avr avr-libc uisp avrdude flex byacc bison
 cd Projects
 make clean
 make -s
