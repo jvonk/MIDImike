@@ -66,14 +66,15 @@ Note that the footprint of `PCB1` is mirrored by accident in rev 1.
 
 | Name | Description                                        | Suggested mfr and part#   |                                                                                                      Paid |
 | ---- | -------------------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------: |
-| PCB1 | Electret microphone w/ auto gain control           | Adafruit 1713             |                                                            [$7.95](https://www.adafruit.com/product/1713) |
-| PCB2 | Arduino Uno R3 or Arduino METRO 328                | Adafruit 2488             |                                                           [$17.50](https://www.adafruit.com/product/2488) |
-| PCB3 | ST7735R 1.8" Color TFT display w/ MicroSD breakout | Adafruit 358              |                                                            [$19.95](https://www.adafruit.com/product/358) |
-| LED1 | LED, Amber Clear 602nm, 1206                       | Lite-On LTST-C150AKT      |                       [$0.33](https://www.digikey.com/en/products/detail/lite-on-inc/LTST-C150AKT/269213) |
-| R1   | Resistor, 330 Ω, 1/8 W, 0805                       | YAGEO RC0805FR-0768RL     |                         [$0.10](https://www.digikey.com/en/products/detail/yageo/RC0805FR-07330RL/727866) |
-| JP1  | Connector header, vertical 3 pos, 2.54mm           | Metz Connect PR20203VBNN  |              [$0.10](https://www.digikey.com/en/products/detail/metz-connect-usa-inc/PR20203VBNN/7794768) |
-| SW1  | Switch tactile, SPST-NO, 0.05A/24V                 | TE Connectivity 1825910-3 | [$0.15](https://www.digikey.com/en/products/detail/te-connectivity-alcoswitch-switches/1825910-3/2400476) |
-| SW2  | Switch rotary dip BDC comp, 100mA/5V               | Nidec Copal SH-7030TB     |             [$2.00](https://www.digikey.com/en/products/detail/nidec-copal-electronics/SH-7030TB/2057869) |
+| PCB1 | Electret microphone w/ auto gain control           | Adafruit 1713             |  [$7.95](https://www.adafruit.com/product/1713) |
+| PCB2 | Arduino Uno R3 or Arduino METRO 328                | Adafruit 2488             | [$17.50](https://www.adafruit.com/product/2488) |
+| PCB3 | ST7735R 1.8" Color TFT display w/ MicroSD breakout | Adafruit 802              | [$19.95](https://www.adafruit.com/product/802) |
+| HDR  | Shield stacking headers for Arduino                | Adafruit 85               |  [$1.95](https://www.digikey.com/en/products/detail/adafruit-industries-llc/85/5154649)
+| LED1 | LED, Amber Clear 602nm, 1206                       | Lite-On LTST-C150AKT      |  [$0.33](https://www.digikey.com/en/products/detail/lite-on-inc/LTST-C150AKT/269213) |
+| R1   | Resistor, 330 Ω, 1/8 W, 0805                       | YAGEO RC0805FR-0768RL     |  [$0.10](https://www.digikey.com/en/products/detail/yageo/RC0805FR-07330RL/727866) |
+| JP1  | Connector header, vertical 3 pos, 2.54mm           | Metz Connect PR20203VBNN  |  [$0.10](https://www.digikey.com/en/products/detail/metz-connect-usa-inc/PR20203VBNN/7794768) |
+| SW1  | Switch tactile, SPST-NO, 0.05A/24V                 | TE Connectivity 1825910-3 |  [$0.15](https://www.digikey.com/en/products/detail/te-connectivity-alcoswitch-switches/1825910-3/2400476) |
+| SW2  | Switch rotary dip BDC comp, 100mA/5V               | Nidec Copal SH-7030TB     |  [$2.00](https://www.digikey.com/en/products/detail/nidec-copal-electronics/SH-7030TB/2057869) |
 
 ### Notes
 
