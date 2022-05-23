@@ -1,0 +1,543 @@
+   1               		.file	"Device.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.USB_Device_SendRemoteWakeup,"ax",@progbits
+  11               	.global	USB_Device_SendRemoteWakeup
+  13               	USB_Device_SendRemoteWakeup:
+  14               	.LFB64:
+  15               		.file 1 "../LUFA/Drivers/USB/LowLevel/Device.c"
+   1:../LUFA/Drivers/USB/LowLevel/Device.c **** /*
+   2:../LUFA/Drivers/USB/LowLevel/Device.c ****              LUFA Library
+   3:../LUFA/Drivers/USB/LowLevel/Device.c ****      Copyright (C) Dean Camera, 2010.
+   4:../LUFA/Drivers/USB/LowLevel/Device.c ****               
+   5:../LUFA/Drivers/USB/LowLevel/Device.c ****   dean [at] fourwalledcubicle [dot] com
+   6:../LUFA/Drivers/USB/LowLevel/Device.c ****       www.fourwalledcubicle.com
+   7:../LUFA/Drivers/USB/LowLevel/Device.c **** */
+   8:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+   9:../LUFA/Drivers/USB/LowLevel/Device.c **** /*
+  10:../LUFA/Drivers/USB/LowLevel/Device.c ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+  12:../LUFA/Drivers/USB/LowLevel/Device.c ****   Permission to use, copy, modify, distribute, and sell this 
+  13:../LUFA/Drivers/USB/LowLevel/Device.c ****   software and its documentation for any purpose is hereby granted
+  14:../LUFA/Drivers/USB/LowLevel/Device.c ****   without fee, provided that the above copyright notice appear in 
+  15:../LUFA/Drivers/USB/LowLevel/Device.c ****   all copies and that both that the copyright notice and this
+  16:../LUFA/Drivers/USB/LowLevel/Device.c ****   permission notice and warranty disclaimer appear in supporting 
+  17:../LUFA/Drivers/USB/LowLevel/Device.c ****   documentation, and that the name of the author not be used in 
+  18:../LUFA/Drivers/USB/LowLevel/Device.c ****   advertising or publicity pertaining to distribution of the 
+  19:../LUFA/Drivers/USB/LowLevel/Device.c ****   software without specific, written prior permission.
+  20:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+  21:../LUFA/Drivers/USB/LowLevel/Device.c ****   The author disclaim all warranties with regard to this
+  22:../LUFA/Drivers/USB/LowLevel/Device.c ****   software, including all implied warranties of merchantability
+  23:../LUFA/Drivers/USB/LowLevel/Device.c ****   and fitness.  In no event shall the author be liable for any
+  24:../LUFA/Drivers/USB/LowLevel/Device.c ****   special, indirect or consequential damages or any damages
+  25:../LUFA/Drivers/USB/LowLevel/Device.c ****   whatsoever resulting from loss of use, data or profits, whether
+  26:../LUFA/Drivers/USB/LowLevel/Device.c ****   in an action of contract, negligence or other tortious action,
+  27:../LUFA/Drivers/USB/LowLevel/Device.c ****   arising out of or in connection with the use or performance of
+  28:../LUFA/Drivers/USB/LowLevel/Device.c ****   this software.
+  29:../LUFA/Drivers/USB/LowLevel/Device.c **** */
+  30:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+  31:../LUFA/Drivers/USB/LowLevel/Device.c **** #define  __INCLUDE_FROM_USB_DRIVER
+  32:../LUFA/Drivers/USB/LowLevel/Device.c **** #include "../HighLevel/USBMode.h"
+  33:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+  34:../LUFA/Drivers/USB/LowLevel/Device.c **** #if defined(USB_CAN_BE_DEVICE)
+  35:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+  36:../LUFA/Drivers/USB/LowLevel/Device.c **** #include "Device.h"
+  37:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+  38:../LUFA/Drivers/USB/LowLevel/Device.c **** void USB_Device_SendRemoteWakeup(void)
+  39:../LUFA/Drivers/USB/LowLevel/Device.c **** {
+  16               		.loc 1 39 0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  22               	.LBB8:
+  23               	.LBB9:
+  24               		.file 2 "../LUFA/Drivers/USB/LowLevel/USBController.h"
+   1:../LUFA/Drivers/USB/LowLevel/USBController.h **** /*
+   2:../LUFA/Drivers/USB/LowLevel/USBController.h ****              LUFA Library
+   3:../LUFA/Drivers/USB/LowLevel/USBController.h ****      Copyright (C) Dean Camera, 2010.
+   4:../LUFA/Drivers/USB/LowLevel/USBController.h ****               
+   5:../LUFA/Drivers/USB/LowLevel/USBController.h ****   dean [at] fourwalledcubicle [dot] com
+   6:../LUFA/Drivers/USB/LowLevel/USBController.h ****       www.fourwalledcubicle.com
+   7:../LUFA/Drivers/USB/LowLevel/USBController.h **** */
+   8:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+   9:../LUFA/Drivers/USB/LowLevel/USBController.h **** /*
+  10:../LUFA/Drivers/USB/LowLevel/USBController.h ****   Copyright 2010  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  12:../LUFA/Drivers/USB/LowLevel/USBController.h ****   Permission to use, copy, modify, distribute, and sell this 
+  13:../LUFA/Drivers/USB/LowLevel/USBController.h ****   software and its documentation for any purpose is hereby granted
+  14:../LUFA/Drivers/USB/LowLevel/USBController.h ****   without fee, provided that the above copyright notice appear in 
+  15:../LUFA/Drivers/USB/LowLevel/USBController.h ****   all copies and that both that the copyright notice and this
+  16:../LUFA/Drivers/USB/LowLevel/USBController.h ****   permission notice and warranty disclaimer appear in supporting 
+  17:../LUFA/Drivers/USB/LowLevel/USBController.h ****   documentation, and that the name of the author not be used in 
+  18:../LUFA/Drivers/USB/LowLevel/USBController.h ****   advertising or publicity pertaining to distribution of the 
+  19:../LUFA/Drivers/USB/LowLevel/USBController.h ****   software without specific, written prior permission.
+  20:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  21:../LUFA/Drivers/USB/LowLevel/USBController.h ****   The author disclaim all warranties with regard to this
+  22:../LUFA/Drivers/USB/LowLevel/USBController.h ****   software, including all implied warranties of merchantability
+  23:../LUFA/Drivers/USB/LowLevel/USBController.h ****   and fitness.  In no event shall the author be liable for any
+  24:../LUFA/Drivers/USB/LowLevel/USBController.h ****   special, indirect or consequential damages or any damages
+  25:../LUFA/Drivers/USB/LowLevel/USBController.h ****   whatsoever resulting from loss of use, data or profits, whether
+  26:../LUFA/Drivers/USB/LowLevel/USBController.h ****   in an action of contract, negligence or other tortious action,
+  27:../LUFA/Drivers/USB/LowLevel/USBController.h ****   arising out of or in connection with the use or performance of
+  28:../LUFA/Drivers/USB/LowLevel/USBController.h ****   this software.
+  29:../LUFA/Drivers/USB/LowLevel/USBController.h **** */
+  30:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  31:../LUFA/Drivers/USB/LowLevel/USBController.h **** /** \file
+  32:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *  \brief USB low level USB controller definitions.
+  33:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *
+  34:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *  This file contains structures, function prototypes and macros related to the low level configur
+  35:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *  USB controller, to start, stop and reset the USB library core.
+  36:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *
+  37:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *  \note This file should not be included directly. It is automatically included as needed by the 
+  38:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *        dispatch header located in LUFA/Drivers/USB/USB.h.
+  39:../LUFA/Drivers/USB/LowLevel/USBController.h ****  */
+  40:../LUFA/Drivers/USB/LowLevel/USBController.h ****  
+  41:../LUFA/Drivers/USB/LowLevel/USBController.h **** /** \ingroup Group_USB
+  42:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *  @defgroup Group_USBManagement USB Interface Management
+  43:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *
+  44:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *  Functions, macros, variables, enums and types related to the setup and management of the USB in
+  45:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *
+  46:../LUFA/Drivers/USB/LowLevel/USBController.h ****  *  @{
+  47:../LUFA/Drivers/USB/LowLevel/USBController.h ****  */
+  48:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  49:../LUFA/Drivers/USB/LowLevel/USBController.h **** #ifndef __USBCONTROLLER_H__
+  50:../LUFA/Drivers/USB/LowLevel/USBController.h **** #define __USBCONTROLLER_H__
+  51:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  52:../LUFA/Drivers/USB/LowLevel/USBController.h **** 	/* Includes: */
+  53:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include <avr/io.h>
+  54:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include <avr/interrupt.h>
+  55:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include <stdbool.h>
+  56:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		
+  57:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include "../HighLevel/USBMode.h"
+  58:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  59:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include "../../../Common/Common.h"
+  60:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include "../HighLevel/USBMode.h"
+  61:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include "../HighLevel/Events.h"
+  62:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include "../HighLevel/USBTask.h"
+  63:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#include "USBInterrupt.h"
+  64:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		
+  65:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#if defined(USB_CAN_BE_HOST) || defined(__DOXYGEN__)
+  66:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#include "Host.h"
+  67:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#include "Pipe.h"
+  68:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#include "OTG.h"
+  69:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#include "../HighLevel/HostStandardReq.h"
+  70:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#endif
+  71:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		
+  72:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#if defined(USB_CAN_BE_DEVICE) || defined(__DOXYGEN__)
+  73:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#include "Device.h"
+  74:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#include "Endpoint.h"
+  75:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#include "../HighLevel/DeviceStandardReq.h"
+  76:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#endif
+  77:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  78:../LUFA/Drivers/USB/LowLevel/USBController.h **** 	/* Enable C linkage for C++ Compilers: */
+  79:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#if defined(__cplusplus)
+  80:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			extern "C" {
+  81:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#endif
+  82:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  83:../LUFA/Drivers/USB/LowLevel/USBController.h **** 	/* Preprocessor Checks and Defines: */
+  84:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#if !defined(__INCLUDE_FROM_USB_DRIVER)
+  85:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#error Do not include this file directly. Include LUFA/Drivers/USB/USB.h instead.
+  86:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#endif
+  87:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+  88:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#if !defined(F_CLOCK)
+  89:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#error F_CLOCK is not defined. You must define F_CLOCK to the frequency of the unprescaled input
+  90:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#endif
+  91:../LUFA/Drivers/USB/LowLevel/USBController.h **** 	
+  92:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#if (F_CLOCK == 8000000)
+  93:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if (defined(__AVR_AT90USB82__) || defined(__AVR_AT90USB162__) || \
+  94:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			     defined(__AVR_ATmega8U2__) || defined(__AVR_ATmega16U2__) || \
+  95:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			     defined(__AVR_ATmega32U2__))
+  96:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_PLL_PSC                0
+  97:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif (defined(__AVR_ATmega16U4__) || defined(__AVR_ATmega32U4__))
+  98:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_PLL_PSC                0
+  99:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif (defined(__AVR_AT90USB646__)  || defined(__AVR_AT90USB1286__) || defined(__AVR_ATmega32U6_
+ 100:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_PLL_PSC                ((1 << PLLP1) | (1 << PLLP0))
+ 101:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif (defined(__AVR_AT90USB647__)  || defined(__AVR_AT90USB1287__))
+ 102:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_PLL_PSC                ((1 << PLLP1) | (1 << PLLP0))
+ 103:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif
+ 104:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#elif (F_CLOCK == 16000000)
+ 105:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if (defined(__AVR_AT90USB82__) || defined(__AVR_AT90USB162__) || \
+ 106:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			     defined(__AVR_ATmega8U2__) || defined(__AVR_ATmega16U2__) || \
+ 107:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			     defined(__AVR_ATmega32U2__))
+ 108:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_PLL_PSC                (1 << PLLP0)
+ 109:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif (defined(__AVR_ATmega16U4__) || defined(__AVR_ATmega32U4__))
+ 110:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_PLL_PSC                (1 << PINDIV)
+ 111:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif (defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB647__) || defined(__AVR_ATmega32U6__)
+ 112:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_PLL_PSC                ((1 << PLLP2) | (1 << PLLP1))
+ 113:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif (defined(__AVR_AT90USB1286__) || defined(__AVR_AT90USB1287__))
+ 114:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_PLL_PSC                ((1 << PLLP2) | (1 << PLLP0))
+ 115:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif
+ 116:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#endif
+ 117:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		
+ 118:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#if !defined(USB_PLL_PSC)
+ 119:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#error No PLL prescale value available for chosen F_CPU value and AVR model.
+ 120:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		#endif
+ 121:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		
+ 122:../LUFA/Drivers/USB/LowLevel/USBController.h **** 	/* Public Interface - May be used in end-application: */
+ 123:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		/* Macros: */
+ 124:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Mode mask for the \ref USB_CurrentMode global. This indicates that the USB interface is curr
+ 125:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  initialized into any mode.
+ 126:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 127:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define USB_MODE_NONE                      0
+ 128:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 129:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Mode mask for the \ref USB_CurrentMode global and the \ref USB_Init() function. This indicat
+ 130:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  USB interface is or should be initialized in the USB device mode.
+ 131:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 132:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define USB_MODE_DEVICE                    1
+ 133:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 134:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Mode mask for the \ref USB_CurrentMode global and the \ref USB_Init() function. This indicat
+ 135:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  USB interface is or should be initialized in the USB host mode.
+ 136:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 137:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define USB_MODE_HOST                      2
+ 138:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 139:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if defined(USB_CAN_BE_BOTH) || defined(__DOXYGEN__)
+ 140:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				/** Mode mask for the the \ref USB_Init() function. This indicates that the USB interface shoul
+ 141:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  initialized into whatever mode the UID pin of the USB AVR indicates, and that the device
+ 142:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  should swap over its mode when the level of the UID pin changes during operation.
+ 143:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *
+ 144:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  \note This token is not available on AVR models which do not support both host and device m
+ 145:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 */
+ 146:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_MODE_UID                       3
+ 147:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif
+ 148:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 149:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Regulator disable option mask for \ref USB_Init(). This indicates that the internal 3.3V USB
+ 150:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  regulator should be enabled to regulate the data pin voltages to within the USB standard.
+ 151:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 152:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note See USB AVR data sheet for more information on the internal pad regulator.
+ 153:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 154:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define USB_OPT_REG_DISABLED               (1 << 1)
+ 155:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 156:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Regulator enable option mask for \ref USB_Init(). This indicates that the internal 3.3V USB 
+ 157:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  regulator should be disabled and the AVR's VCC level used for the data pads.
+ 158:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 159:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note See USB AVR data sheet for more information on the internal pad regulator.
+ 160:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 161:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define USB_OPT_REG_ENABLED                (0 << 1)
+ 162:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 163:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Manual PLL control option mask for \ref USB_Init(). This indicates to the library that the u
+ 164:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  will take full responsibility for controlling the AVR's PLL (used to generate the high frequ
+ 165:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  that the USB controller requires) and ensuring that it is locked at the correct frequency fo
+ 166:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 167:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define USB_OPT_MANUAL_PLL                 (1 << 2)
+ 168:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 169:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Automatic PLL control option mask for \ref USB_Init(). This indicates to the library that th
+ 170:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  take full responsibility for controlling the AVR's PLL (used to generate the high frequency 
+ 171:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  that the USB controller requires) and ensuring that it is locked at the correct frequency fo
+ 172:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 173:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define USB_OPT_AUTO_PLL                   (0 << 2)
+ 174:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 175:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Mask for a CONTROL type endpoint or pipe.
+ 176:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 177:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note See \ref Group_EndpointManagement and \ref Group_PipeManagement for endpoint/pipe func
+ 178:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 179:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define EP_TYPE_CONTROL                    0x00
+ 180:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 181:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Mask for an ISOCHRONOUS type endpoint or pipe.
+ 182:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 183:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note See \ref Group_EndpointManagement and \ref Group_PipeManagement for endpoint/pipe func
+ 184:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 185:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define EP_TYPE_ISOCHRONOUS                0x01
+ 186:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 187:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Mask for a BULK type endpoint or pipe.
+ 188:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 189:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note See \ref Group_EndpointManagement and \ref Group_PipeManagement for endpoint/pipe func
+ 190:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 191:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define EP_TYPE_BULK                       0x02
+ 192:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 193:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Mask for an INTERRUPT type endpoint or pipe.
+ 194:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 195:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note See \ref Group_EndpointManagement and \ref Group_PipeManagement for endpoint/pipe func
+ 196:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 197:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#define EP_TYPE_INTERRUPT                  0x03
+ 198:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 199:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if !defined(USB_STREAM_TIMEOUT_MS) || defined(__DOXYGEN__)
+ 200:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				/** Constant for the maximum software timeout period of the USB data stream transfer functions
+ 201:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  (both control and standard) when in either device or host mode. If the next packet of a str
+ 202:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  is not received or acknowledged within this time period, the stream function will fail.
+ 203:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *
+ 204:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  This value may be overridden in the user project makefile as the value of the 
+ 205:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  \ref USB_STREAM_TIMEOUT_MS token, and passed to the compiler using the -D switch.
+ 206:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 */
+ 207:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_STREAM_TIMEOUT_MS       100
+ 208:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif
+ 209:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		
+ 210:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		/* Inline Functions: */
+ 211:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if defined(USB_SERIES_4_AVR) || defined(USB_SERIES_6_AVR) || defined(USB_SERIES_7_AVR) || defin
+ 212:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				/** Returns boolean true if the VBUS line is currently high (i.e. the USB host is supplying pow
+ 213:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  otherwise returns false.
+ 214:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *
+ 215:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  \note This function is not available on some AVR models which do not support hardware VBUS 
+ 216:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 */
+ 217:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				static inline bool USB_VBUS_GetStatus(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 218:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				static inline bool USB_VBUS_GetStatus(void)
+ 219:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				{
+ 220:../LUFA/Drivers/USB/LowLevel/USBController.h **** 					return ((USBSTA & (1 << VBUS)) ? true : false);
+ 221:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				}
+ 222:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif
+ 223:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 224:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Detaches the device from the USB bus. This has the effect of removing the device from any
+ 225:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  attached host, ceasing USB communications. If no host is present, this prevents any host fro
+ 226:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  enumerating the device once attached until \ref USB_Attach() is called.
+ 227:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 228:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_Detach(void) ATTR_ALWAYS_INLINE;
+ 229:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_Detach(void)
+ 230:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 231:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				UDCON  |=  (1 << DETACH);
+ 232:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 233:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 234:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Attaches the device to the USB bus. This announces the device's presence to any attached
+ 235:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  USB host, starting the enumeration process. If no host is present, attaching the device
+ 236:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  will allow for enumeration once a host is connected to the device.
+ 237:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 238:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  This is inexplicably also required for proper operation while in host mode, to enable the
+ 239:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  attachment of a device to the host. This is despite the bit being located in the device-mode
+ 240:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  register and despite the datasheet making no mention of its requirement in host mode.
+ 241:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 242:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_Attach(void) ATTR_ALWAYS_INLINE;
+ 243:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_Attach(void)
+ 244:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 245:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				UDCON  &= ~(1 << DETACH);
+ 246:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 247:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 248:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		/* Function Prototypes: */
+ 249:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Main function to initialize and start the USB interface. Once active, the USB interface will
+ 250:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  allow for device connection to a host when in device mode, or for device enumeration while i
+ 251:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  host mode.
+ 252:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 253:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  As the USB library relies on interrupts for the device and host mode enumeration processes,
+ 254:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  the user must enable global interrupts before or shortly after this function is called. In
+ 255:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  device mode, interrupts must be enabled within 500ms of this function being called to ensure
+ 256:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  that the host does not time out whilst enumerating the device. In host mode, interrupts may 
+ 257:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  enabled at the application's leisure however enumeration will not begin of an attached devic
+ 258:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  until after this has occurred.
+ 259:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 260:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  Calling this function when the USB interface is already initialized will cause a complete US
+ 261:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  interface reset and re-enumeration.
+ 262:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 263:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \param[in] Mode     This is a mask indicating what mode the USB interface is to be initializ
+ 264:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *                      Valid mode masks are \ref USB_MODE_DEVICE, \ref USB_MODE_HOST or \ref US
+ 265:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 266:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \param[in] Options  Mask indicating the options which should be used when initializing the U
+ 267:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *                      interface to control the USB interface's behaviour. This should be compr
+ 268:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *                      a USB_OPT_REG_* mask to control the regulator, a USB_OPT_*_PLL mask to c
+ 269:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *                      PLL, and a USB_DEVICE_OPT_* mask (when the device mode is enabled) to se
+ 270:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *                      mode speed.
+ 271:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 272:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note To reduce the FLASH requirements of the library if only device or host mode is require
+ 273:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        the mode can be statically set in the project makefile by defining the token USB_DEVIC
+ 274:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        (for device mode) or USB_HOST_ONLY (for host mode), passing the token to the compiler 
+ 275:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        via the -D switch. If the mode is statically set, this parameter does not exist in the
+ 276:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        function prototype.
+ 277:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        \n\n
+ 278:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 279:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note To reduce the FLASH requirements of the library if only fixed settings are are require
+ 280:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        the options may be set statically in the same manner as the mode (see the Mode paramet
+ 281:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        this function). To statically set the USB options, pass in the USE_STATIC_OPTIONS toke
+ 282:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        defined to the appropriate options masks. When the options are statically set, this
+ 283:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        parameter does not exist in the function prototype.
+ 284:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        \n\n
+ 285:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        
+ 286:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \note The mode parameter does not exist on devices where only one mode is possible, such as 
+ 287:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *        AVR models which only implement the USB device mode in hardware.
+ 288:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *
+ 289:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  \see Device.h for the USB_DEVICE_OPT_* masks.
+ 290:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 291:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			void USB_Init(
+ 292:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               #if defined(USB_CAN_BE_BOTH) || defined(__DOXYGEN__)
+ 293:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               const uint8_t Mode
+ 294:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               #endif
+ 295:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 296:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               #if (defined(USB_CAN_BE_BOTH) && !defined(USE_STATIC_OPTIONS)) || defined(__DOXYG
+ 297:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               ,
+ 298:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               #elif (!defined(USB_CAN_BE_BOTH) && defined(USE_STATIC_OPTIONS))
+ 299:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               void
+ 300:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               #endif
+ 301:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 302:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               #if !defined(USE_STATIC_OPTIONS) || defined(__DOXYGEN__)
+ 303:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               const uint8_t Options
+ 304:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               #endif
+ 305:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			               );
+ 306:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 307:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Shuts down the USB interface. This turns off the USB interface after deallocating all USB FI
+ 308:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  memory, endpoints and pipes. When turned off, no USB functionality can be used until the int
+ 309:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  is restarted with the \ref USB_Init() function.
+ 310:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 311:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			void USB_ShutDown(void);
+ 312:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 313:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Resets the interface, when already initialized. This will re-enumerate the device if already
+ 314:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  to a host, or re-enumerate an already attached device when in host mode.
+ 315:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 316:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			void USB_ResetInterface(void);
+ 317:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 318:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		/* Enums: */
+ 319:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			/** Enum for error codes relating to the powering on of the USB interface. These error codes are
+ 320:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 *  used in the ErrorCode parameter value of the \ref EVENT_USB_InitFailure() event.
+ 321:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			 */
+ 322:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			enum USB_InitErrorCodes_t
+ 323:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 324:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				USB_INITERROR_NoUSBModeSpecified       = 0, /**< Indicates that \ref USB_Init() was called with
+ 325:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				                                             *   invalid or missing Mode parameter.
+ 326:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				                                             */
+ 327:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			};
+ 328:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 329:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		/* Global Variables: */
+ 330:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if (!defined(USB_HOST_ONLY) && !defined(USB_DEVICE_ONLY)) || defined(__DOXYGEN__)
+ 331:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				/** Indicates the mode that the USB interface is currently initialized to. This value will be
+ 332:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  one of the USB_MODE_* masks defined elsewhere in this module.
+ 333:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *
+ 334:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  \note This variable should be treated as read-only in the user application, and never manua
+ 335:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *        changed in value.
+ 336:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 */
+ 337:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				extern volatile uint8_t USB_CurrentMode;
+ 338:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif defined(USB_HOST_ONLY)
+ 339:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_CurrentMode USB_MODE_HOST
+ 340:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif defined(USB_DEVICE_ONLY)
+ 341:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_CurrentMode USB_MODE_DEVICE
+ 342:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif
+ 343:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 344:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if !defined(USE_STATIC_OPTIONS) || defined(__DOXYGEN__)
+ 345:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				/** Indicates the current USB options that the USB interface was initialized with when \ref USB
+ 346:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  was called. This value will be one of the USB_MODE_* masks defined elsewhere in this module
+ 347:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *
+ 348:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *  \note This variable should be treated as read-only in the user application, and never manua
+ 349:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 *        changed in value.
+ 350:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				 */
+ 351:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				extern volatile uint8_t USB_Options;
+ 352:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#elif defined(USE_STATIC_OPTIONS)
+ 353:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				#define USB_Options USE_STATIC_OPTIONS
+ 354:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif
+ 355:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 356:../LUFA/Drivers/USB/LowLevel/USBController.h **** 	/* Private Interface - For use in library only: */
+ 357:../LUFA/Drivers/USB/LowLevel/USBController.h **** 	#if !defined(__DOXYGEN__)
+ 358:../LUFA/Drivers/USB/LowLevel/USBController.h **** 		/* Inline Functions: */
+ 359:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_PLL_On(void) ATTR_ALWAYS_INLINE;
+ 360:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_PLL_On(void)
+ 361:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 362:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				PLLCSR  = USB_PLL_PSC;
+  25               		.loc 2 362 0
+  26 0000 84E0      		ldi r24,lo8(4)
+  27 0002 89BD      		out 0x29,r24
+ 363:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				PLLCSR |= (1 << PLLE);
+  28               		.loc 2 363 0
+  29 0004 89B5      		in r24,0x29
+  30 0006 8260      		ori r24,lo8(2)
+  31 0008 89BD      		out 0x29,r24
+  32               	.L2:
+  33               	.LBE9:
+  34               	.LBE8:
+  40:../LUFA/Drivers/USB/LowLevel/Device.c **** 	if (!(USB_Options & USB_OPT_MANUAL_PLL))
+  41:../LUFA/Drivers/USB/LowLevel/Device.c **** 	{
+  42:../LUFA/Drivers/USB/LowLevel/Device.c **** 		USB_PLL_On();
+  43:../LUFA/Drivers/USB/LowLevel/Device.c **** 		while (!(USB_PLL_IsReady()));
+  35               		.loc 1 43 0 discriminator 1
+  36 000a 09B4      		in __tmp_reg__,0x29
+  37 000c 00FE      		sbrs __tmp_reg__,0
+  38 000e 00C0      		rjmp .L2
+  39               	.LBB10:
+  40               	.LBB11:
+ 364:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 365:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 366:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_PLL_Off(void) ATTR_ALWAYS_INLINE;
+ 367:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_PLL_Off(void)
+ 368:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 369:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				PLLCSR  = 0;
+ 370:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 371:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 372:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline bool USB_PLL_IsReady(void) ATTR_WARN_UNUSED_RESULT ATTR_ALWAYS_INLINE;
+ 373:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline bool USB_PLL_IsReady(void)
+ 374:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 375:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				return ((PLLCSR  &   (1 << PLOCK)) ? true : false);
+ 376:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 377:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 378:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_REG_On(void) ATTR_ALWAYS_INLINE;
+ 379:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_REG_On(void)
+ 380:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 381:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if defined(USB_SERIES_4_AVR) || defined(USB_SERIES_6_AVR) || defined(USB_SERIES_7_AVR)
+ 382:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				UHWCON  |=  (1 << UVREGE);
+ 383:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#else
+ 384:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				REGCR   &= ~(1 << REGDIS);
+ 385:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif			
+ 386:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 387:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 388:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_REG_Off(void) ATTR_ALWAYS_INLINE;
+ 389:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_REG_Off(void)
+ 390:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 391:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if defined(USB_SERIES_4_AVR) || defined(USB_SERIES_6_AVR) || defined(USB_SERIES_7_AVR)
+ 392:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				UHWCON  &= ~(1 << UVREGE);
+ 393:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#else
+ 394:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				REGCR   |=  (1 << REGDIS);
+ 395:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif			
+ 396:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 397:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 398:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#if defined(USB_SERIES_4_AVR) || defined(USB_SERIES_6_AVR) || defined(USB_SERIES_7_AVR)
+ 399:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_OTGPAD_On(void) ATTR_ALWAYS_INLINE;
+ 400:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_OTGPAD_On(void)
+ 401:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 402:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				USBCON  |=  (1 << OTGPADE);
+ 403:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 404:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 405:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_OTGPAD_Off(void) ATTR_ALWAYS_INLINE;
+ 406:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_OTGPAD_Off(void)
+ 407:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 408:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				USBCON  &= ~(1 << OTGPADE);
+ 409:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 410:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			#endif
+ 411:../LUFA/Drivers/USB/LowLevel/USBController.h **** 
+ 412:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_CLK_Freeze(void) ATTR_ALWAYS_INLINE;
+ 413:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_CLK_Freeze(void)
+ 414:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 415:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				USBCON  |=  (1 << FRZCLK);
+ 416:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			}
+ 417:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			
+ 418:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_CLK_Unfreeze(void) ATTR_ALWAYS_INLINE;
+ 419:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			static inline void USB_CLK_Unfreeze(void)
+ 420:../LUFA/Drivers/USB/LowLevel/USBController.h **** 			{
+ 421:../LUFA/Drivers/USB/LowLevel/USBController.h **** 				USBCON  &= ~(1 << FRZCLK);
+  41               		.loc 2 421 0
+  42 0010 8091 D800 		lds r24,216
+  43 0014 8F7D      		andi r24,lo8(-33)
+  44 0016 8093 D800 		sts 216,r24
+  45               	.LBE11:
+  46               	.LBE10:
+  44:../LUFA/Drivers/USB/LowLevel/Device.c **** 	}
+  45:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+  46:../LUFA/Drivers/USB/LowLevel/Device.c **** 	USB_CLK_Unfreeze();
+  47:../LUFA/Drivers/USB/LowLevel/Device.c **** 
+  48:../LUFA/Drivers/USB/LowLevel/Device.c **** 	UDCON |= (1 << RMWKUP);
+  47               		.loc 1 48 0
+  48 001a 8091 E000 		lds r24,224
+  49 001e 8260      		ori r24,lo8(2)
+  50 0020 8093 E000 		sts 224,r24
+  51               	.L3:
+  49:../LUFA/Drivers/USB/LowLevel/Device.c **** 	while (!(UDCON & (1 << RMWKUP)));
+  52               		.loc 1 49 0 discriminator 1
+  53 0024 8091 E000 		lds r24,224
+  54 0028 81FF      		sbrs r24,1
+  55 002a 00C0      		rjmp .L3
+  56               	/* epilogue start */
+  50:../LUFA/Drivers/USB/LowLevel/Device.c **** }
+  57               		.loc 1 50 0
+  58 002c 0895      		ret
+  59               		.cfi_endproc
+  60               	.LFE64:
+  62               		.text
+  63               	.Letext0:
+  64               		.file 3 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 Device.c
+     /tmp/ccwGGHwv.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccwGGHwv.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccwGGHwv.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccwGGHwv.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccwGGHwv.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccwGGHwv.s:13     .text.USB_Device_SendRemoteWakeup:0000000000000000 USB_Device_SendRemoteWakeup
+
+NO UNDEFINED SYMBOLS
