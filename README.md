@@ -60,7 +60,7 @@ This is totally overkill, but the `.brd` file can be found the in `hardware` dir
 ![Top](media/pcb/top.png)
 ![Bottom](media/pcb/bottom.png)
 
-Note that the footprint of `PCB1` is mirrored by accident in rev 1.
+Note that the footprint of `PCB1` is mirrored, and `MISO2` and `MOSI2` should be connected in rev 1 of the board. These problems are corrected in rev 2.
 
 ### Bill of materials
 
