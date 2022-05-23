@@ -196,7 +196,7 @@ The file `config.h` is used to configure the device.
 
 ### USB
 
-USB protocol spoken. After changing to USB-MIDI, connect MOSI2 to GND and power cycle the Arduino board
+USB protocol spoken. After changing to USB-MIDI, connect MISO2 to GND and power cycle the Arduino board
 
 | SRC | Description |
 |-----|-------------|
