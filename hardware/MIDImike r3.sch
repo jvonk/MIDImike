@@ -491,30 +491,30 @@ Includes mounting holes, and holes for ICSP header
 <rectangle x1="2.2352" y1="-0.3048" x2="2.8448" y2="0.3048" layer="51"/>
 </package>
 <package name="SW_RDS-16S-1045-SMT-TR">
-<circle x="-8.735" y="2.54" radius="0.1" width="0.2" layer="21"/>
-<circle x="-8.735" y="2.54" radius="0.1" width="0.2" layer="51"/>
-<wire x1="-5" y1="5" x2="5" y2="5" width="0.127" layer="51"/>
-<wire x1="-5" y1="-5" x2="5" y2="-5" width="0.127" layer="51"/>
-<wire x1="-5" y1="5" x2="-5" y2="-5" width="0.127" layer="51"/>
-<wire x1="5" y1="5" x2="5" y2="-5" width="0.127" layer="51"/>
-<wire x1="-7.95" y1="5.25" x2="7.95" y2="5.25" width="0.05" layer="39"/>
-<wire x1="-7.95" y1="-5.25" x2="7.95" y2="-5.25" width="0.05" layer="39"/>
-<wire x1="-7.95" y1="5.25" x2="-7.95" y2="-5.25" width="0.05" layer="39"/>
-<wire x1="7.95" y1="5.25" x2="7.95" y2="-5.25" width="0.05" layer="39"/>
-<text x="-7.5" y="-5.5" size="1.27" layer="27" align="top-left">&gt;VALUE</text>
-<text x="-7.41" y="5.327" size="1.27" layer="25">&gt;NAME</text>
-<wire x1="-5" y1="5" x2="5" y2="5" width="0.127" layer="21"/>
-<wire x1="-5" y1="-5" x2="5" y2="-5" width="0.127" layer="21"/>
-<wire x1="-5" y1="5" x2="-5" y2="3.36" width="0.127" layer="21"/>
-<wire x1="-5" y1="-3.36" x2="-5" y2="-5" width="0.127" layer="21"/>
-<wire x1="5" y1="5" x2="5" y2="3.36" width="0.127" layer="21"/>
-<wire x1="5" y1="-3.36" x2="5" y2="-5" width="0.127" layer="21"/>
-<smd name="1" x="-6.35" y="2.54" dx="2.7" dy="1" layer="1"/>
-<smd name="C_1" x="-6.35" y="0" dx="2.7" dy="1" layer="1"/>
-<smd name="4" x="-6.35" y="-2.54" dx="2.7" dy="1" layer="1"/>
-<smd name="2" x="6.35" y="-2.54" dx="2.7" dy="1" layer="1"/>
-<smd name="C_2" x="6.35" y="0" dx="2.7" dy="1" layer="1"/>
-<smd name="8" x="6.35" y="2.54" dx="2.7" dy="1" layer="1"/>
+<circle x="-6.195" y="3.81" radius="0.1" width="0.2" layer="21"/>
+<circle x="-6.195" y="3.81" radius="0.1" width="0.2" layer="51"/>
+<wire x1="-3.73" y1="5" x2="3.73" y2="5" width="0.127" layer="51"/>
+<wire x1="-3.73" y1="-5" x2="3.73" y2="-5" width="0.127" layer="51"/>
+<wire x1="-3.73" y1="5" x2="-3.73" y2="-5" width="0.127" layer="51"/>
+<wire x1="3.73" y1="5" x2="3.73" y2="-5" width="0.127" layer="51"/>
+<wire x1="-6.68" y1="5.25" x2="6.68" y2="5.25" width="0.05" layer="39"/>
+<wire x1="-6.68" y1="-5.25" x2="6.68" y2="-5.25" width="0.05" layer="39"/>
+<wire x1="-6.68" y1="5.25" x2="-6.68" y2="-5.25" width="0.05" layer="39"/>
+<wire x1="6.68" y1="5.25" x2="6.68" y2="-5.25" width="0.05" layer="39"/>
+<text x="-6.23" y="-5.5" size="1.27" layer="27" align="top-left">&gt;VALUE</text>
+<text x="-6.14" y="5.327" size="1.27" layer="25">&gt;NAME</text>
+<wire x1="-3.73" y1="5" x2="3.73" y2="5" width="0.127" layer="21"/>
+<wire x1="-3.73" y1="-5" x2="3.73" y2="-5" width="0.127" layer="21"/>
+<wire x1="-3.73" y1="5" x2="-3.73" y2="3.36" width="0.127" layer="21"/>
+<wire x1="-3.73" y1="-3.36" x2="-3.73" y2="-5" width="0.127" layer="21"/>
+<wire x1="3.73" y1="5" x2="3.73" y2="3.36" width="0.127" layer="21"/>
+<wire x1="3.73" y1="-3.36" x2="3.73" y2="-5" width="0.127" layer="21"/>
+<smd name="1" x="-5.08" y="2.54" dx="2.7" dy="1" layer="1"/>
+<smd name="C_1" x="-5.08" y="0" dx="2.7" dy="1" layer="1"/>
+<smd name="4" x="-5.08" y="-2.54" dx="2.7" dy="1" layer="1"/>
+<smd name="2" x="5.08" y="-2.54" dx="2.7" dy="1" layer="1"/>
+<smd name="C_2" x="5.08" y="0" dx="2.7" dy="1" layer="1"/>
+<smd name="8" x="5.08" y="2.54" dx="2.7" dy="1" layer="1"/>
 </package>
 </packages>
 <packages3d>
