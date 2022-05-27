@@ -64,14 +64,18 @@ namespace {
     //  Arduino 5V -----------------wire to--- VCC *and* LITE on TFT/SD breakout
     //  Arduino GND ----------------wire to--- GND on TFT/SD breakout
     typedef enum digialIoPins_t {
-        SPI_RST = 9,          // ---wire-to--- RESET on TFT/SD breakout    (Reset)
-        SPI_DC = 8,           // ---wire-to--- D/C on TFT/SD breakout      (SPI Data/Command)
+        SHIFT_BCD1 = 2,       // ---wire-to--- SW2 BCD value 1 to GND
+        SHIFT_BCD2 = 3,       // ---wire-to--- SW2 BCD value 2 to GND
+        SHIFT_BCD4 = 5,       // ---wire-to--- SW2 BCD value 4 to GND
+        SHIFT_BCD8 = 6,       // ---wire-to--- SW2 BCD value 8 to GND
+        REPLAY_BUTTON = 7,    // ---wire-to--- Pushbutton to GND
         SPI_SD_CS = 4,        // ---wire-to--- CARD_CS on TFT/SD breakout  (SPI SD Card Chip Select)
+        SPI_DC = 8,           // ---wire-to--- D/C on TFT/SD breakout      (SPI Data/Command)
+        SPI_RST = 9,          // ---wire-to--- RESET on TFT/SD breakout    (Reset)
         SPI_TFT_CS = 10,      // ---wire-to--- TFT_CS on TFT/SD breakout   (SPI TFT Chip Select)
         SPI_MOSI = 11,        // ---wire-to--- MOSI on TFT/SD breakout     (SPI Master out, slave in)
-        SPI_CLK = 13,         // ---wire-to--- SCK  TFT/SD on breakout     (SPI Clock)
         SPI_MISO = 12,        // ---wire-to--- MISO TFT/SD on breakout     (SPI Master in, slave out)
-        BUTTON_IN = 5         // ---wire-to--- Pushbutton to Vcc, and with 1 MOhm to GND
+        SPI_CLK = 13          // ---wire-to--- SCK  TFT/SD on breakout     (SPI Clock)
     } digialIoPins_t;
 
     // Arduino Analog input connecting to Microphone Amp
@@ -136,6 +140,11 @@ setup()
         }
     }
 
+    pinMode(SHIFT_BCD1, INPUT_PULLUP);  // 
+    pinMode(SHIFT_BCD2, INPUT_PULLUP);
+    pinMode(SHIFT_BCD4, INPUT_PULLUP);
+    pinMode(SHIFT_BCD8, INPUT_PULLUP);
+
     switch (DST) {
         case DST_STAFF:
             staff_init(SPI_TFT_CS, SPI_DC, SPI_RST);
@@ -144,7 +153,7 @@ setup()
             _.segment = new Segment();
             _.segmentBuf = new SegmentBuf();
             pianoroll_init(SPI_TFT_CS, SPI_DC, SPI_RST);
-            pinMode(BUTTON_IN, INPUT_PULLUP);
+            pinMode(REPLAY_BUTTON, INPUT_PULLUP);
             break;
         case DST_TEXT:
             if (SRC == SRC_FILE) {
@@ -172,6 +181,10 @@ setup()
 void 
 loop()
 {
+    uint8_t const shift = 1 * digitalRead(SHIFT_BCD1) + 2 * digitalRead(SHIFT_BCD2) +
+                          4 * digitalRead(SHIFT_BCD4) + 8 * digitalRead(SHIFT_BCD8);
+    (void)shift;  // 2BD use this!
+ 
     switch(SRC) {
 
         case SRC_MICR: {
@@ -204,7 +217,7 @@ loop()
                     _.segment->put(millis(), pitch_measured.get_segment(), amplitude, _.segmentBuf);
                     pianoroll_draw(_.segment->get_last_offset(), _.segmentBuf);
 
-                    if ((USB == USB_MIDI) && digitalRead(BUTTON_IN) == 0) {
+                    if ((USB == USB_MIDI) && digitalRead(REPLAY_BUTTON) == 0) {
                         midiserial_send_notes(_.segmentBuf);
                         pianoroll_clear();
                     }
