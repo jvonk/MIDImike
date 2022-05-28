@@ -66,11 +66,12 @@ namespace {
     typedef enum digialIoPins_t {
         SHIFT_BCD1 = 2,       // ---wire-to--- SW2 BCD value 1 to GND
         SHIFT_BCD2 = 3,       // ---wire-to--- SW2 BCD value 2 to GND
+        SPI_SD_CS = 4,        // ---wire-to--- CARD_CS on TFT/SD breakout  (SPI SD Card Chip Select)
         SHIFT_BCD4 = 5,       // ---wire-to--- SW2 BCD value 4 to GND
         SHIFT_BCD8 = 6,       // ---wire-to--- SW2 BCD value 8 to GND
-        REPLAY_BUTTON = 7,    // ---wire-to--- Pushbutton to GND
-        SPI_SD_CS = 4,        // ---wire-to--- CARD_CS on TFT/SD breakout  (SPI SD Card Chip Select)
-        SPI_DC = 8,           // ---wire-to--- D/C on TFT/SD breakout      (SPI Data/Command)
+        //REPLAY_BUTTON = 7,  // ---wire-to--- Pushbutton to GND
+        CLIP_LED = 7,         // ---wire-to--- LED and 330 Ohm to GND
+        SPI_TFT_DC = 8,       // ---wire-to--- TFT_DC on TFT/SD breakout   (SPI TFT Data/!Command)
         SPI_RST = 9,          // ---wire-to--- RESET on TFT/SD breakout    (Reset)
         SPI_TFT_CS = 10,      // ---wire-to--- TFT_CS on TFT/SD breakout   (SPI TFT Chip Select)
         SPI_MOSI = 11,        // ---wire-to--- MOSI on TFT/SD breakout     (SPI Master out, slave in)
@@ -144,16 +145,17 @@ setup()
     pinMode(SHIFT_BCD2, INPUT_PULLUP);
     pinMode(SHIFT_BCD4, INPUT_PULLUP);
     pinMode(SHIFT_BCD8, INPUT_PULLUP);
+    pinMode(CLIP_LED, OUTPUT);
 
     switch (DST) {
         case DST_STAFF:
-            staff_init(SPI_TFT_CS, SPI_DC, SPI_RST);
+            staff_init(SPI_TFT_CS, SPI_TFT_DC, SPI_RST);
             break;
         case DST_PIANOROLL:
             _.segment = new Segment();
             _.segmentBuf = new SegmentBuf();
-            pianoroll_init(SPI_TFT_CS, SPI_DC, SPI_RST);
-            pinMode(REPLAY_BUTTON, INPUT_PULLUP);
+            pianoroll_init(SPI_TFT_CS, SPI_TFT_DC, SPI_RST);
+            //pinMode(REPLAY_BUTTON, INPUT_PULLUP);
             break;
         case DST_TEXT:
             if (SRC == SRC_FILE) {
@@ -192,7 +194,9 @@ loop()
 
             // get samples from microphone, samples will be dynamically allocated on first invocation
             amplitude_t amplitude;
-            samples_t samples = microphone_get_samples(&amplitude);
+            bool clipping;
+            samples_t samples = microphone_get_samples(&amplitude, &clipping);
+            digitalWrite(CLIP_LED, clipping);
 
             // find frequency from samples
             float freq = frequency_calculate(samples);
@@ -216,11 +220,12 @@ loop()
                 case DST_PIANOROLL:
                     _.segment->put(millis(), pitch_measured.get_segment(), amplitude, _.segmentBuf);
                     pianoroll_draw(_.segment->get_last_offset(), _.segmentBuf);
-
+#if 0
                     if ((USB == USB_MIDI) && digitalRead(REPLAY_BUTTON) == 0) {
                         midiserial_send_notes(_.segmentBuf);
                         pianoroll_clear();
                     }
+#endif
                     break;
                 case DST_TEXT:
                     Pitch pitch_in(NOTENR_C, 0);
