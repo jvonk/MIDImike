@@ -202,12 +202,12 @@ pianoroll_clear(void)
 }
 
 void
-pianoroll_init(uint_least8_t tftCS_pin,  // GPIO# for SPI TFT Chip Select
-			   uint_least8_t dc_pin,     // GPIO# SPI Data/Command
-			   uint_least8_t reset_pin)  // GPIO# SPI Reset
+pianoroll_init(uint_least8_t tft_cs_pin,  // GPIO# for SPI TFT Chip Select
+			   uint_least8_t tft_dc_pin,  // GPIO# SPI Data/Command
+			   uint_least8_t reset_pin)   // GPIO# SPI Reset
 {
-	pinMode(tftCS_pin, OUTPUT);
-	_.tft = new Adafruit_ST7735(tftCS_pin, dc_pin, reset_pin);  // instantiate TFT driver
+	pinMode(tft_cs_pin, OUTPUT);
+	_.tft = new Adafruit_ST7735(tft_cs_pin, tft_dc_pin, reset_pin);  // instantiate TFT driver
 	_.tft->initR(INITR_BLACKTAB);  // initialize TFT (ST7735S chip, black tab)
 	_.tft->setRotation(3);  // make (0,0) corresponds to top-right
 	_resize(_.tft->width(), _.tft->height());

@@ -287,12 +287,12 @@ staff_draw_note(Pitch & pitch)  // note measured
      ************/
 
 void
-staff_init(uint_least8_t tftCS_pin,   // GPIO# for SPI TFT Chip Select
-            uint_least8_t dc_pin,     // GPIO# for SPI Data/Command
-            uint_least8_t reset_pin)  // GPIO# for SPI Reset
+staff_init(uint_least8_t tft_cs_pin,  // GPIO# for SPI TFT Chip Select
+           uint_least8_t tft_dc_pin,  // GPIO# for SPI Data/Command
+           uint_least8_t reset_pin)   // GPIO# for SPI Reset
 {
-    pinMode(tftCS_pin, OUTPUT);
-    _.tft = new Adafruit_ST7735(tftCS_pin, dc_pin, reset_pin);
+    pinMode(tft_cs_pin, OUTPUT);
+    _.tft = new Adafruit_ST7735(tft_cs_pin, tft_dc_pin, reset_pin);
     _.tft->initR(INITR_BLACKTAB);  // initialize ST7735S chip, black tab
     _.tft->fillScreen(COLOR_BG);
     _.tft->setRotation(3);         // (0,0) corresponds to top-right

@@ -110,13 +110,14 @@ microphone_start(void)
      ************************/
 
 samples_t                                                 // returns pointer to array of data samples, NULL on failure
-microphone_get_samples(amplitude_t * const amplitudePtr)
+microphone_get_samples(amplitude_t * const amplitudePtr, bool * const clipPtr)
 {
     while (ADCSRA & ADCSRA_IRQ_ENABLE) {
         // spin wait until all samples are available
     }
 
     bool clipping = (_.range.max == SCHAR_MIN) || (_.range.max == SCHAR_MAX);
+    *clipPtr = clipping;
     amplitude_t amplitude = (int16_t)_.range.max - _.range.min; // top-top [0..255]
 
     *amplitudePtr = amplitude/2; // range [0..127]

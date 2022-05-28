@@ -4,5 +4,5 @@
 #include <stdint.h>
 #include "../../sample_t.h"
 
-void staff_init(uint_least8_t tftCS_pin, uint_least8_t dc_pin, uint_least8_t reset_pin);
+void staff_init(uint_least8_t tft_cs_pin, uint_least8_t tft_dc_pin, uint_least8_t reset_pin);
 void staff_draw_note(Pitch & pitch);

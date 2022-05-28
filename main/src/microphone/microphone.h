@@ -6,4 +6,4 @@
 
 void microphone_begin(uint8_t const port);  // 0 for A0
 void microphone_start(void);
-samples_t microphone_get_samples(amplitude_t * const amplitudePtr);
+samples_t microphone_get_samples(amplitude_t * const amplitudePtr, bool * const clipPtr);
