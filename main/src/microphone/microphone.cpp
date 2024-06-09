@@ -116,7 +116,7 @@ microphone_get_samples(amplitude_t * const amplitudePtr, bool * const clipPtr)
         // spin wait until all samples are available
     }
 
-    bool clipping = (_.range.max == SCHAR_MIN) || (_.range.max == SCHAR_MAX);
+    bool clipping = (_.range.min == SCHAR_MIN) || (_.range.max == SCHAR_MAX);
     *clipPtr = clipping;
     amplitude_t amplitude = (int16_t)_.range.max - _.range.min; // top-top [0..255]
 
